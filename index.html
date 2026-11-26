@@ -64,7 +64,8 @@ body.clicking #cur-ring{width:24px;height:24px;}
 .promo-strip.on{display:block;}
 .promo-strip .promo-cd{display:inline-block;margin-left:14px;color:var(--promo-accent,#fff);font-weight:500;letter-spacing:.08em;white-space:nowrap;}
 body.vetrina-on .topbar{background:var(--promo-bg,var(--rose-d));}
-.v-hub{display:none;padding:48px 60px 8px;background:var(--cream);}
+.col-bf{position:absolute;top:16px;left:16px;z-index:3;background:#CC0C39;color:#fff;font:500 10px/1.2 var(--sans);letter-spacing:.12em;text-transform:uppercase;padding:7px 10px;pointer-events:none;}
+.v-hub{display:none;padding:48px 60px 48px;background:var(--cream);}
 .v-hub.on{display:block;}
 .v-hub-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;}
 .v-tile{position:relative;text-align:left;border:0;cursor:pointer;background:#fff;color:var(--text);padding:22px 22px 20px;min-height:260px;display:flex;flex-direction:column;gap:8px;overflow:hidden;font-family:var(--sans);box-shadow:0 1px 0 rgba(0,0,0,.04);transition:transform .25s;}
@@ -88,7 +89,7 @@ body.vetrina-on .topbar{background:var(--promo-bg,var(--rose-d));}
 .v-cat-l{font:400 16px/1.2 var(--sans);}
 .v-cat-o{font:500 11px/1.2 var(--sans);color:#CC0C39;}
 .v-cat-o0{color:#6E5560;font-weight:300;}
-.nav-link.nav-promo,.nav-link.nav-promo:hover{color:var(--promo-accent,#fff)!important;background:var(--promo-bg,var(--rose-d));padding:7px 12px 6px;font-weight:500;}
+body .nav-link.nav-promo,body .nav-link.nav-promo:hover,body.solid-nav .nav-link.nav-promo{color:var(--promo-accent,#fff)!important;background:var(--promo-bg,var(--rose-d));padding:7px 12px 6px;font-weight:500;}
 .v-tile-main .v-tile-txt-l{color:rgba(255,255,255,.85);}
 body.vetrina-on .p-badge.pb-s{background:#CC0C39;font-size:9px;padding:5px 9px;}
 @media(max-width:700px){.v-hub{padding:32px 20px 0;}.v-hub-tiles{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px;padding:0 0 6px;}.v-tile{flex:0 0 78%;scroll-snap-align:start;min-height:240px;}.v-hub-cats{grid-template-columns:repeat(2,minmax(0,1fr));}}
@@ -2095,8 +2096,6 @@ body.solid-nav .ham span{background:var(--text)!important;}
   <!-- HUB FESTIVITA' (stile "Settimana del Black Friday": tessere + categorie) -->
   <section class="v-hub" id="vHub" aria-label="Promozione in corso">
     <div class="v-hub-tiles" id="vHubTiles"></div>
-    <h2 class="v-hub-h" id="vHubCatTitle"></h2>
-    <div class="v-hub-cats" id="vHubCats"></div>
   </section>
 
   <!-- VETRINA FESTIVITA' (gestita da Shopify, collezione "Vetrina") -->
@@ -3078,7 +3077,7 @@ function _vSetTopOffset(){
 
 // Quanto si vede la promozione sul sito: 'minimo' | 'leggero' | 'medio' | 'completo'
 const V_LIVELLI = ['minimo','leggero','medio','completo'];
-const V_LIVELLO_DEFAULT = 'completo';
+const V_LIVELLO_DEFAULT = 'completo'; // scelto: D · Completo
 function goVetrina(){
   if (window.VETRINA && window.VETRINA.lv === 0) { _vOpenCatOffers('borse', 1); return; }
   const go = () => { const sec = document.getElementById('vetrinaSec');
@@ -3273,10 +3272,15 @@ async function _vHub(v, prods, cfg){
     '<button class="v-tile" onclick="scrollToLive()"><span class="v-tile-k">In diretta</span><strong>Le offerte anche in live</strong><span class="v-tile-txt">eBay il giovedì e il sabato dalle 19:30, TikTok dalle 22:00.</span><span class="v-tile-go">Le prossime live →</span></button>'
   ].filter(Boolean).join('');
   document.getElementById('vHubTiles').innerHTML = tiles;
-  document.getElementById('vHubCatTitle').textContent = nome + ' per categoria';
-  document.getElementById('vHubCats').innerHTML = cats.map(x =>
-    '<button class="v-cat" onclick="_vOpenCatOffers(\'' + x.c + '\',' + x.offers + ')"><span class="v-cat-img"><img src="' + shopImg(x.pic, 400) + '" alt="" loading="lazy"></span><span class="v-cat-l">' + x.label + '</span>' +
-    (x.offers ? '<span class="v-cat-o">' + x.offers + (x.offers === 1 ? ' offerta' : ' offerte') + (x.maxPct ? ' · fino al −' + x.maxPct + '%' : '') + '</span>' : '<span class="v-cat-o v-cat-o0">Pezzi unici</span>') + '</button>').join('');
+  // Griglia "Piccole opere d'arte": etichetta con le offerte su ogni categoria, il clic apre le offerte
+  cats.forEach(x => {
+    const card = document.querySelector('.cols-grid .col-card[data-cat="' + x.c + '"]'); if (!card) return;
+    card.querySelector('.col-bf')?.remove();
+    if (!x.offers) return;
+    if (card.dataset.vOrig === undefined) card.dataset.vOrig = card.getAttribute('onclick') || '';
+    card.setAttribute('onclick', "_vOpenCatOffers('" + x.c + "'," + x.offers + ");return false");
+    card.insertAdjacentHTML('afterbegin', '<span class="col-bf">' + esc(nome) + ' · ' + x.offers + (x.offers === 1 ? ' offerta' : ' offerte') + (x.maxPct ? ', fino al −' + x.maxPct + '%' : '') + '</span>');
+  });
   hub.classList.add('on');
   const t = document.getElementById('promoCd'); const hc = document.getElementById('vHubCd'); if (t && hc) hc.textContent = t.textContent;
 }
@@ -3290,6 +3294,8 @@ function _vNav(){
 }
 function _vHubOff(){
   document.getElementById('vHub')?.classList.remove('on');
+  document.querySelectorAll('.cols-grid .col-bf').forEach(e => e.remove());
+  document.querySelectorAll('.cols-grid .col-card[data-v-orig]').forEach(c => { c.setAttribute('onclick', c.dataset.vOrig); delete c.dataset.vOrig; });
   document.querySelectorAll('.nav-promo-li,.mob-promo').forEach(e => e.remove());
 }
 
