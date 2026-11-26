@@ -1899,7 +1899,7 @@ body.solid-nav .ham span{background:var(--text)!important;}
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2E7D4F" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="1.5"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>
         <span id="pnWho">Accesso sicuro</span>
         <a href="/" target="_blank" rel="noopener">Vedi il sito</a>
-        <a href="/cdn-cgi/access/logout" id="pnOut" hidden>Esci</a>
+        <a href="/pannello/esci" id="pnOut" hidden>Esci</a>
       </div>
     </div>
   </header>
@@ -4148,16 +4148,17 @@ function _pnPrezzo(handle){
   });
 }
 
-// ── PANNELLO: chi è collegato (Cloudflare Access) ──
+// ── PANNELLO: chi è collegato (utente e password, vedi functions/_middleware.js) ──
 async function _pnIdentity(){
   if (!IS_PANNELLO || window._pnIdDone) return; window._pnIdDone = true;
   try {
-    const r = await fetch('/cdn-cgi/access/get-identity', { credentials: 'same-origin' });
+    const r = await fetch('/pannello/api/io', { credentials: 'same-origin', cache: 'no-store' });
+    if (r.status === 401) { location.replace('/pannello/accedi'); return; }
     if (!r.ok) return;
-    const d = await r.json(); if (!d || !d.email) return;
-    const nm = (d.name || d.email.split('@')[0].split(/[._-]/)[0] || '').trim();
+    const d = await r.json(); if (!d || !d.utente) return;
+    const nm = String(d.utente).split(/[._-]/)[0].trim();
     window._pnName = nm ? nm.charAt(0).toUpperCase() + nm.slice(1).toLowerCase() : '';
-    const w = document.getElementById('pnWho'); if (w) w.textContent = 'Accesso sicuro · ' + d.email;
+    const w = document.getElementById('pnWho'); if (w) w.textContent = 'Accesso sicuro · ' + window._pnName;
     const o = document.getElementById('pnOut'); if (o) o.hidden = false;
     const h = document.querySelector('.pn-hello h1[data-greet]');
     if (h && window._pnName && !h.querySelector('em')) h.insertAdjacentHTML('beforeend', ', <em>' + window._pnName.replace(/[&<>"]/g,'') + '</em>');
