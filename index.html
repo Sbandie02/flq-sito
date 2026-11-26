@@ -92,10 +92,10 @@ body.vetrina-on .topbar{background:var(--promo-bg,var(--rose-d));}
 .v-tile-main .v-tile-txt-l{color:rgba(255,255,255,.85);}
 body.vetrina-on .p-badge.pb-s{background:#CC0C39;font-size:9px;padding:5px 9px;}
 @media(max-width:700px){.v-hub{padding:32px 20px 0;}.v-hub-tiles{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px;padding:0 0 6px;}.v-tile{flex:0 0 78%;scroll-snap-align:start;min-height:240px;}.v-hub-cats{grid-template-columns:repeat(2,minmax(0,1fr));}}
-body.vetrina-on .btn-fill,body.vetrina-on .btn-buy{background:var(--promo-bg,var(--rose));border-color:var(--promo-bg,var(--rose));}
-body.vetrina-on .btn-fill:hover,body.vetrina-on .btn-buy:hover{filter:brightness(1.18);}
-body.vetrina-on .pb-s{background:var(--promo-bg,var(--rose-d));}
-body.vetrina-on .col-page-bg{background:linear-gradient(135deg,#1C1218 10%,var(--promo-bg,#3A1828));}
+body.v-lv3 .btn-fill,body.v-lv3 .btn-buy{background:var(--promo-bg,var(--rose));border-color:var(--promo-bg,var(--rose));}
+body.v-lv3 .btn-fill:hover,body.v-lv3 .btn-buy:hover{filter:brightness(1.18);}
+
+body.v-lv3 .col-page-bg{background:linear-gradient(135deg,#1C1218 10%,var(--promo-bg,#3A1828));}
 .p-badge.p-vtag{background:var(--promo-bg,var(--rose-d));color:var(--promo-accent,#fff);}
 .v-col-banner{display:none;align-items:center;justify-content:center;flex-wrap:wrap;gap:6px 18px;padding:14px 20px;background:var(--promo-bg,var(--rose-d));color:#fff;font:400 11px/1.4 var(--sans);letter-spacing:.14em;text-transform:uppercase;cursor:pointer;text-align:center;}
 .v-col-banner.on{display:flex;}
@@ -3076,7 +3076,11 @@ function _vSetTopOffset(){
   _syncNavTop();
 }
 
+// Quanto si vede la promozione sul sito: 'minimo' | 'leggero' | 'medio' | 'completo'
+const V_LIVELLI = ['minimo','leggero','medio','completo'];
+const V_LIVELLO_DEFAULT = 'completo';
 function goVetrina(){
+  if (window.VETRINA && window.VETRINA.lv === 0) { _vOpenCatOffers('borse', 1); return; }
   const go = () => { const sec = document.getElementById('vetrinaSec');
     if (sec && sec.classList.contains('on')) window.scrollTo({ top: sec.getBoundingClientRect().top + window.scrollY - 140, behavior: 'smooth' }); };
   if (currentPage !== 'home') { nav('home'); setTimeout(go, 1100); } else go();
@@ -3093,7 +3097,7 @@ function _vTagCards(){
 }
 function _vPdBanner(){
   const el = document.getElementById('vPdBanner'); if (!el) return;
-  const on = window.VETRINA && window.VETRINA.active && window._vSet && typeof currentProductData !== 'undefined' && currentProductData && window._vSet.has(_handleOf(currentProductData));
+  const on = window.VETRINA && window.VETRINA.active && window.VETRINA.lv >= 1 && window._vSet && typeof currentProductData !== 'undefined' && currentProductData && window._vSet.has(_handleOf(currentProductData));
   el.classList.toggle('on', !!on);
   if (on) document.getElementById('vPdName').textContent = 'Fa parte della selezione ' + window.VETRINA.nome;
 }
@@ -3105,7 +3109,7 @@ function _vDeactivate(){
   document.getElementById('vColBanner')?.classList.remove('on');
   document.getElementById('vPdBanner')?.classList.remove('on');
   clearInterval(window._vTimer);
-  document.body.classList.remove('vetrina-on','vetrina-photo');
+  document.body.classList.remove('vetrina-on','vetrina-photo','v-lv0','v-lv1','v-lv2','v-lv3');
   document.getElementById('promoStrip')?.classList.remove('on');
   document.getElementById('vetrinaSec')?.classList.remove('on');
   document.querySelector('.hero-vetrina-img')?.remove();
@@ -3252,11 +3256,6 @@ async function _vHub(v, prods, cfg){
   const hub = document.getElementById('vHub'); if (!hub) return;
   const nome = window.VETRINA.nome || 'Promozione';
   const esc = t => String(t || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  document.querySelectorAll('.nav-promo-li,.mob-promo').forEach(e => e.remove());
-  const ul = document.querySelector('#nav .nav-links');
-  if (ul) ul.insertAdjacentHTML('afterbegin', '<li class="nav-promo-li"><a class="nav-link nav-promo" href="#" onclick="goVetrina();return false">' + esc(nome) + '</a></li>');
-  const mh = document.querySelector('#mob .mob-link');
-  if (mh) mh.insertAdjacentHTML('afterend', '<a class="mob-link mob-promo" href="#" onclick="goVetrina();closeMob();return false">' + esc(nome) + '</a>');
   await Promise.all(_V_CATS.map(([c]) => fetchProducts(c, 250).catch(() => [])));
   if (!window.VETRINA.active) return;
   const cats = _V_CATS.map(([c, label]) => {
@@ -3280,6 +3279,14 @@ async function _vHub(v, prods, cfg){
     (x.offers ? '<span class="v-cat-o">' + x.offers + (x.offers === 1 ? ' offerta' : ' offerte') + (x.maxPct ? ' · fino al −' + x.maxPct + '%' : '') + '</span>' : '<span class="v-cat-o v-cat-o0">Pezzi unici</span>') + '</button>').join('');
   hub.classList.add('on');
   const t = document.getElementById('promoCd'); const hc = document.getElementById('vHubCd'); if (t && hc) hc.textContent = t.textContent;
+}
+function _vNav(){
+  const nome = String(window.VETRINA.nome || 'Promozione').replace(/[&<>"']/g, '');
+  document.querySelectorAll('.nav-promo-li,.mob-promo').forEach(e => e.remove());
+  const ul = document.querySelector('#nav .nav-links');
+  if (ul) ul.insertAdjacentHTML('afterbegin', '<li class="nav-promo-li"><a class="nav-link nav-promo" href="#" onclick="goVetrina();return false">' + nome + '</a></li>');
+  const mh = document.querySelector('#mob .mob-link');
+  if (mh) mh.insertAdjacentHTML('afterend', '<a class="mob-link mob-promo" href="#" onclick="goVetrina();closeMob();return false">' + nome + '</a>');
 }
 function _vHubOff(){
   document.getElementById('vHub')?.classList.remove('on');
@@ -3343,6 +3350,9 @@ function _vApply(v, prods, preview){
   window.VETRINA = Object.assign({ active: true, handle: v.handle }, cfg);
   CACHE['vetrina'] = prods;
   document.body.classList.add('vetrina-on');
+  const _lv = V_LIVELLI.indexOf(cfg.livello || window.V_LIVELLO || V_LIVELLO_DEFAULT);
+  const lv = _lv < 0 ? 3 : _lv; window.VETRINA.lv = lv;
+  document.body.classList.remove('v-lv0','v-lv1','v-lv2','v-lv3'); document.body.classList.add('v-lv' + lv);
 
   // Colore di stagione
   let colors = null;
@@ -3398,7 +3408,7 @@ function _vApply(v, prods, preview){
 
   // Prodotti in evidenza
   const sec = document.getElementById('vetrinaSec');
-  if (sec && prods.length) {
+  if (sec && prods.length && lv >= 1) {
     const label = document.getElementById('vetrinaLabel');
     const isGeneric = /^vetrina$/i.test((v.title||'').trim());
     const niceTitle = (v.title||'').replace(/^vetrina\s*[-–:]?\s*/i, '').trim();
@@ -3418,9 +3428,10 @@ function _vApply(v, prods, preview){
   window._vSet = new Set(prods.map(_handleOf).filter(Boolean));
   _vTagCards();
   const cb = document.getElementById('vColBanner');
-  if (cb && cfg.fascia) { document.getElementById('vColText').textContent = cfg.fascia; cb.classList.add('on'); }
+  if (cb && cfg.fascia && lv >= 2) { document.getElementById('vColText').textContent = cfg.fascia; cb.classList.add('on'); }
   _vPdBanner();
-  if (!cfg.noHub) _vHub(v, prods, cfg).catch(() => {});
+  if (!cfg.noHub && lv >= 1) _vNav();
+  if (!cfg.noHub && lv >= 2) _vHub(v, prods, cfg).catch(() => {});
 
   // Conto alla rovescia + spegnimento automatico a fine promo
   clearInterval(window._vTimer);
