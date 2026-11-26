@@ -235,6 +235,61 @@ body.pannello-mode .btn-outline{border-color:#9E4A65;color:var(--rose-d);}
 .vd-f-row .vd-f:last-child{flex:0 0 120px;}
 .vd-steps{margin:0 0 14px;padding-left:20px;font:300 14px/1.8 var(--sans);}
 .vd-linkbtn{background:none;border:0;padding:0;font:inherit;color:var(--rose-d);text-decoration:underline;cursor:pointer;}
+
+/* ── PANNELLO: veste "maison" (scuro, oro, schede bianche) ── */
+body.pannello-mode{background:#F5F0EB;}
+body.pannello-mode .pn-hd{background:#120B0F;border-bottom:1px solid rgba(217,180,74,.25);}
+body.pannello-mode .pn-hd-in{max-width:none;padding:16px 28px;}
+body.pannello-mode .pn-logo{color:#F3D9E2;}
+body.pannello-mode .pn-tag{color:#D9B44A;}
+body.pannello-mode .pn-user{color:rgba(255,255,255,.7);}
+body.pannello-mode .pn-user a{color:#D9B44A;}
+body.pannello-mode .pn-layout{max-width:none;align-items:stretch;}
+body.pannello-mode .pn-side{flex:0 0 264px;background:linear-gradient(180deg,#1C1218 0%,#24151C 100%);padding:28px 16px 40px;min-height:calc(100vh - 66px);position:relative;}
+body.pannello-mode .pn-side::after{content:"";position:absolute;top:0;right:0;bottom:0;width:1px;background:linear-gradient(180deg,rgba(217,180,74,.35),rgba(217,180,74,0));}
+body.pannello-mode .pn-sg{color:rgba(217,180,74,.75);margin-left:12px;}
+body.pannello-mode .pn-si{color:rgba(255,255,255,.82);border-radius:10px;min-height:44px;transition:background .2s,color .2s;}
+body.pannello-mode .pn-si svg{color:#D98FA8;}
+body.pannello-mode .pn-si:hover{background:rgba(255,255,255,.06);color:#fff;}
+body.pannello-mode .pn-si.on{background:linear-gradient(90deg,rgba(217,143,168,.28),rgba(217,143,168,.06));box-shadow:inset 3px 0 0 #D9B44A;color:#fff;font-weight:500;}
+body.pannello-mode .pn-lock{color:rgba(255,255,255,.55);}
+body.pannello-mode .pn-lock svg{color:rgba(217,143,168,.7);}
+body.pannello-mode .pn-lock svg:last-child{color:#D9B44A;opacity:.8;}
+body.pannello-mode .pn-on{background:rgba(46,125,79,.25);color:#9FE0B6;border-radius:999px;padding:4px 8px;}
+body.pannello-mode .pn-layout .vd-wrap{padding:36px 40px 80px;max-width:1180px;}
+body.pannello-mode .pn-hello h1{font:400 44px/1.1 var(--serif);color:#1C1218;}
+body.pannello-mode .pn-hello p{color:#6E5560;}
+body.pannello-mode .pn-hero{position:relative;overflow:hidden;border-radius:18px;padding:34px 36px 30px;margin-bottom:24px;background:radial-gradient(120% 140% at 100% 0%,#7A3048 0%,rgba(122,48,72,0) 55%),linear-gradient(135deg,#1C1218 0%,#2E1822 60%,#3A1828 100%);box-shadow:0 18px 40px rgba(28,18,24,.18);}
+body.pannello-mode .pn-hero::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 30%,rgba(217,180,74,.18),transparent 35%),radial-gradient(circle at 70% 80%,rgba(217,180,74,.10),transparent 30%);pointer-events:none;}
+body.pannello-mode .pn-hero h1{color:#fff;margin:6px 0 10px;}
+body.pannello-mode .pn-hero h1 em{color:#F0B9CB;}
+body.pannello-mode .pn-hero p{color:rgba(255,255,255,.78);margin:0;font-size:16px;}
+body.pannello-mode .pn-hero b{color:#D9B44A;font-weight:500;}
+.pn-hero-k{font:400 11px/1 var(--sans);letter-spacing:.22em;text-transform:uppercase;color:#D9B44A;}
+body.pannello-mode .vd-wrap h2{font:italic 400 28px/1.2 var(--serif);color:#1C1218;margin:40px 0 16px;display:flex;align-items:center;gap:14px;}
+body.pannello-mode .vd-wrap h2::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,rgba(217,180,74,.6),rgba(217,180,74,0));}
+body.pannello-mode .vd-stat,body.pannello-mode .vd-card,body.pannello-mode .pn-quick,body.pannello-mode .pn-table,body.pannello-mode .vd-timeline,body.pannello-mode .pk-card,body.pannello-mode .pk-table,body.pannello-mode .vd-sugg-item{background:#fff;border:1px solid rgba(28,18,24,.06);border-radius:14px;box-shadow:0 1px 2px rgba(28,18,24,.05),0 10px 28px rgba(28,18,24,.06);}
+body.pannello-mode .pn-table{overflow:hidden;}
+body.pannello-mode .vd-stat{position:relative;overflow:hidden;padding:22px 22px 20px;}
+body.pannello-mode .vd-stat::before{content:"";position:absolute;left:0;top:0;right:0;height:3px;background:linear-gradient(90deg,#9E4A65,#D9B44A);}
+body.pannello-mode .pn-stats .vd-stat strong{font:500 34px/1.1 var(--serif);color:#1C1218;}
+body.pannello-mode a.pn-stat:hover,body.pannello-mode .pn-quick:hover{transform:translateY(-2px);box-shadow:0 2px 4px rgba(28,18,24,.06),0 16px 34px rgba(28,18,24,.10);}
+body.pannello-mode a.pn-stat,body.pannello-mode .pn-quick{transition:transform .2s,box-shadow .2s;}
+body.pannello-mode .pn-quick svg{color:#9E4A65;}
+body.pannello-mode .pn-todo-i{border-radius:14px;background:#FFF8EA;border:1px solid #F2DFB4;}
+body.pannello-mode .pn-locked{border-radius:16px;border:1px solid rgba(217,180,74,.45);background:linear-gradient(135deg,#1C1218,#2E1822);color:#fff;box-shadow:0 14px 34px rgba(28,18,24,.16);}
+body.pannello-mode .pn-locked svg{color:#D9B44A;}
+body.pannello-mode .pn-locked strong{color:#fff;}
+body.pannello-mode .pn-locked span{color:rgba(255,255,255,.7);}
+body.pannello-mode .pn-locked em{color:#D9B44A;}
+body.pannello-mode .btn{border-radius:10px;}
+body.pannello-mode .pn-chip{border-radius:999px;}
+body.pannello-mode .pn-chip[aria-pressed="true"]{background:#1C1218;border-color:#1C1218;}
+body.pannello-mode .pn-price-btn{border-radius:8px;}
+body.pannello-mode .vd-badge{border-radius:999px;}
+.vd-modal .vd-m-box{border-radius:18px;}
+.vd-modal .vd-f input,.vd-modal .vd-f select,.vd-modal .vd-m-pin input{border-radius:10px;}
+@media(max-width:900px){body.pannello-mode .pn-side{min-height:0;padding:10px 12px;}body.pannello-mode .pn-side::after{display:none;}body.pannello-mode .pn-si{border:1px solid rgba(255,255,255,.12);}body.pannello-mode .pn-layout .vd-wrap{padding:24px 16px 60px;}body.pannello-mode .pn-hero{padding:24px 20px;}body.pannello-mode .pn-hello h1{font-size:32px;}}
 .pn-act{white-space:nowrap;text-align:right;}
 .pn-price-btn{min-height:36px;padding:0 12px;margin-right:12px;border:1px solid #9E4A65;background:#fff;color:var(--rose-d);font:400 11px/1 var(--sans);letter-spacing:.08em;text-transform:uppercase;cursor:pointer;}
 .pn-price-btn:hover{background:#9E4A65;color:#fff;}
@@ -3982,7 +4037,8 @@ async function renderPanoramica(){
   const S = SHOP_ADMIN, link = (u, t, ic) => '<a class="pn-quick" href="' + S + u + '" target="_blank" rel="noopener">' + _pnIco(ic) + '<span>' + t + '</span></a>';
   const tipi = {};
   dasist.forEach(x => x.avvisi.forEach(a => { const k = a.startsWith('Sconto') ? 'Sconto molto basso' : a; tipi[k] = (tipi[k] || 0) + 1; }));
-  box.innerHTML = '<section class="pn-hello"><h1 data-greet>' + saluto + (window._pnName ? ', <em>' + esc(window._pnName) + '</em>' : '') + '</h1><p>Il punto della situazione del vostro negozio.</p></section>' +
+  const oggi = now.toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' });
+  box.innerHTML = '<section class="pn-hello pn-hero"><span class="pn-hero-k">' + oggi + '</span><h1 data-greet>' + saluto + (window._pnName ? ', <em>' + esc(window._pnName) + '</em>' : '') + '</h1><p>' + (live || bi ? 'Sul sito è online <b>' + promo + '</b>. ' : '') + online.length + ' pezzi in vendita, ' + offerte.length + ' in offerta' + (dasist.length ? ', ' + dasist.length + ' da sistemare.' : '. Tutto in ordine.') + '</p></section>' +
     '<div class="vd-summary pn-stats">' +
       stat('Online adesso', promo, live || bi ? 'promozione sul sito' : 'nessuna promozione', 'vetrine') +
       stat('Pezzi in vendita', online.length, 'su tutto il catalogo', 'catalogo') +
