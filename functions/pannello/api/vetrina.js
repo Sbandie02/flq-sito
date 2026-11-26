@@ -1,4 +1,4 @@
-// Cloudflare Pages Function: POST /api/vetrina
+// Cloudflare Pages Function: POST /pannello/api/vetrina
 // Pubblica o ritira una festività ("Vetrina ...") su Shopify, togliendo o
 // aggiungendo la riga "Stato: bozza" nella descrizione della collezione.
 //

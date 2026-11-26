@@ -2981,9 +2981,13 @@ function _vPickActive(list){
   return act[0] || null;
 }
 
+// Area riservata: dashboard e anteprime funzionano solo su /pannello (protetto da Cloudflare Access)
+const IS_PANNELLO = /^\/pannello\/?$/.test(location.pathname);
+if (IS_PANNELLO) { const mr = document.createElement('meta'); mr.name = 'robots'; mr.content = 'noindex,nofollow'; document.head.appendChild(mr); }
+
 async function loadVetrina(){
   const params = new URLSearchParams(location.search);
-  const previewHandle = params.get('anteprima');
+  const previewHandle = IS_PANNELLO ? params.get('anteprima') : null;
   const list = await _vLoadList();
   if (!list.length) return;
   const now = new Date();
@@ -3264,7 +3268,7 @@ async function _vDoPublish(v, action, okLabel){
   ok.disabled = true; ok.textContent = 'Un attimo…'; msg.className = 'vd-m-msg'; msg.textContent = '';
   let res, data = {};
   try {
-    res = await fetch('/api/vetrina', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ action, id: v.id, pin }) });
+    res = await fetch('/pannello/api/vetrina', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ action, id: v.id, pin }) });
     data = await res.json().catch(() => ({}));
   } catch (_) { data = { error: 'Connessione assente: riprovate.' }; }
   if (res && res.ok && data.ok) {
@@ -4215,7 +4219,9 @@ function routeFromHash(fromHistory, restoreScroll){
   const m = h.match(/^#\/prodotto\/([^\/?#]+)/);
   if (m) { openProductByHandle(decodeURIComponent(m[1]), true, restoreScroll); return; }
   const pm = h.match(/^#\/([a-z-]+)/);
-  const page = (pm && ROUTE_PAGES.includes(pm[1])) ? pm[1] : 'home';
+  let page = (pm && ROUTE_PAGES.includes(pm[1])) ? pm[1] : 'home';
+  if (page === 'vetrine' && !IS_PANNELLO) page = 'home';
+  if (IS_PANNELLO && !pm && !new URLSearchParams(location.search).get('anteprima')) page = 'vetrine';
   if (page === currentPage && !fromHistory) return;
   nav(page, null, true, restoreScroll);
 }
@@ -5025,7 +5031,7 @@ window.addEventListener('DOMContentLoaded', () => {
   loadShopBanner().finally(() => loadVetrina());
 
   // Link diretto: se l'indirizzo contiene una pagina (#/borse, #/prodotto/...), aprila
-  if (/^#\/[a-z]/.test(location.hash || '')) {
+  if (/^#\/[a-z]/.test(location.hash || '') || (IS_PANNELLO && !new URLSearchParams(location.search).get('anteprima'))) {
     setTimeout(() => routeFromHash(true), 250);
   }
 });
