@@ -58,6 +58,21 @@ body.clicking #cur-ring{width:24px;height:24px;}
 @keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 .tb-i{font:300 9px/30px var(--sans);letter-spacing:.2em;color:rgba(255,255,255,.8);padding:0 32px;}
 .tb-s{color:rgba(255,255,255,.3);font-size:10px;line-height:30px;}
+.tb-i.tb-promo{color:#fff;font-weight:500;}
+/* ── KIT FESTIVITA' ── */
+.promo-strip{display:none;position:relative;z-index:499;background:var(--promo-bg,var(--rose-d));color:#fff;text-align:center;padding:9px 16px;font:400 11px/1.4 var(--sans);letter-spacing:.14em;text-transform:uppercase;cursor:pointer;}
+.promo-strip.on{display:block;}
+.promo-strip .promo-cd{display:inline-block;margin-left:14px;color:var(--promo-accent,#fff);font-weight:500;letter-spacing:.08em;white-space:nowrap;}
+body.vetrina-on .topbar{background:var(--promo-bg,var(--rose-d));}
+.hero-vetrina-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;z-index:0;}
+body.vetrina-photo .hero-mosaic{display:none;}
+body.vetrina-photo .hero-mosaic-overlay{background:linear-gradient(180deg,rgba(20,10,15,.62) 0%,rgba(20,10,15,.38) 45%,rgba(20,10,15,.7) 100%)!important;}
+.vetrina-sec{display:none;}
+.vetrina-sec.on{display:block;}
+.vetrina-sec .sec-label{color:var(--promo-bg,var(--rose));}
+.vetrina-cd{font:400 10px/1.4 var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--promo-bg,var(--rose-d));white-space:nowrap;}
+.vetrina-grid{grid-template-columns:repeat(4,1fr);}
+@media(max-width:700px){.promo-strip{font-size:9.5px;letter-spacing:.1em;padding:8px 10px;}.promo-strip .promo-cd{display:block;margin:3px 0 0;}.vetrina-sec .prods-hdr{flex-direction:column;align-items:flex-start;gap:10px;}}
 
 /* ═══════════════════════════════════════════════
    NAV
@@ -1785,7 +1800,7 @@ body.solid-nav .ham span{background:var(--text)!important;}
 
 <!-- TOPBAR -->
 <div class="topbar">
-  <div class="tb-track">
+  <div class="tb-track" id="tbTrack">
     <span class="tb-i">OGNI GIOVEDÌ E SABATO DALLE 22:00 LIVE SU TIKTOK</span><span class="tb-s">|</span>
     <span class="tb-i">ARTICOLI CERTIFICATI ENTRUPY — PRECISIONE 99%+</span><span class="tb-s">|</span>
     <span class="tb-i">SPEDIZIONE EXPRESS 24/48H</span><span class="tb-s">|</span>
@@ -1798,6 +1813,7 @@ body.solid-nav .ham span{background:var(--text)!important;}
     <span class="tb-i">RESO GARANTITO</span><span class="tb-s">|</span>
   </div>
 </div>
+<div class="promo-strip" id="promoStrip" onclick="goVetrina()"><span id="promoText"></span><span class="promo-cd" id="promoCd"></span></div>
 
 <!-- NAV -->
 <nav id="nav">
@@ -1993,6 +2009,15 @@ body.solid-nav .ham span{background:var(--text)!important;}
       <div class="ent-stat"><span class="ent-stat-n">99%</span><span class="ent-stat-t">precisione nella certificazione di autenticità</span></div>
       <a class="btn btn-outline-dark" href="#" onclick="nav('borse')">Scopri i prodotti certificati →</a>
     </div>
+  </section>
+
+  <!-- VETRINA FESTIVITA' (gestita da Shopify, collezione "Vetrina") -->
+  <section class="prods-wrap vetrina-sec" id="vetrinaSec">
+    <div class="prods-hdr rv">
+      <div><span class="sec-label" id="vetrinaLabel">Selezione del momento</span><h2 class="sec-h2" id="vetrinaTitle" style="margin-bottom:0;"></h2></div>
+      <span class="vetrina-cd" id="vetrinaCd"></span>
+    </div>
+    <div class="prods-grid vetrina-grid" id="vetrinaProds"></div>
   </section>
 
   <!-- PRODUCTS -->
@@ -2708,6 +2733,242 @@ async function shopifyFetch(query, variables = {}) {
   }
 }
 
+// ── KIT FESTIVITA': COLLEZIONE "VETRINA" ──────────────
+// Tutto si gestisce da Shopify → Prodotti → Collezioni → "Vetrina":
+//  • prodotti della collezione  → sezione in evidenza in home
+//  • immagine della collezione  → foto di sfondo della home
+//  • descrizione, una riga per voce:
+//      Titolo: / Titolo evidenziato: / Testo: / Fascia: / Barra:
+//      Sezione: / Inizio: gg/mm/aaaa [hh:mm] / Fine: gg/mm/aaaa [hh:mm] / Colore:
+// Collezione non pubblicata, vuota, non ancora iniziata o scaduta = sito normale.
+window.VETRINA = { active: false };
+const VETRINA_QUERY = `
+  query vetrina {
+    collection(handle: "vetrina") {
+      title
+      descriptionHtml
+      image { url }
+      products(first: 12) {
+        edges { node {
+          id title handle vendor descriptionHtml createdAt tags
+          priceRange { minVariantPrice { amount currencyCode } }
+          compareAtPriceRange { minVariantPrice { amount } }
+          variants(first: 1) { edges { node { id availableForSale } } }
+          images(first: 10) { edges { node { url altText } } }
+        } }
+      }
+    }
+  }`;
+const VETRINA_COLORS = {
+  'natale':['#8E1B2C','#F2CF86'], 'rosso':['#8E1B2C','#F2CF86'],
+  'black friday':['#111111','#D9B44A'], 'nero':['#111111','#D9B44A'],
+  'oro':['#6E521B','#F6DE9C'], 'san valentino':['#A8264F','#FFD3E0'], 'rosa':['#A8264F','#FFD3E0'],
+  'verde':['#1F4D3A','#E3CF92'], 'blu':['#16325C','#C6D9F7'], 'bordeaux':['#5A1526','#F0C9A0']
+};
+
+function _vParseDate(txt, endOfDay){
+  const m = (txt||'').match(/(\d{1,2})[\/.\-](\d{1,2})(?:[\/.\-](\d{2,4}))?(?:\s+(?:ore\s+)?(\d{1,2})[:.](\d{2}))?/i);
+  if (!m) return null;
+  let y = m[3] ? parseInt(m[3],10) : new Date().getFullYear(); if (y < 100) y += 2000;
+  const h = m[4] != null ? parseInt(m[4],10) : (endOfDay ? 23 : 0);
+  const mi = m[5] != null ? parseInt(m[5],10) : (endOfDay ? 59 : 0);
+  const d = new Date(y, parseInt(m[2],10)-1, parseInt(m[1],10), h, mi, endOfDay && m[4]==null ? 59 : 0);
+  return isNaN(d) ? null : d;
+}
+
+function _vParseSettings(html){
+  const tmp = document.createElement('div');
+  tmp.innerHTML = (html||'').replace(/<br\s*\/?>/gi,'\n').replace(/<\/(p|div|li|h[1-6])>/gi,'\n');
+  const out = { barra: [] };
+  (tmp.textContent||'').split('\n').forEach(line => {
+    const m = line.match(/^\s*([^:]{2,25}):\s*(.+?)\s*$/);
+    if (!m) return;
+    const k = m[1].toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim(), v = m[2];
+    if (k === 'titolo') out.titolo = v;
+    else if (k.startsWith('titolo eviden') || k === 'titolo 2' || k === 'seconda riga') out.titolo2 = v;
+    else if (k === 'testo' || k === 'sottotitolo') out.testo = v;
+    else if (k === 'fascia') out.fascia = v;
+    else if (k === 'barra') out.barra.push(v);
+    else if (k === 'sezione' || k === 'titolo sezione') out.sezione = v;
+    else if (k === 'inizio') out.inizio = _vParseDate(v, false);
+    else if (k === 'fine') out.fine = _vParseDate(v, true);
+    else if (k === 'colore') out.colore = v.toLowerCase().trim();
+  });
+  return out;
+}
+
+// Categoria del prodotto in vetrina (serve per "articoli simili" e "torna alla categoria")
+function _vGuessCat(title){
+  const t = (title||'').toLowerCase();
+  if (/portafogl|portacart|wallet|card holder|portamonet/.test(t)) return 'portafogli';
+  if (/cintur|belt/.test(t)) return 'cinture';
+  if (/scarp|sneaker|decollet|décollet|mocassin|stival|sandal|ballerin|slingback/.test(t)) return 'scarpe';
+  if (/braccial|collan|orecchin|foulard|portachiav|occhial|charm|anello|cappell|sciarp/.test(t)) return 'accessori';
+  return 'borse';
+}
+
+function _vCountdown(to){
+  let s = Math.max(0, Math.floor((to - new Date())/1000));
+  const g = Math.floor(s/86400); s -= g*86400;
+  const h = Math.floor(s/3600); s -= h*3600;
+  const mi = Math.floor(s/60); const se = s - mi*60;
+  const pad = n => String(n).padStart(2,'0');
+  return (g > 0 ? g + (g === 1 ? ' giorno ' : ' giorni ') : '') + pad(h) + 'h ' + pad(mi) + 'm ' + pad(se) + 's';
+}
+
+function _vSetTopOffset(){
+  const tb = document.querySelector('.topbar'), ps = document.getElementById('promoStrip');
+  const h = (tb ? tb.offsetHeight : 30) + (ps && ps.classList.contains('on') ? ps.offsetHeight : 0);
+  document.documentElement.style.setProperty('--topbar-h', h + 'px');
+  _syncNavTop();
+}
+
+function goVetrina(){
+  const go = () => { const sec = document.getElementById('vetrinaSec');
+    if (sec && sec.classList.contains('on')) window.scrollTo({ top: sec.getBoundingClientRect().top + window.scrollY - 140, behavior: 'smooth' }); };
+  if (currentPage !== 'home') { nav('home'); setTimeout(go, 1100); } else go();
+}
+
+function _vDeactivate(){
+  window.VETRINA = { active: false };
+  document.body.classList.remove('vetrina-on','vetrina-photo');
+  document.getElementById('promoStrip')?.classList.remove('on');
+  document.getElementById('vetrinaSec')?.classList.remove('on');
+  document.querySelector('.hero-vetrina-img')?.remove();
+  document.documentElement.style.removeProperty('--promo-bg');
+  document.documentElement.style.removeProperty('--promo-accent');
+  _vSetTopOffset();
+  if (currentPage === 'home') initHeroAnim();
+}
+
+async function loadVetrina(){
+  const data = await shopifyFetch(VETRINA_QUERY);
+  const col = data && data.collection;
+  if (!col) return;
+  const cfg = _vParseSettings(col.descriptionHtml);
+  const prods = (col.products?.edges || []).map(({node}) => { const p = mapShopifyNode(node); p.cat = _vGuessCat(p.name); return p; });
+  const now = new Date();
+  if (cfg.inizio && now < cfg.inizio) {           // promo programmata: si accende da sola
+    const wait = cfg.inizio - now; if (wait < 2147483000) setTimeout(loadVetrina, wait + 1000);
+    return;
+  }
+  if (cfg.fine && now >= cfg.fine) return;          // promo finita: sito normale
+  const hasContent = prods.length || cfg.fascia || cfg.titolo || cfg.titolo2 || col.image || cfg.barra.length;
+  if (!hasContent) return;
+
+  window.VETRINA = Object.assign({ active: true }, cfg);
+  CACHE['vetrina'] = prods;
+  document.body.classList.add('vetrina-on');
+
+  // Colore di stagione
+  let colors = null;
+  if (cfg.colore) {
+    if (/^#[0-9a-f]{6}$/i.test(cfg.colore)) colors = [cfg.colore, '#FFFFFF'];
+    else Object.keys(VETRINA_COLORS).forEach(k => { if (!colors && cfg.colore.includes(k)) colors = VETRINA_COLORS[k]; });
+  }
+  if (colors) {
+    document.documentElement.style.setProperty('--promo-bg', colors[0]);
+    document.documentElement.style.setProperty('--promo-accent', colors[1]);
+  }
+
+  // Fascia con conto alla rovescia
+  const strip = document.getElementById('promoStrip');
+  if (strip && cfg.fascia) {
+    document.getElementById('promoText').textContent = cfg.fascia;
+    strip.classList.add('on');
+  }
+
+  // Barra scorrevole: messaggi extra
+  if (cfg.barra.length) {
+    const track = document.getElementById('tbTrack');
+    if (track) {
+      const esc = t => t.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+      const all = Array.from(track.querySelectorAll('.tb-i'));
+      const fixed = all.slice(0, all.length/2).filter(el => !el.classList.contains('tb-promo')).map(el => el.textContent);
+      const promos = all.slice(0, all.length/2).filter(el => el.classList.contains('tb-promo')).map(el => el.textContent);
+      const item = (t, pr) => '<span class="tb-i' + (pr ? ' tb-promo' : '') + '">' + esc(t) + '</span><span class="tb-s">|</span>';
+      const half = cfg.barra.map(l => item(l.toUpperCase(), true)).join('') + promos.map(t => item(t, true)).join('') + fixed.map(t => item(t, false)).join('');
+      track.innerHTML = half + half;
+    }
+  }
+
+  // Foto della home
+  if (col.image && col.image.url) {
+    const hero = document.querySelector('#pg-home .hero');
+    if (hero && !hero.querySelector('.hero-vetrina-img')) {
+      const img = document.createElement('img');
+      img.className = 'hero-vetrina-img'; img.alt = ''; img.src = col.image.url;
+      hero.insertBefore(img, hero.querySelector('.hero-mosaic-overlay'));
+      document.body.classList.add('vetrina-photo');
+    }
+  }
+
+  // Testo sotto al titolo
+  if (cfg.testo) {
+    const sub = document.querySelector('#pg-home .hero-sub');
+    if (sub) { if (!sub.dataset.orig) sub.dataset.orig = sub.innerHTML; sub.textContent = cfg.testo; }
+  }
+
+  // Prodotti in evidenza
+  const sec = document.getElementById('vetrinaSec');
+  if (sec && prods.length) {
+    const label = document.getElementById('vetrinaLabel');
+    const isGeneric = /^vetrina$/i.test((col.title||'').trim());
+    document.getElementById('vetrinaTitle').textContent = cfg.sezione || (isGeneric ? 'Selezione del momento' : col.title);
+    if (label) label.textContent = cfg.fine ? 'Solo per pochi giorni' : 'In evidenza';
+    document.getElementById('vetrinaProds').innerHTML = prods.slice(0, 8).map((p,i) => makeCard(p, 'd' + (i%4))).join('');
+    sec.classList.add('on');
+    setTimeout(() => { try { initReveal(); initTilt(); } catch(_){} }, 80);
+  }
+
+  // Titolo della home
+  if (currentPage === 'home' && (cfg.titolo || cfg.titolo2)) initHeroAnim();
+
+  // Conto alla rovescia + spegnimento automatico a fine promo
+  if (cfg.fine) {
+    const tick = () => {
+      if (new Date() >= cfg.fine) { clearInterval(window._vTimer); _vDeactivate(); return; }
+      const t = _vCountdown(cfg.fine);
+      const pc = document.getElementById('promoCd'); if (pc && cfg.fascia) pc.textContent = 'Termina tra ' + t;
+      const vc = document.getElementById('vetrinaCd'); if (vc) vc.textContent = 'Termina tra ' + t;
+    };
+    tick(); clearInterval(window._vTimer); window._vTimer = setInterval(tick, 1000);
+  }
+  _vSetTopOffset();
+}
+window.addEventListener('resize', () => { if (window.VETRINA && window.VETRINA.active) _vSetTopOffset(); });
+
+// Il menu resta attaccato in cima quando la barra annunci esce dallo schermo
+function _syncNavTop(){
+  const nv = document.querySelector('nav'); if (!nv) return;
+  const h = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--topbar-h')) || 30;
+  nv.style.top = Math.max(0, h - window.scrollY) + 'px';
+}
+window.addEventListener('scroll', _syncNavTop, { passive: true });
+
+// ── BARRA ANNUNCI MODIFICABILE DA SHOPIFY ─────────────
+// Shopify → Negozio online → Pagine → pagina "Banner sito" (indirizzo: banner-sito).
+// Ogni riga del contenuto = un messaggio in evidenza nella barra in alto, prima di quelli fissi.
+// Pagina nascosta o vuota = solo i messaggi fissi. Nessuna modifica al codice necessaria.
+async function loadShopBanner(){
+  const track = document.getElementById('tbTrack');
+  if (!track) return;
+  const data = await shopifyFetch('query { page(handle: "banner-sito") { body } }');
+  const html = (data && data.page && data.page.body) || '';
+  if (!html.trim()) return;
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html.replace(/<br\s*\/?>/gi, '\n').replace(/<\/(p|div|li|h[1-6])>/gi, '\n');
+  const lines = (tmp.textContent || '').split('\n').map(l => l.trim()).filter(Boolean).slice(0, 6);
+  if (!lines.length) return;
+  const esc = t => t.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const fixed = Array.from(track.querySelectorAll('.tb-i')).slice(0, track.querySelectorAll('.tb-i').length / 2).map(el => el.textContent);
+  const item = (t, promo) => '<span class="tb-i' + (promo ? ' tb-promo' : '') + '">' + esc(t) + '</span><span class="tb-s">|</span>';
+  const half = lines.map(l => item(l.toUpperCase(), true)).join('') + fixed.map(t => item(t, false)).join('');
+  track.innerHTML = half + half;
+  const chars = lines.join('').length + fixed.join('').length;
+  track.style.animationDuration = Math.max(22, Math.round(chars * 0.11)) + 's';
+}
+
 // ── QUERY PRODOTTI PER COLLEZIONE ────────────────────
 const PRODUCTS_QUERY = `
   query getProducts($handle: String!, $first: Int!) {
@@ -2783,7 +3044,20 @@ async function fetchProducts(cat, limit = 12) {
   if (!CACHE[cat]) {
     const data = await shopifyFetch(PRODUCTS_QUERY, { handle, first: 250 });
     if (!data?.collection?.products?.edges) return (PRODUCTS[cat] || []).slice(0, limit);
-    CACHE[cat] = data.collection.products.edges.map(({ node }) => {
+    CACHE[cat] = data.collection.products.edges.map(({ node }) => mapShopifyNode(node));
+    // "Nuovi arrivi" = i 12 prodotti creati più di recente nella categoria
+    [...CACHE[cat]]
+      .filter(p => p._createdAt)
+      .sort((a,b) => new Date(b._createdAt) - new Date(a._createdAt))
+      .slice(0, 12)
+      .forEach(p => { p.isNew = true; });
+  }
+  return CACHE[cat].slice(0, limit);
+}
+
+// Converte un prodotto Shopify nel formato usato dalle card del sito
+function mapShopifyNode(node) {
+  {
       const priceNum = parseFloat(node.priceRange.minVariantPrice.amount) || 0;
       const cmpNum = parseFloat(node.compareAtPriceRange?.minVariantPrice?.amount) || 0;
       const isSale = cmpNum > priceNum && priceNum > 0;
@@ -2803,18 +3077,10 @@ async function fetchProducts(cat, limit = 12) {
         url: `https://${SHOPIFY_CONFIG.domain}/products/${node.handle}`,
         isSale, discountPct, isNew: false,
         _createdAt: node.createdAt || null,
-        badge: isSale ? 'sale' : (node.tags.includes('nuovo') ? 'new' : 'cert'),
+        badge: isSale ? 'sale' : ((node.tags || []).includes('nuovo') ? 'new' : 'cert'),
         bg: '#D4C4CA'
       };
-    });
-    // "Nuovi arrivi" = i 12 prodotti creati più di recente nella categoria
-    [...CACHE[cat]]
-      .filter(p => p._createdAt)
-      .sort((a,b) => new Date(b._createdAt) - new Date(a._createdAt))
-      .slice(0, 12)
-      .forEach(p => { p.isNew = true; });
   }
-  return CACHE[cat].slice(0, limit);
 }
 
 // ── PRODOTTI REALI da firstluxuryqueen.com ──────────
@@ -3034,8 +3300,17 @@ function makeCard(p, extraClass='', forceCat='') {
 
 // ── NAVIGATION ────────────────────────────────────────
 let currentPage = 'home';
-function nav(page, e) {
-  if(e) e.preventDefault();
+function nav(page, e, fromHistory, restoreScroll) {
+  if(e && e.preventDefault) e.preventDefault();
+  // Cronologia: ogni pagina ha il suo indirizzo (#/borse, #/prodotto/...),
+  // cosi' il tasto Indietro del browser/telefono torna alla pagina precedente
+  if (!fromHistory) {
+    const target = _hashFor(page);
+    if (target !== null && target !== (location.hash || '')) {
+      try { history.replaceState(Object.assign({}, history.state, { scroll: window.scrollY }), ''); } catch(_){}
+      history.pushState({ page: page }, '', target || (location.pathname + location.search));
+    }
+  }
   const ov = document.getElementById('page-overlay');
   ov.className = 'enter';
   setTimeout(()=>{
@@ -3043,6 +3318,7 @@ function nav(page, e) {
     window.scrollTo(0,0);
     ov.className = 'exit';
     setTimeout(()=>{ ov.className=''; }, 600);
+    if (restoreScroll) setTimeout(()=>{ window.scrollTo(0, restoreScroll); }, 500);
   }, 450);
 }
 
@@ -3053,10 +3329,6 @@ function showPage(page) {
   // Nav: solido su tutte le pagine TRANNE home (che ha hero scuro)
   document.body.classList.toggle('solid-nav', page !== 'home');
 
-  // Deep-link: se si lascia la scheda prodotto, ripulisci l'hash /prodotto/
-  if (page !== 'product' && !_suppressHash && /\/prodotto\//.test(location.hash || '')) {
-    history.replaceState(null, '', location.pathname + location.search);
-  }
 
   const collectionPages = ['borse','portafogli','cinture','accessori','scarpe'];
   if (collectionPages.includes(page)) {
@@ -3111,7 +3383,6 @@ function showPage(page) {
   } else if (page === 'product') {
     document.getElementById('pg-product').classList.add('active');
     renderProductPage();
-    setProductHash(currentProductData);
   } else if (page === 'cart') {
     document.getElementById('pg-cart').classList.add('active');
     renderCart();
@@ -3191,8 +3462,11 @@ function initHeroAnim() {
   setTimeout(()=>{
     const sw1 = document.getElementById('sw1');
     const sw2 = document.getElementById('sw2');
-    if(sw1) animateText(sw1, 'Benvenuto su', 0.6);
-    if(sw2) animateText(sw2, 'First Luxury Queen', 0.9);
+    const V = (window.VETRINA && window.VETRINA.active) ? window.VETRINA : null;
+    const t1 = V && (V.titolo || V.titolo2) ? (V.titolo || '') : 'Benvenuto su';
+    const t2 = V && (V.titolo || V.titolo2) ? (V.titolo2 || '') : 'First Luxury Queen';
+    if(sw1){ sw1.innerHTML=''; if(t1) animateText(sw1, t1, 0.6); }
+    if(sw2){ sw2.innerHTML=''; if(t2) animateText(sw2, t2, 0.9); }
   }, 100);
 }
 
@@ -3470,50 +3744,69 @@ function openProduct(pid) {
 // ── DEEP-LINK PRODOTTO (URL condivisibile) ───────────
 // Permette link diretti tipo  .../#/prodotto/<handle>  che aprono
 // la scheda dell'articolo invece di rimandare alla home.
-let _suppressHash = false;
 
 function _handleOf(p){
   if (!p) return '';
   return p.handle || ((p.url || '').split('/products/')[1] || '').split(/[?#]/)[0];
 }
 
-function setProductHash(p){
-  const h = _handleOf(p);
-  if (!h) return;
-  _suppressHash = true;
-  location.hash = '/prodotto/' + h;
-  setTimeout(() => { _suppressHash = false; }, 60);
+
+const ROUTE_PAGES = ['home','borse','portafogli','cinture','accessori','scarpe','contatti','vendi','cart','privacy','termini','spedizioni','resi','note-legali','account'];
+
+function _hashFor(page){
+  if (page === 'product') { const h = _handleOf(currentProductData); return h ? '#/prodotto/' + h : null; }
+  if (page === 'home') return '';
+  return ROUTE_PAGES.includes(page) ? '#/' + page : null;
 }
 
-async function openProductByHandle(handle){
+function _findCached(handle){
+  for (const c of Object.keys(COLLECTION_HANDLES).concat(['vetrina'])){
+    const found = (CACHE[c] || []).find(p => _handleOf(p).toLowerCase() === handle);
+    if (found) return { p: found, c: c };
+  }
+  return null;
+}
+
+async function openProductByHandle(handle, fromHistory, restoreScroll){
   if (!handle) return false;
   handle = String(handle).toLowerCase();
-  const cats = Object.keys(COLLECTION_HANDLES);
-  // Assicura che tutte le categorie siano scaricate in CACHE
-  await Promise.all(cats.map(c => fetchProducts(c, 250).catch(() => [])));
-  for (const c of cats){
-    const list = CACHE[c] || [];
-    const found = list.find(p => _handleOf(p).toLowerCase() === handle);
-    if (found){
-      currentProductData = { ...found, cat: c };
-      currentProductCat = c;
-      nav('product');
-      return true;
-    }
+  let hit = _findCached(handle);
+  if (!hit){
+    // Assicura che tutte le categorie siano scaricate in CACHE
+    await Promise.all(Object.keys(COLLECTION_HANDLES).map(c => fetchProducts(c, 250).catch(() => [])));
+    hit = _findCached(handle);
+  }
+  if (hit){
+    currentProductData = { ...hit.p, cat: hit.c };
+    currentProductCat = hit.c;
+    nav('product', null, fromHistory, restoreScroll);
+    return true;
   }
   console.warn('Deep-link: prodotto non trovato per handle', handle);
+  if (fromHistory) nav('home', null, true);
   return false;
 }
 
-function routeFromHash(){
-  const m = (location.hash || '').match(/\/prodotto\/([^\/?#]+)/);
-  if (m && m[1]) openProductByHandle(decodeURIComponent(m[1]));
+// Legge l'indirizzo attuale e mostra la pagina giusta (Indietro/Avanti e link diretti)
+function routeFromHash(fromHistory, restoreScroll){
+  const h = location.hash || '';
+  const m = h.match(/^#\/prodotto\/([^\/?#]+)/);
+  if (m) { openProductByHandle(decodeURIComponent(m[1]), true, restoreScroll); return; }
+  const pm = h.match(/^#\/([a-z-]+)/);
+  const page = (pm && ROUTE_PAGES.includes(pm[1])) ? pm[1] : 'home';
+  if (page === currentPage && !fromHistory) return;
+  nav(page, null, true, restoreScroll);
 }
 
-window.addEventListener('hashchange', () => {
-  if (_suppressHash) return;
-  routeFromHash();
+window.addEventListener('popstate', (ev) => {
+  routeFromHash(true, ev.state && ev.state.scroll);
 });
+
+// I link interni (href="#") non devono aggiungere passaggi vuoti alla cronologia
+document.addEventListener('click', (ev) => {
+  const a = ev.target.closest && ev.target.closest('a[href="#"]');
+  if (a) ev.preventDefault();
+}, true);
 
 // ── CONDIVIDI PRODOTTO ───────────────────────────────
 // Genera il link diretto all'articolo (sempre sul dominio di produzione,
@@ -3598,7 +3891,12 @@ function renderProductPage() {
   // Vendor, titolo, prezzo
   document.getElementById('pd-vendor').textContent = p.brand || '';
   document.getElementById('pd-title').textContent = p.name || '';
-  document.getElementById('pd-price').textContent = p.price || '';
+  const _pp = document.getElementById('pd-price');
+  if (p.comparePrice) {
+    _pp.innerHTML = (p.price || '') + ' <span class="p-price-old" style="font-size:.6em;margin-left:10px;">' + p.comparePrice + '</span>';
+  } else {
+    _pp.textContent = p.price || '';
+  }
 
   // Descrizione: testo reale dal prodotto Shopify (descriptionHtml), con fallback
   const descEl = document.getElementById('pd-desc');
@@ -3611,7 +3909,9 @@ function renderProductPage() {
 
   // Badge dinamici
   document.getElementById('pd-badge-new').style.display  = p.badge === 'new' ? 'inline-block' : 'none';
-  document.getElementById('pd-badge-sale').style.display = p.badge === 'sale' ? 'inline-block' : 'none';
+  const _sb = document.getElementById('pd-badge-sale');
+  _sb.style.display = p.badge === 'sale' ? 'inline-block' : 'none';
+  _sb.textContent = (p.discountPct > 0) ? '\u2212' + p.discountPct + '%' : 'In offerta';
 
   // Disponibilità: se esaurito → badge + pulsante acquisto disabilitato
   const _pdSold = p.available === false;
@@ -4300,9 +4600,11 @@ window.addEventListener('DOMContentLoaded', () => {
     updateCartCount();
   }, 150);
 
-  // Deep-link: se l'URL al caricamento contiene /prodotto/<handle>, apri quel prodotto
-  if (/\/prodotto\//.test(location.hash || '')) {
-    setTimeout(routeFromHash, 250);
+  loadShopBanner().finally(() => loadVetrina());
+
+  // Link diretto: se l'indirizzo contiene una pagina (#/borse, #/prodotto/...), aprila
+  if (/^#\/[a-z]/.test(location.hash || '')) {
+    setTimeout(() => routeFromHash(true), 250);
   }
 });
 
