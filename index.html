@@ -64,6 +64,19 @@ body.clicking #cur-ring{width:24px;height:24px;}
 .promo-strip.on{display:block;}
 .promo-strip .promo-cd{display:inline-block;margin-left:14px;color:var(--promo-accent,#fff);font-weight:500;letter-spacing:.08em;white-space:nowrap;}
 body.vetrina-on .topbar{background:var(--promo-bg,var(--rose-d));}
+body.vetrina-on .btn-fill,body.vetrina-on .btn-buy{background:var(--promo-bg,var(--rose));border-color:var(--promo-bg,var(--rose));}
+body.vetrina-on .btn-fill:hover,body.vetrina-on .btn-buy:hover{filter:brightness(1.18);}
+body.vetrina-on .pb-s{background:var(--promo-bg,var(--rose-d));}
+body.vetrina-on .col-page-bg{background:linear-gradient(135deg,#1C1218 10%,var(--promo-bg,#3A1828));}
+.p-badge.p-vtag{background:var(--promo-bg,var(--rose-d));color:var(--promo-accent,#fff);}
+.v-col-banner{display:none;align-items:center;justify-content:center;flex-wrap:wrap;gap:6px 18px;padding:14px 20px;background:var(--promo-bg,var(--rose-d));color:#fff;font:400 11px/1.4 var(--sans);letter-spacing:.14em;text-transform:uppercase;cursor:pointer;text-align:center;}
+.v-col-banner.on{display:flex;}
+.v-col-cd{color:var(--promo-accent,#fff);font-weight:500;}
+.v-col-go{text-decoration:underline;text-underline-offset:3px;}
+.v-pd-banner{display:none;margin:10px 0 4px;padding:10px 14px;background:var(--promo-bg,var(--rose-d));color:#fff;font:400 11px/1.4 var(--sans);letter-spacing:.12em;text-transform:uppercase;gap:4px 14px;flex-wrap:wrap;}
+.v-pd-banner.on{display:flex;}
+.v-pd-banner span{color:var(--promo-accent,#fff);font-weight:500;}
+
 .hero-vetrina-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;z-index:0;}
 body.vetrina-photo .hero-mosaic{display:none;}
 body.vetrina-photo .hero-mosaic-overlay{background:linear-gradient(180deg,rgba(20,10,15,.62) 0%,rgba(20,10,15,.38) 45%,rgba(20,10,15,.7) 100%)!important;}
@@ -178,6 +191,8 @@ body.pannello-mode .btn-outline{border-color:#9E4A65;color:var(--rose-d);}
 .vd-form-wrap{max-width:1120px!important;width:100%;max-height:calc(100vh - 32px);overflow-y:auto;display:grid;grid-template-columns:minmax(0,420px) minmax(0,1fr);gap:28px;align-items:start;}
 .vd-live{position:sticky;top:0;display:flex;flex-direction:column;gap:10px;}
 .vd-live-hd{display:flex;justify-content:space-between;align-items:center;gap:10px;font:400 10px/1.3 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:#6E5560;}
+.vd-live-pg{display:flex;align-items:center;gap:8px;}
+.vd-live-pg select{font:400 12px/1.2 var(--sans);letter-spacing:0;text-transform:none;color:var(--text);border:1px solid var(--rose-l);padding:6px 8px;background:#fff;}
 .vd-live-hd .vd-linkbtn{font:400 12px/1.3 var(--sans);letter-spacing:0;text-transform:none;}
 .vd-live-frame{--vk:.5;position:relative;width:100%;aspect-ratio:1280/820;overflow:hidden;border:1px solid var(--rose-l);background:#fff;}
 .vd-live-frame iframe{position:absolute;top:0;left:0;width:1280px;height:820px;border:0;transform:scale(var(--vk));transform-origin:0 0;pointer-events:none;}
@@ -2323,6 +2338,7 @@ body.solid-nav .ham span{background:var(--text)!important;}
       <h1 class="col-page-title"><em id="col-title">Borse</em></h1>
     </div>
   </div>
+  <div class="v-col-banner" id="vColBanner" role="button" tabindex="0" onclick="goVetrina()" onkeydown="if(event.key==='Enter')goVetrina()"><span id="vColText"></span><span class="v-col-cd" id="vColCd"></span><span class="v-col-go">Vedi la selezione →</span></div>
   <div class="filters">
     <div class="filters-row">
       <input type="text" class="col-search" id="colSearch" placeholder="Cerca per nome o brand…" oninput="applyColFilters()" autocomplete="off">
@@ -2583,6 +2599,7 @@ body.solid-nav .ham span{background:var(--text)!important;}
       <span class="product-info-vendor" id="pd-vendor">Brand</span>
       <h1 class="product-info-title" id="pd-title">Caricamento...</h1>
       <div class="product-info-price" id="pd-price">€ —</div>
+      <div class="v-pd-banner" id="vPdBanner"><strong id="vPdName"></strong><span id="vPdCd"></span></div>
 
       <div class="product-badges-row">
         <span class="pb-entrupy-big">★ Entrupy 99%+</span>
@@ -3029,8 +3046,27 @@ function goVetrina(){
   if (currentPage !== 'home') { nav('home'); setTimeout(go, 1100); } else go();
 }
 
+function _vTagCards(){
+  const set = window._vSet, nome = String((window.VETRINA && window.VETRINA.nome) || '').replace(/[&<>"]/g,'');
+  document.querySelectorAll('.p-vtag').forEach(el => el.remove());
+  if (!set || !set.size) return;
+  document.querySelectorAll('.p-card[data-h]').forEach(c => {
+    if (!set.has(c.dataset.h) || c.classList.contains('p-soldout')) return;
+    const b = c.querySelector('.p-badges'); if (b) b.insertAdjacentHTML('afterbegin', '<span class="p-badge p-vtag">' + nome + '</span>');
+  });
+}
+function _vPdBanner(){
+  const el = document.getElementById('vPdBanner'); if (!el) return;
+  const on = window.VETRINA && window.VETRINA.active && window._vSet && typeof currentProductData !== 'undefined' && currentProductData && window._vSet.has(_handleOf(currentProductData));
+  el.classList.toggle('on', !!on);
+  if (on) document.getElementById('vPdName').textContent = 'Fa parte della selezione ' + window.VETRINA.nome;
+}
 function _vDeactivate(){
   window.VETRINA = { active: false };
+  window._vSet = null;
+  document.querySelectorAll('.p-vtag').forEach(el => el.remove());
+  document.getElementById('vColBanner')?.classList.remove('on');
+  document.getElementById('vPdBanner')?.classList.remove('on');
   clearInterval(window._vTimer);
   document.body.classList.remove('vetrina-on','vetrina-photo');
   document.getElementById('promoStrip')?.classList.remove('on');
@@ -3098,16 +3134,30 @@ async function _vProvaApply(d){
   }
   const v = { handle: 'prova', title: d.title || 'Anteprima', image: d.image || null, productCount: prods.length, cfg: _vParseSettings(_vCampiHtml(d.campi)) };
   _vDeactivate();
-  if (currentPage !== 'home') showPage('home');
+  if (!window._vProvaPage) { window._vProvaPage = 'home'; showPage('home'); }
   _vApply(v, prods, true);
   if (!document.body.classList.contains('vetrina-on')) initHeroAnim();
 }
+function _vProvaGo(pg){
+  window._vProvaPage = pg;
+  if (pg === 'home' || pg === 'borse') { nav(pg); return; }
+  const p = (window._vProvaProds || [])[0];
+  if (p) { openProductByHandle(_handleOf(p)); return; }
+  nav('borse');
+  let n = 0; const t = setInterval(() => { const c = document.querySelector('#pg-collection .p-card[data-h]');
+    if (c && c.dataset.h) { clearInterval(t); openProductByHandle(c.dataset.h); } else if (++n > 30) clearInterval(t); }, 300);
+}
 if (IS_PROVA) {
-  window.addEventListener('message', ev => { if (ev.origin === location.origin && ev.data && ev.data.type === 'vprova') _vProvaApply(ev.data); });
+  window.addEventListener('message', ev => {
+    if (ev.origin !== location.origin || !ev.data) return;
+    if (ev.data.type === 'vprova') _vProvaApply(ev.data);
+    if (ev.data.type === 'vprova-page') _vProvaGo(ev.data.page);
+  });
 }
 
 async function loadVetrina(){
   const params = new URLSearchParams(location.search);
+  if (document.body.classList.contains('pannello-mode')) return;
   if (IS_PROVA) {
     let d = null; try { d = JSON.parse(params.get('prova')); } catch(_) {}
     if (d && d.campi) _vProvaApply(d);
@@ -3230,6 +3280,14 @@ function _vApply(v, prods, preview){
   // Titolo della home
   if (currentPage === 'home') initHeroAnim();
 
+  // Tutto il sito: etichetta sui prodotti in promozione, fascia nelle collezioni, avviso in scheda prodotto
+  window.VETRINA.nome = (v.title||'').replace(/^vetrina\s*[-–:]?\s*/i, '').trim() || 'In promozione';
+  window._vSet = new Set(prods.map(_handleOf).filter(Boolean));
+  _vTagCards();
+  const cb = document.getElementById('vColBanner');
+  if (cb && cfg.fascia) { document.getElementById('vColText').textContent = cfg.fascia; cb.classList.add('on'); }
+  _vPdBanner();
+
   // Conto alla rovescia + spegnimento automatico a fine promo
   clearInterval(window._vTimer);
   if (cfg.fine) {
@@ -3238,6 +3296,8 @@ function _vApply(v, prods, preview){
       const t = _vCountdown(cfg.fine);
       const pc = document.getElementById('promoCd'); if (pc && cfg.fascia) pc.textContent = 'Termina tra ' + t;
       const vc = document.getElementById('vetrinaCd'); if (vc) vc.textContent = 'Termina tra ' + t;
+      const cc = document.getElementById('vColCd'); if (cc) cc.textContent = 'Termina tra ' + t;
+      const dc = document.getElementById('vPdCd'); if (dc) dc.textContent = 'Termina tra ' + t;
     };
     tick(); window._vTimer = setInterval(tick, 1000);
   }
@@ -3459,7 +3519,7 @@ function _vOpenForm(mode, ref){
     '<label class="vd-m-pin">PIN del pannello<input id="vdPin" type="password" inputmode="numeric" autocomplete="current-password" value="' + esc(_vPinGet()) + '"></label>' +
     '<p class="vd-m-msg" id="vdMsg" role="status"></p>' +
     '<div class="vd-actions"><button type="button" class="btn btn-outline" onclick="_vCloseModal()">Annulla</button><button type="submit" class="btn btn-fill" id="vdOk">' + (mode === 'crea' ? 'Crea in bozza' : 'Salva') + '</button></div></form>' +
-    '<aside class="vd-live"><div class="vd-live-hd"><span>Anteprima della prima pagina</span><button type="button" class="vd-linkbtn" id="vdLiveBig">Apri a schermo intero</button></div>' +
+    '<aside class="vd-live"><div class="vd-live-hd"><label class="vd-live-pg">Anteprima di <select id="vdLivePage"><option value="home">prima pagina</option><option value="borse">pagina Borse</option><option value="prodotto">scheda di un prodotto</option></select></label><button type="button" class="vd-linkbtn" id="vdLiveBig">Apri a schermo intero</button></div>' +
     '<div class="vd-live-frame" id="vdLiveBox"><iframe id="vdLive" title="Anteprima del sito con questa festività" src="' + location.pathname + '?prova=1#/" tabindex="-1"></iframe></div>' +
     '<p class="vd-m-small">Si aggiorna mentre scrivete. ' + (mode === 'crea' ? 'Prodotti e foto li aggiungete dopo la creazione.' : 'Con i prodotti e la foto già scelti.') + '</p></aside></div>';
   m.addEventListener('click', e => { if (e.target === m) _vCloseModal(); });
@@ -3478,6 +3538,7 @@ function _vOpenForm(mode, ref){
   window._vLiveCleanup = () => window.removeEventListener('message', onMsg);
   form.addEventListener('input', () => { clearTimeout(tmr); tmr = setTimeout(push, 350); });
   form.addEventListener('change', push);
+  document.getElementById('vdLivePage').addEventListener('change', e => { if (ready) frame.contentWindow.postMessage({ type: 'vprova-page', page: e.target.value }, location.origin); });
   const fit = () => { const box = document.getElementById('vdLiveBox'); if (box) box.style.setProperty('--vk', box.clientWidth / 1280); };
   fit(); window.addEventListener('resize', fit, { passive: true });
   document.getElementById('vdLiveBig').onclick = () => {
@@ -4030,7 +4091,9 @@ function makeCard(p, extraClass='', forceCat='') {
   const _priceHtml = p.comparePrice
     ? `${p.price} <span class="p-price-old">${p.comparePrice}</span>`
     : p.price;
-  return `<div class="p-card rv ${extraClass}${_sold?' p-soldout':''}" data-brand="${_esc(p.brand)}" data-name="${_esc(p.name)}" data-price="${_priceNum}" data-avail="${p.available===false?'0':'1'}" data-badge="${p.badge||'cert'}" data-new="${_isNew?'1':'0'}" data-sale="${_isSale?'1':'0'}" onclick="openProduct('${pid}')">
+  const _h = _handleOf(p);
+  if (!_sold && window._vSet && window._vSet.has(_h)) _badgeHtml = '<span class="p-badge p-vtag">' + String(window.VETRINA.nome||'').replace(/[&<>"]/g,'') + '</span>' + _badgeHtml;
+  return `<div class="p-card rv ${extraClass}${_sold?' p-soldout':''}" data-h="${_esc(_h)}" data-brand="${_esc(p.brand)}" data-name="${_esc(p.name)}" data-price="${_priceNum}" data-avail="${p.available===false?'0':'1'}" data-badge="${p.badge||'cert'}" data-new="${_isNew?'1':'0'}" data-sale="${_isSale?'1':'0'}" onclick="openProduct('${pid}')">
     <div class="p-img">
       ${imgContent}
       <div class="p-badges">${_badgeHtml}<span class="p-badge pb-c">✓ Entrupy</span></div>
@@ -4604,6 +4667,7 @@ function _fallbackCopy(text, flash){
 function renderProductPage() {
   const p = currentProductData;
   if (!p) return;
+  try { _vPdBanner(); } catch(_) {}
 
   // Breadcrumb
   const catInfo = (typeof COL_INFO !== 'undefined' && COL_INFO[currentProductCat]) || {title:'Prodotti'};
