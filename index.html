@@ -362,6 +362,48 @@ a.pn-stat:hover{border-color:#9E4A65;}
 @media(max-width:900px){.pn-side{flex:1 1 100%;flex-direction:row;overflow-x:auto;padding:12px 16px;gap:6px;border-bottom:1px solid var(--rose-l);background:#fff;}.pn-sg{display:none;}.pn-si{flex:none;white-space:nowrap;border:1px solid var(--rose-l);}.pn-si.on{box-shadow:none;border-color:#9E4A65;}}
 .vd-modal{position:fixed;inset:0;background:rgba(20,14,16,.45);display:flex;align-items:center;justify-content:center;z-index:10000;padding:16px;}
 .vd-m-box{background:#fff;max-width:440px;width:100%;padding:28px 26px 22px;box-shadow:0 20px 60px rgba(0,0,0,.25);}
+/* ── PANNELLO SU TELEFONO: barra in basso stile app, catalogo a schede, finestre dal basso ── */
+@media(max-width:760px){
+  body.pannello-mode{padding-bottom:calc(76px + env(safe-area-inset-bottom));}
+  body.pannello-mode #pg-vetrine{transform:none!important;animation:none!important;}
+  body.pannello-mode .pn-hd-in{padding:12px 16px;flex-wrap:nowrap;gap:10px;}
+  body.pannello-mode .pn-tag,body.pannello-mode #pnWho,body.pannello-mode .pn-user svg{display:none;}
+  body.pannello-mode .pn-logo{font-size:20px;white-space:nowrap;}
+  body.pannello-mode .pn-user{gap:14px;flex-wrap:nowrap;}
+  body.pannello-mode .pn-user a{font-size:10.5px;white-space:nowrap;}
+  body.pannello-mode .pn-side{position:fixed;left:0;right:0;bottom:0;z-index:900;flex:none;min-height:0;display:flex;flex-direction:row;justify-content:space-around;gap:0;overflow:visible;
+    padding:6px 6px calc(6px + env(safe-area-inset-bottom));background:rgba(18,11,15,.97);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid rgba(217,180,74,.28);border-bottom:0;box-shadow:0 -8px 24px rgba(0,0,0,.25);}
+  body.pannello-mode .pn-side::after,body.pannello-mode .pn-sg,body.pannello-mode .pn-si.pn-lock,body.pannello-mode .pn-si .pn-on{display:none;}
+  body.pannello-mode .pn-si{flex:1 1 0;flex-direction:column;justify-content:center;gap:4px;min-height:54px;padding:4px 2px;border:0;border-radius:12px;background:none;box-shadow:none;color:rgba(255,255,255,.62);}
+  body.pannello-mode .pn-si.on{background:rgba(217,180,74,.12);color:#D9B44A;box-shadow:none;}
+  body.pannello-mode .pn-si span{font-size:0;line-height:0;}
+  body.pannello-mode .pn-si span::after{content:attr(data-s);font:500 10.5px/1 var(--sans);letter-spacing:.04em;}
+  body.pannello-mode .pn-layout .vd-wrap{padding:20px 14px 40px;}
+  body.pannello-mode .pn-table{overflow:visible;background:none;border:0;box-shadow:none;}
+  body.pannello-mode .pn-table table{min-width:0;display:block;}
+  body.pannello-mode .pn-table thead{display:none;}
+  body.pannello-mode .pn-table tbody{display:flex;flex-direction:column;gap:10px;}
+  body.pannello-mode .pn-table tr{display:grid;grid-template-columns:72px 1fr auto;column-gap:12px;row-gap:6px;align-items:start;background:#fff;border:1px solid rgba(28,18,24,.06);border-radius:14px;padding:12px;box-shadow:0 4px 14px rgba(28,18,24,.05);}
+  body.pannello-mode .pn-table tr[hidden]{display:none!important;}
+  body.pannello-mode .pn-table td{display:block;padding:0;border:0;}
+  body.pannello-mode .pn-table td:nth-child(1){grid-row:1/span 3;}
+  body.pannello-mode .pn-table td img,body.pannello-mode .pn-table .pn-noimg{width:72px;height:72px;border-radius:10px;}
+  body.pannello-mode .pn-table td:nth-child(2){grid-column:2/4;font-size:15px;}
+  body.pannello-mode .pn-table td:nth-child(3){grid-column:2;font-size:12px;color:#6E5560;}
+  body.pannello-mode .pn-table td:nth-child(4){grid-column:3;grid-row:2;text-align:right;font-weight:500;white-space:nowrap;}
+  body.pannello-mode .pn-table td:nth-child(5){grid-column:2/4;display:flex;flex-wrap:wrap;gap:4px;}
+  body.pannello-mode .pn-table td.pn-act{grid-column:1/-1;display:flex;gap:8px;margin-top:6px;text-align:left;}
+  body.pannello-mode .pn-table td.pn-act .pn-price-btn{flex:1;min-height:42px;}
+  body.pannello-mode .pn-table td.pn-act a{display:flex;align-items:center;justify-content:center;min-height:42px;padding:0 14px;border:1px solid rgba(122,48,72,.25);border-radius:10px;}
+  body.pannello-mode .pn-chips{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px;}
+  body.pannello-mode .pn-chip{flex:none;min-height:38px;}
+  .vd-modal{align-items:flex-end;padding:0;}
+  .vd-modal .vd-m-box{max-width:none;border-radius:20px 20px 0 0;max-height:92vh;overflow-y:auto;padding:24px 18px calc(20px + env(safe-area-inset-bottom));}
+  .vd-modal input,.vd-modal select,.vd-modal textarea,body.pannello-mode input,body.pannello-mode select,body.pannello-mode textarea{font-size:16px!important;}
+  .vd-modal .vd-actions .btn,.vd-modal .vd-actions button{flex:1;min-height:46px;}
+  body.pannello-mode .vd-timeline{overflow-x:auto;}
+}
+
 .vd-m-box h3{font:400 26px/1.2 var(--serif);font-style:italic;margin:0 0 14px;color:var(--text);}
 .vd-m-box p{font:300 14px/1.65 var(--sans);color:var(--text);margin:0 0 10px;}
 .vd-m-box b{font-weight:500;}
@@ -3982,7 +4024,7 @@ function _pnIco(d, sz){ return '<svg width="' + (sz||18) + '" height="' + (sz||1
 const _PN_LOCK = 'M6 11h12v9H6zM8 11V8a4 4 0 018 0v3';
 function _pnSide(page){
   const el = document.getElementById('pnSide'); if (!el) return;
-  const it = (pg, label, ic, extra) => '<a class="pn-si' + (page === pg ? ' on' : '') + '" href="#/' + pg + '" onclick="nav(\'' + pg + '\', event)"' + (page === pg ? ' aria-current="page"' : '') + '>' + _pnIco(ic) + '<span>' + label + '</span>' + (extra || '') + '</a>';
+  const it = (pg, label, ic, extra) => '<a class="pn-si' + (page === pg ? ' on' : '') + '" href="#/' + pg + '" onclick="nav(\'' + pg + '\', event)"' + (page === pg ? ' aria-current="page"' : '') + '>' + _pnIco(ic) + '<span data-s="' + label.split(' ')[0] + '">' + label + '</span>' + (extra || '') + '</a>';
   el.innerHTML =
     '<span class="pn-sg">Il vostro negozio</span>' +
     it('panoramica', 'Panoramica', 'M4 13h7V4H4zM13 20h7V11h-7zM4 20h7v-5H4zM13 4v5h7V4z') +
@@ -4172,7 +4214,7 @@ const PN_PACKS = [
   { nome:'Essenziale', sub:'Sapere cosa vende e presentarlo bene.', prezzo:79,
     voci:['Report vendite ogni mese','Descrizioni prodotto curate, fino a 20 al mese','Recensioni dei clienti sul sito (attivazione inclusa)','Assistenza sul pannello festività'],
     nota:'Presi singolarmente: 88 €/mese + 120 € di attivazione' },
-  { nome:'Crescita', sub:'Farsi trovare e farsi ricordare, ogni settimana.', prezzo:149, listino:250, best:true,
+  { nome:'Crescita', sub:'Farsi trovare e farsi ricordare, ogni settimana.', prezzo:179, listino:250, best:true,
     voci:['Tutto Essenziale, descrizioni fino a 40 al mese','Agente marketing: 12 post al mese con didascalie per Instagram e TikTok','Newsletter e avvisi delle live, solo a chi ha dato il consenso','Prodotti su Google Shopping, attivati e tenuti aggiornati'],
     nota:'Listino 250 €/mese · presi singolarmente 256 €/mese + 310 € di attivazioni' },
   { nome:'Premium', sub:'Anche la pubblicità, gestita per voi.', prezzo:329,
@@ -4194,7 +4236,7 @@ function _pnGrowHtml(){
     tile(ic.report, 'Da 39 €/mese', 'Report vendite', 'Ogni mese cosa avete venduto, i pezzi più visti e cosa riassortire.') +
     tile(ic.mkt, 'Da 99 €/mese', 'Agente marketing', 'Post e didascalie pronti per Instagram e TikTok a ogni nuovo arrivo.') +
     tile(ic.gs, '190 € una tantum', 'Google Shopping', 'I vostri articoli nella scheda Prodotti di Google, senza pagare pubblicità.') +
-    '</div><a class="pn-cta" href="#/pacchetti" onclick="nav(\'pacchetti\', event)">Scopri l\'offerta di lancio: Crescita a 149 € invece di 250 €</a>';
+    '</div><a class="pn-cta" href="#/pacchetti" onclick="nav(\'pacchetti\', event)">Scopri l\'offerta di lancio: Crescita a 179 € invece di 250 €</a>';
 }
 function renderPacchetti(){
   const box = document.getElementById('vdBody'); if (!box) return;
