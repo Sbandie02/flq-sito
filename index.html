@@ -235,6 +235,63 @@ body.pannello-mode .btn-outline{border-color:#9E4A65;color:var(--rose-d);}
 .vd-f-row .vd-f:last-child{flex:0 0 120px;}
 .vd-steps{margin:0 0 14px;padding-left:20px;font:300 14px/1.8 var(--sans);}
 .vd-linkbtn{background:none;border:0;padding:0;font:inherit;color:var(--rose-d);text-decoration:underline;cursor:pointer;}
+.pn-layout{display:flex;flex-wrap:wrap;max-width:1320px;margin:0 auto;}
+.pn-side{flex:0 0 240px;padding:32px 0 40px 24px;display:flex;flex-direction:column;gap:2px;}
+.pn-sg{font:400 10px/1 var(--sans);letter-spacing:.18em;text-transform:uppercase;color:#6E5560;margin:18px 0 8px 12px;}
+.pn-sg:first-child{margin-top:0;}
+.pn-si{display:flex;align-items:center;gap:10px;min-height:42px;padding:0 12px;border:0;background:none;text-align:left;cursor:pointer;font:400 14px/1.2 var(--sans);color:var(--text);text-decoration:none;}
+.pn-si span{flex:1;}
+.pn-si:hover{background:#F3E9EC;}
+.pn-si.on{background:#fff;box-shadow:inset 3px 0 0 #9E4A65;color:var(--rose-d);font-weight:500;}
+.pn-si svg{flex:none;color:#9E4A65;}
+.pn-lock{color:#6E5560;}
+.pn-lock svg:last-child{color:#B9AEB2;}
+.pn-on{font:500 10px/1 var(--sans);font-style:normal;letter-spacing:.08em;text-transform:uppercase;color:#1E6B3E;background:#E3F2E8;padding:4px 6px;}
+body.pannello-mode .pn-layout .vd-wrap{flex:999 1 560px;min-width:0;margin:0;}
+.pn-stats{grid-template-columns:repeat(auto-fit,minmax(190px,1fr));}
+a.pn-stat{text-decoration:none;color:inherit;}
+a.pn-stat:hover{border-color:#9E4A65;}
+.pn-todo{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;}
+.pn-todo-i{display:flex;align-items:baseline;gap:10px;background:#FFF6E5;border:1px solid #F0DDB5;padding:16px 18px;text-decoration:none;color:var(--text);}
+.pn-todo-i strong{font:500 26px/1 var(--serif);}
+.pn-todo-i span{font:300 14px/1.3 var(--sans);}
+.pn-quicks{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;}
+.pn-quick{display:flex;align-items:center;gap:10px;min-height:52px;padding:0 16px;background:#fff;border:1px solid var(--rose-l);text-decoration:none;color:var(--text);font:400 14px/1.2 var(--sans);}
+.pn-quick svg{color:#9E4A65;}
+.pn-quick:hover{border-color:#9E4A65;}
+.pn-locked{width:100%;display:flex;align-items:center;gap:18px;padding:22px 24px;border:1px dashed #C8849A;background:repeating-linear-gradient(135deg,#FBF6F8 0 12px,#F6EEF1 12px 24px);cursor:pointer;text-align:left;font-family:var(--sans);color:var(--text);}
+.pn-locked svg{color:#9E4A65;flex:none;}
+.pn-locked div{flex:1;display:flex;flex-direction:column;gap:4px;}
+.pn-locked strong{font:400 18px/1.3 var(--serif);font-style:italic;}
+.pn-locked span{font:300 13px/1.4 var(--sans);color:#6E5560;}
+.pn-locked em{font:500 11px/1 var(--sans);font-style:normal;letter-spacing:.14em;text-transform:uppercase;color:var(--rose-d);}
+.pn-mod{max-width:480px;}
+.pn-mod-ic{display:flex;align-items:center;justify-content:space-between;color:#9E4A65;margin-bottom:10px;}
+.pn-mod-lock{display:inline-flex;align-items:center;gap:6px;font:500 10px/1 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:#6E5560;background:#F3E9EC;padding:6px 8px;}
+.pn-mod-price{font:500 24px/1.2 var(--serif)!important;color:var(--rose-d)!important;display:flex;flex-direction:column;gap:2px;}
+.pn-mod-price span{font:300 12px/1.4 var(--sans);color:#6E5560;}
+.pn-chips{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 18px;}
+.pn-chip{min-height:40px;padding:0 14px;border:1px solid var(--rose-l);background:#fff;cursor:pointer;font:400 13px/1 var(--sans);color:var(--text);}
+.pn-chip span{color:#6E5560;margin-left:4px;}
+.pn-chip[aria-pressed="true"]{background:#9E4A65;border-color:#9E4A65;color:#fff;}
+.pn-chip[aria-pressed="true"] span{color:#F3E9EC;}
+.pn-table{background:#fff;border:1px solid var(--rose-l);overflow-x:auto;}
+.pn-table table{width:100%;min-width:680px;border-collapse:collapse;font:300 14px/1.4 var(--sans);}
+.pn-table th{text-align:left;padding:12px 14px;border-bottom:1px solid var(--rose-l);font:400 10px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:#6E5560;}
+.pn-table td{padding:10px 14px;border-bottom:1px solid #F0E4E9;vertical-align:middle;}
+.pn-table td img{width:54px;height:54px;object-fit:cover;display:block;}
+.pn-table td small{display:block;color:#6E5560;font-size:12px;}
+.pn-table td strong{font-weight:400;}
+.pn-table td s{color:#6E5560;font-size:12px;}
+.pn-table td a{color:var(--rose-d);font-size:12px;letter-spacing:.08em;text-transform:uppercase;}
+.pn-noimg{display:flex;width:54px;height:54px;align-items:center;justify-content:center;background:#F3E9EC;color:#6E5560;}
+.pn-tag-o,.pn-tag-e,.pn-tag-ok,.pn-tag-w{display:inline-block;font:500 11px/1 var(--sans);padding:5px 7px;margin:2px 4px 2px 0;}
+.pn-tag-o{background:#CC0C39;color:#fff;}
+.pn-tag-e{background:#EEEEEE;color:#4A4A4A;}
+.pn-tag-ok{background:#E3F2E8;color:#1E6B3E;}
+.pn-tag-w{background:#FFF6E5;color:#7A5200;}
+@media(max-width:700px){.vd-summary.pn-stats{grid-template-columns:1fr 1fr;gap:10px;}.pn-stats .vd-stat{padding:14px;}.pn-stats .vd-stat strong{font-size:22px;}}
+@media(max-width:900px){.pn-side{flex:1 1 100%;flex-direction:row;overflow-x:auto;padding:12px 16px;gap:6px;border-bottom:1px solid var(--rose-l);background:#fff;}.pn-sg{display:none;}.pn-si{flex:none;white-space:nowrap;border:1px solid var(--rose-l);}.pn-si.on{box-shadow:none;border-color:#9E4A65;}}
 .vd-modal{position:fixed;inset:0;background:rgba(20,14,16,.45);display:flex;align-items:center;justify-content:center;z-index:10000;padding:16px;}
 .vd-m-box{background:#fff;max-width:440px;width:100%;padding:28px 26px 22px;box-shadow:0 20px 60px rgba(0,0,0,.25);}
 .vd-m-box h3{font:400 26px/1.2 var(--serif);font-style:italic;margin:0 0 14px;color:var(--text);}
@@ -1769,7 +1826,7 @@ body.solid-nav .ham span{background:var(--text)!important;}
 <div class="page" id="pg-vetrine">
   <header class="pn-hd">
     <div class="pn-hd-in">
-      <div class="pn-brand"><a href="#/vetrine" class="pn-logo">First Luxury Queen</a><span class="pn-tag">Pannello riservato</span></div>
+      <div class="pn-brand"><a href="#/panoramica" onclick="nav('panoramica', event)" class="pn-logo">First Luxury Queen</a><span class="pn-tag">Pannello di controllo</span></div>
       <div class="pn-user">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2E7D4F" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="1.5"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>
         <span id="pnWho">Accesso sicuro</span>
@@ -1778,7 +1835,10 @@ body.solid-nav .ham span{background:var(--text)!important;}
       </div>
     </div>
   </header>
-  <div class="vd-wrap" id="vdBody"></div>
+  <div class="pn-layout">
+    <div class="pn-side" id="pnSide" role="navigation" aria-label="Sezioni del pannello"></div>
+    <div class="vd-wrap" id="vdBody"></div>
+  </div>
 </div>
 </div>
 
@@ -3823,6 +3883,138 @@ async function _vSaveForm(mode, v){
   ok.disabled = false; ok.textContent = label;
 }
 
+// ── PANNELLO DI CONTROLLO: menu, panoramica, catalogo, moduli da sbloccare ──
+const PN_MODULI = [
+  { id:'report', nome:'Report vendite', prezzo:'39 €/mese', ic:'M4 20V10M10 20V4M16 20v-7M22 20H2',
+    desc:'Ogni mese un riepilogo chiaro: quanto avete venduto, i pezzi più visti, cosa si vende in fretta e cosa riassortire.',
+    voci:['Vendite e incassi del mese, confrontati con il mese prima','I pezzi più visti e quelli fermi da troppo tempo','Consigli su cosa mettere in offerta'] },
+  { id:'marketing', nome:'Agente marketing', prezzo:'99 €/mese', ic:'M4 4h16v12H5.2L4 17.2V4z',
+    desc:'Per ogni nuovo arrivo prepara post e didascalie per Instagram e TikTok, pronti da pubblicare.',
+    voci:['12 post al mese con testi e hashtag','Calendario dei contenuti','Testi per le live'] },
+  { id:'google', nome:'Google Shopping', prezzo:'190 € una tantum', ic:'M11 4a7 7 0 100 14 7 7 0 000-14zM21 21l-5-5',
+    desc:'I vostri articoli nella scheda Prodotti di Google, senza pagare pubblicità.',
+    voci:['Collegamento a Google Merchant Center','Catalogo aggiornato da solo','Controllo degli errori'] },
+  { id:'campagne', nome:'Campagne Meta e Google', prezzo:'149 €/mese + budget', ic:'M3 11v2l13 5V6L3 11zM16 9a3 3 0 010 6',
+    desc:'Pubblicità su Instagram, Facebook e Google creata e ottimizzata per voi, con un report mensile.',
+    voci:['Creazione e gestione delle campagne','Report: quanto spendete e quanto rientra','Budget pagato da voi direttamente a Meta e Google'] },
+  { id:'newsletter', nome:'Newsletter e avvisi live', prezzo:'69 €/mese', ic:'M4 6h16v12H4zM4 6l8 7 8-7',
+    desc:'Avvisa chi ha già comprato quando arrivano pezzi nuovi o inizia una live, solo con il loro consenso.',
+    voci:['Raccolta contatti conforme al GDPR','Email per nuovi arrivi e live','Statistiche di apertura'] },
+  { id:'recensioni', nome:'Recensioni sul sito', prezzo:'120 € una tantum', ic:'M12 3l2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z',
+    desc:'Le recensioni dei vostri clienti in evidenza nelle pagine prodotto, per dare fiducia a chi compra.',
+    voci:['Richiesta automatica di recensione dopo l\'acquisto','Recensioni nelle schede prodotto','Solo recensioni vere di clienti reali'] },
+  { id:'descrizioni', nome:'Assistente descrizioni', prezzo:'49 €/mese', ic:'M4 20h4L19 9l-4-4L4 16v4z',
+    desc:'Dalle foto e dai dati del prodotto scrive descrizioni curate e ottimizzate per Google.',
+    voci:['Fino a 20 descrizioni al mese','Titoli e testi pensati per Google','Stesso tono del vostro sito'] },
+  { id:'contovendita', nome:'Gestione conto vendita', prezzo:'da 390 € + 29 €/mese', ic:'M4 7h16v13H4zM9 7V4h6v3',
+    desc:'Chi vi lascia le borse, valutazioni, commissioni e pagamenti ai venditori, tutto in un posto.',
+    voci:['Schede venditori e pezzi in conto vendita','Calcolo delle commissioni','Promemoria dei pagamenti'] }
+];
+function _pnIco(d, sz){ return '<svg width="' + (sz||18) + '" height="' + (sz||18) + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="' + d + '"/></svg>'; }
+const _PN_LOCK = 'M6 11h12v9H6zM8 11V8a4 4 0 018 0v3';
+function _pnSide(page){
+  const el = document.getElementById('pnSide'); if (!el) return;
+  const it = (pg, label, ic, extra) => '<a class="pn-si' + (page === pg ? ' on' : '') + '" href="#/' + pg + '" onclick="nav(\'' + pg + '\', event)"' + (page === pg ? ' aria-current="page"' : '') + '>' + _pnIco(ic) + '<span>' + label + '</span>' + (extra || '') + '</a>';
+  el.innerHTML =
+    '<span class="pn-sg">Il vostro negozio</span>' +
+    it('panoramica', 'Panoramica', 'M4 13h7V4H4zM13 20h7V11h-7zM4 20h7v-5H4zM13 4v5h7V4z') +
+    it('vetrine', 'Festività', 'M12 3v18M5 8h14M7 8c0-3 5-3 5 0 0-3 5-3 5 0', '<em class="pn-on">Attiva</em>') +
+    it('catalogo', 'Catalogo', 'M4 6h16M4 12h16M4 18h10') +
+    '<span class="pn-sg">Da sbloccare</span>' +
+    PN_MODULI.map(m => '<button class="pn-si pn-lock" onclick="_pnModulo(\'' + m.id + '\')">' + _pnIco(m.ic) + '<span>' + m.nome + '</span>' + _pnIco(_PN_LOCK, 14) + '</button>').join('') +
+    it('pacchetti', 'Pacchetti e prezzi', 'M20 12v8H4v-8M2 7h20v5H2zM12 22V7M12 7C10 3 7 3 7 5s5 2 5 2 5 0 5-2-3-2-5 2');
+}
+function _pnModulo(id){
+  const m = PN_MODULI.find(x => x.id === id); if (!m) return;
+  _vCloseModal();
+  const d = document.createElement('div'); d.id = 'vdModal'; d.className = 'vd-modal';
+  d.innerHTML = '<div class="vd-m-box pn-mod" role="dialog" aria-modal="true" aria-labelledby="vdMTitle">' +
+    '<div class="pn-mod-ic">' + _pnIco(m.ic, 26) + '<span class="pn-mod-lock">' + _pnIco(_PN_LOCK, 13) + ' Da sbloccare</span></div>' +
+    '<h3 id="vdMTitle">' + m.nome + '</h3><p>' + m.desc + '</p><ul class="vd-steps">' + m.voci.map(v => '<li>' + v + '</li>').join('') + '</ul>' +
+    '<p class="pn-mod-price">' + m.prezzo + '<span>oppure incluso nei pacchetti, da 79 €/mese</span></p>' +
+    '<div class="vd-actions"><a class="btn btn-fill" href="' + _pnMail('Vorrei sbloccare: ' + m.nome) + '" target="_blank" rel="noopener">Sblocca</a>' +
+    '<a class="btn btn-outline" href="#/pacchetti" onclick="_vCloseModal();nav(\'pacchetti\', event)">Vedi i pacchetti</a></div></div>';
+  d.addEventListener('click', e => { if (e.target === d) _vCloseModal(); });
+  document.body.appendChild(d); document.addEventListener('keydown', _vModalKey);
+}
+async function _pnCatalogo(){
+  await Promise.all(Object.keys(COLLECTION_HANDLES).map(c => fetchProducts(c, 250).catch(() => [])));
+  const seen = new Set(), out = [];
+  Object.keys(COLLECTION_HANDLES).forEach(c => (CACHE[c] || []).forEach(p => {
+    const h = _handleOf(p); if (!h || seen.has(h)) return; seen.add(h);
+    const txt = String(p.description || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    const av = [];
+    if (!p.image) av.push('Senza foto');
+    if (txt.length < 120) av.push('Descrizione corta');
+    if (p.isSale && p.discountPct > 0 && p.discountPct < 5) av.push('Sconto solo del ' + p.discountPct + '%');
+    out.push({ p, cat: c, avvisi: av, esaurito: p.available === false });
+  }));
+  return out;
+}
+function _pnAdminUrl(p){
+  const num = String(p.id || '').split('/').pop();
+  return /^\d+$/.test(num) ? SHOP_ADMIN + '/products/' + num : SHOP_ADMIN + '/products?query=' + encodeURIComponent(p.name || '');
+}
+async function renderPanoramica(){
+  const box = document.getElementById('vdBody'); if (!box) return;
+  const esc = t => String(t == null ? '' : t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const now = new Date(), hr = now.getHours(), saluto = hr < 13 ? 'Buongiorno' : (hr < 18 ? 'Buon pomeriggio' : 'Buonasera');
+  box.innerHTML = '<section class="pn-hello"><h1 data-greet>' + saluto + (window._pnName ? ', <em>' + esc(window._pnName) + '</em>' : '') + '</h1><p>Il punto della situazione del vostro negozio.</p></section><p class="vd-empty">Un attimo, sto leggendo il catalogo…</p>';
+  const [cat, list] = await Promise.all([_pnCatalogo(), _vLoadList().catch(() => [])]);
+  if (currentPage !== 'panoramica') return;
+  const online = cat.filter(x => !x.esaurito), offerte = cat.filter(x => x.p.isSale && !x.esaurito), esauriti = cat.filter(x => x.esaurito), dasist = cat.filter(x => x.avvisi.length && !x.esaurito);
+  const live = _vPickActive(list), bi = !live && _vBuiltin(now);
+  const promo = live ? esc(live.title.replace(/^vetrina\s*/i, '')) : (bi ? (bi.fase === 'annuncio' ? 'Annuncio Black Friday' : esc(bi.b.title.replace(/^vetrina\s*/i, ''))) : 'Sito normale');
+  const stat = (k, v, sub, pg) => '<a class="vd-stat pn-stat" href="#/' + pg + '" onclick="nav(\'' + pg + '\', event)"><span>' + k + '</span><strong>' + v + '</strong><em>' + sub + '</em></a>';
+  const S = SHOP_ADMIN, link = (u, t, ic) => '<a class="pn-quick" href="' + S + u + '" target="_blank" rel="noopener">' + _pnIco(ic) + '<span>' + t + '</span></a>';
+  const tipi = {};
+  dasist.forEach(x => x.avvisi.forEach(a => { const k = a.startsWith('Sconto') ? 'Sconto molto basso' : a; tipi[k] = (tipi[k] || 0) + 1; }));
+  box.innerHTML = '<section class="pn-hello"><h1 data-greet>' + saluto + (window._pnName ? ', <em>' + esc(window._pnName) + '</em>' : '') + '</h1><p>Il punto della situazione del vostro negozio.</p></section>' +
+    '<div class="vd-summary pn-stats">' +
+      stat('Online adesso', promo, live || bi ? 'promozione sul sito' : 'nessuna promozione', 'vetrine') +
+      stat('Pezzi in vendita', online.length, 'su tutto il catalogo', 'catalogo') +
+      stat('In offerta', offerte.length, 'con il prezzo barrato', 'catalogo') +
+      stat('Esauriti', esauriti.length, 'ancora nel catalogo', 'catalogo') +
+    '</div>' +
+    '<h2>Da sistemare</h2>' + (Object.keys(tipi).length
+      ? '<div class="pn-todo">' + Object.keys(tipi).map(k => '<a class="pn-todo-i" href="#/catalogo" onclick="window._pnFiltro=\'sistemare\';nav(\'catalogo\', event)"><strong>' + tipi[k] + '</strong><span>' + k + '</span></a>').join('') + '</div><p class="vd-hint">Una scheda completa (foto, descrizione di almeno 2-3 righe) vende di più e piace a Google.</p>'
+      : '<p class="vd-empty">Tutto in ordine: nessun prodotto da sistemare.</p>') +
+    '<h2>Azioni rapide su Shopify</h2><div class="pn-quicks">' +
+      link('/products/new', 'Aggiungi un prodotto', 'M12 5v14M5 12h14') + link('/orders', 'Ordini', 'M5 7h14l-1 13H6zM9 7a3 3 0 016 0') +
+      link('/products', 'Prodotti', 'M4 6h16M4 12h16M4 18h10') + link('/customers', 'Clienti', 'M16 20v-1a4 4 0 00-8 0v1M12 11a3 3 0 100-6 3 3 0 000 6z') +
+      link('/discounts', 'Sconti', 'M9 15l6-6M9.5 9.5h.01M14.5 14.5h.01M4 12l8-8 8 8-8 8z') + link('/collections', 'Collezioni', 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z') +
+    '</div>' +
+    '<h2>Vendite del mese</h2><button class="pn-locked" onclick="_pnModulo(\'report\')">' + _pnIco(_PN_LOCK, 22) + '<div><strong>Vedete qui vendite, incassi e pezzi più visti</strong><span>Si sblocca con il Report vendite, 39 €/mese o nei pacchetti</span></div><em>Sblocca →</em></button>';
+}
+async function renderCatalogo(){
+  const box = document.getElementById('vdBody'); if (!box) return;
+  const esc = t => String(t == null ? '' : t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  box.innerHTML = '<section class="pn-hello"><h1>Catalogo</h1><p>Tutti i vostri pezzi, con quello che c\'è da sistemare. Si modificano su Shopify.</p></section><p class="vd-empty">Un attimo, sto leggendo il catalogo…</p>';
+  const cat = await _pnCatalogo();
+  if (currentPage !== 'catalogo') return;
+  window._pnCat = cat;
+  const f = window._pnFiltro || 'tutti'; window._pnFiltro = null;
+  const labels = { borse:'Borse', portafogli:'Portafogli', cinture:'Cinture', accessori:'Accessori', scarpe:'Scarpe' };
+  const filtri = [['tutti','Tutti',cat.length],['offerta','In offerta',cat.filter(x=>x.p.isSale).length],['esauriti','Esauriti',cat.filter(x=>x.esaurito).length],['sistemare','Da sistemare',cat.filter(x=>x.avvisi.length&&!x.esaurito).length]];
+  box.innerHTML = '<section class="pn-hello"><h1>Catalogo</h1><p>Tutti i vostri pezzi, con quello che c\'è da sistemare. Si modificano su Shopify.</p></section>' +
+    '<div class="pn-chips" role="group" aria-label="Filtra">' + filtri.map(([k,l,n]) => '<button class="pn-chip" data-f="' + k + '" aria-pressed="' + (k===f) + '" onclick="_pnFiltra(\'' + k + '\')">' + l + ' <span>' + n + '</span></button>').join('') + '</div>' +
+    '<div class="pn-table"><table><thead><tr><th></th><th>Pezzo</th><th>Categoria</th><th>Prezzo</th><th>Stato</th><th></th></tr></thead><tbody>' +
+    cat.map(x => '<tr data-o="' + (x.p.isSale?1:0) + '" data-e="' + (x.esaurito?1:0) + '" data-s="' + (x.avvisi.length&&!x.esaurito?1:0) + '">' +
+      '<td>' + (x.p.image ? '<img src="' + shopImg(x.p.image, 120) + '" alt="" loading="lazy">' : '<span class="pn-noimg">—</span>') + '</td>' +
+      '<td><strong>' + esc(x.p.name) + '</strong><small>' + esc(x.p.brand) + '</small></td><td>' + (labels[x.cat] || x.cat) + '</td>' +
+      '<td>' + esc(x.p.price) + (x.p.comparePrice ? ' <s>' + esc(x.p.comparePrice) + '</s>' : '') + '</td>' +
+      '<td>' + (x.esaurito ? '<span class="pn-tag-e">Esaurito</span>' : (x.p.isSale ? '<span class="pn-tag-o">−' + x.p.discountPct + '%</span>' : '<span class="pn-tag-ok">In vendita</span>')) + x.avvisi.map(a => '<span class="pn-tag-w">' + a + '</span>').join('') + '</td>' +
+      '<td><a href="' + _pnAdminUrl(x.p) + '" target="_blank" rel="noopener">Modifica</a></td></tr>').join('') +
+    '</tbody></table></div>';
+  _pnFiltra(f);
+}
+function _pnFiltra(k){
+  document.querySelectorAll('.pn-chip').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.f === k)));
+  document.querySelectorAll('.pn-table tbody tr').forEach(r => {
+    r.hidden = !(k === 'tutti' || (k === 'offerta' && r.dataset.o === '1') || (k === 'esauriti' && r.dataset.e === '1') || (k === 'sistemare' && r.dataset.s === '1'));
+  });
+}
+
 // ── PANNELLO: chi è collegato (Cloudflare Access) ──
 async function _pnIdentity(){
   if (!IS_PANNELLO || window._pnIdDone) return; window._pnIdDone = true;
@@ -3834,7 +4026,7 @@ async function _pnIdentity(){
     window._pnName = nm ? nm.charAt(0).toUpperCase() + nm.slice(1).toLowerCase() : '';
     const w = document.getElementById('pnWho'); if (w) w.textContent = 'Accesso sicuro · ' + d.email;
     const o = document.getElementById('pnOut'); if (o) o.hidden = false;
-    const h = document.querySelector('.pn-hello h1');
+    const h = document.querySelector('.pn-hello h1[data-greet]');
     if (h && window._pnName && !h.querySelector('em')) h.insertAdjacentHTML('beforeend', ', <em>' + window._pnName.replace(/[&<>"]/g,'') + '</em>');
   } catch(_) {}
 }
@@ -3880,7 +4072,7 @@ function renderPacchetti(){
     '<span class="pk-note">' + k.nota + '</span>' +
     '<a class="pk-btn" href="' + _pnMail('Scelgo il pacchetto ' + k.nome) + '" target="_blank" rel="noopener">Scelgo ' + k.nome + '</a></article>').join('');
   box.innerHTML =
-    '<p style="margin:0 0 28px"><a href="#/vetrine" onclick="nav(\'vetrine\', event)" style="font:400 12px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--rose-d)">← Torna al pannello</a></p>' +
+    '<p style="margin:0 0 28px"><a href="#/panoramica" onclick="nav(\'panoramica\', event)" style="font:400 12px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--rose-d)">← Torna al pannello</a></p>' +
     '<section class="pk-intro"><span>Servizi per il vostro negozio</span><h1>Il sito è pronto.</h1><p>Scegliete quanto lavoro volete togliervi di dosso: noi prepariamo contenuti, numeri e campagne, voi pensate alle borse e alle live.</p></section>' +
     '<section class="pk-offer"><div><small>Offerta di lancio · per chi ha il Kit Festività</small><strong>Attivando entro il ' + PN_OFFER.scadenza + ': ' + PN_OFFER.testo + '</strong><p>Nessun vincolo: si disdice con 30 giorni di preavviso.</p></div>' +
     '<a href="' + _pnMail('Blocco l\'offerta di lancio') + '" target="_blank" rel="noopener">Blocca l\'offerta</a></section>' +
@@ -3905,8 +4097,9 @@ async function renderVetrineDashboard(){
   const live = _vPickActive(list);
   const labels = { attiva:'Online ora', programmata:'Programmata', conclusa:'Conclusa', bozza:'Bozza' };
   const hr = now.getHours(), saluto = hr < 13 ? 'Buongiorno' : (hr < 18 ? 'Buon pomeriggio' : 'Buonasera');
-  let html = '<section class="pn-hello"><h1>' + saluto + (window._pnName ? ', <em>' + esc(window._pnName) + '</em>' : '') + '</h1>' +
-    '<p>Da qui preparate, provate e pubblicate le promozioni del sito. I prodotti si gestiscono sempre da Shopify.</p></section>';
+  void saluto;
+  let html = '<section class="pn-hello"><h1>Festività</h1>' +
+    '<p>Preparate, provate e pubblicate le promozioni del sito. I prodotti si gestiscono sempre da Shopify.</p></section>';
 
   // Riepilogo
   const upcoming = list.filter(v => v.status === 'programmata');
@@ -4116,6 +4309,7 @@ function mapShopifyNode(node) {
       return {
         brand: detectBrand(node.title) || node.vendor,
         name: node.title,
+        id: node.id || '',
         handle: node.handle || '',
         description: node.descriptionHtml || '',
         price: '€ ' + priceNum.toLocaleString('it-IT', {minimumFractionDigits: 0}),
@@ -4454,9 +4648,10 @@ function showPage(page) {
   } else if (page === 'spedizioni') {
     document.getElementById('pg-spedizioni').classList.add('active');
     setTimeout(()=>initReveal(), 80);
-  } else if (page === 'vetrine' || page === 'pacchetti') {
+  } else if (['vetrine','pacchetti','panoramica','catalogo'].includes(page)) {
     document.getElementById('pg-vetrine').classList.add('active');
-    if (page === 'pacchetti') renderPacchetti(); else renderVetrineDashboard();
+    _pnSide(page);
+    if (page === 'pacchetti') renderPacchetti(); else if (page === 'panoramica') renderPanoramica(); else if (page === 'catalogo') renderCatalogo(); else renderVetrineDashboard();
   } else if (page === 'resi') {
     document.getElementById('pg-resi').classList.add('active');
     setTimeout(()=>initReveal(), 80);
@@ -4811,7 +5006,7 @@ function _handleOf(p){
 }
 
 
-const ROUTE_PAGES = ['vetrine','pacchetti','offerte','home','borse','portafogli','cinture','accessori','scarpe','contatti','vendi','cart','privacy','termini','spedizioni','resi','note-legali','account'];
+const ROUTE_PAGES = ['panoramica','catalogo','vetrine','pacchetti','offerte','home','borse','portafogli','cinture','accessori','scarpe','contatti','vendi','cart','privacy','termini','spedizioni','resi','note-legali','account'];
 
 function _hashFor(page){
   if (page === 'product') { const h = _handleOf(currentProductData); return h ? '#/prodotto/' + h : null; }
@@ -4854,8 +5049,8 @@ function routeFromHash(fromHistory, restoreScroll){
   if (m) { openProductByHandle(decodeURIComponent(m[1]), true, restoreScroll); return; }
   const pm = h.match(/^#\/([a-z-]+)/);
   let page = (pm && ROUTE_PAGES.includes(pm[1])) ? pm[1] : 'home';
-  if ((page === 'vetrine' || page === 'pacchetti') && !IS_PANNELLO) page = 'home';
-  if (IS_PANNELLO && !pm && !_VQ.get('anteprima') && !IS_PROVA) page = 'vetrine';
+  if (['vetrine','pacchetti','panoramica','catalogo'].includes(page) && !IS_PANNELLO) page = 'home';
+  if (IS_PANNELLO && !pm && !_VQ.get('anteprima') && !IS_PROVA) page = 'panoramica';
   if (page === currentPage && !fromHistory) return;
   nav(page, null, true, restoreScroll);
 }
