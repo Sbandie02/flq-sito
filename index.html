@@ -3155,6 +3155,57 @@ if (IS_PROVA) {
   });
 }
 
+// ── PROMOZIONE INTEGRATA: Black Friday 2026 ──
+// Si accende da sola se su Shopify non c'è una festività "Vetrina…" attiva (quella di Shopify vince sempre).
+// Annuncio dal 24/11, promo dal 27/11 (venerdì) al 30/11 (Cyber Monday) alle 23:59; poi il sito torna normale.
+// Mostra in offerta SOLO i prodotti che su Shopify hanno davvero un "Prezzo di confronto" (art. 17-bis Cod. Consumo).
+const BUILTIN_PROMOS = [{
+  handle: 'builtin-black-friday', title: 'Vetrina Black Friday',
+  annuncio: new Date(2026, 10, 24, 0, 0), inizio: new Date(2026, 10, 27, 0, 0), fine: new Date(2026, 10, 30, 23, 59, 59),
+  teaser: { fascia: 'Black Friday da venerdì 27 novembre', barra: ['Black Friday: da venerdì 27 novembre'] },
+  live: {
+    titolo: 'Black Friday', titolo2: 'pezzi unici', colore: 'black friday',
+    testo: 'Borse e accessori di lusso certificati Entrupy, a prezzi speciali fino a lunedì 30 novembre. Ogni pezzo è unico: quando è venduto, è venduto.',
+    fasciaOfferte: 'Black Friday: pezzi unici in offerta fino a lunedì 30',
+    fasciaSenza: 'Black Friday da First Luxury Queen, fino a lunedì 30',
+    sezione: 'Le offerte del Black Friday',
+    barra: ['Black Friday fino a lunedì 30 novembre', 'Pezzi unici: quando è venduto, è venduto']
+  }
+}];
+function _vBuiltin(now){
+  for (const b of BUILTIN_PROMOS) {
+    if (now >= b.annuncio && now < b.inizio) return { b, fase: 'annuncio' };
+    if (now >= b.inizio && now <= b.fine) return { b, fase: 'live' };
+  }
+  return null;
+}
+async function _vApplyBuiltin(x){
+  const b = x.b;
+  if (x.fase === 'annuncio') {
+    const cfg = { fascia: b.teaser.fascia, barra: b.teaser.barra.slice(), colore: 'black friday', fine: b.inizio, cdLabel: 'Inizia tra' };
+    _vApply({ handle: b.handle, title: b.title, image: null, productCount: 0, cfg }, [], false);
+    document.getElementById('vColBanner')?.classList.remove('on');
+    document.querySelector('.hero-vetrina-img')?.remove();
+    return;
+  }
+  // Prodotti davvero scontati, da tutte le categorie
+  let prods = [];
+  try {
+    await Promise.all(Object.keys(COLLECTION_HANDLES).map(c => fetchProducts(c, 250).catch(() => [])));
+    const seen = new Set();
+    Object.keys(COLLECTION_HANDLES).forEach(c => (CACHE[c] || []).forEach(p => {
+      const h = _handleOf(p);
+      if (!h || seen.has(h) || p.available === false || !(p.isSale && p.discountPct > 0)) return;
+      seen.add(h); prods.push({ ...p, cat: p.cat || c });
+    }));
+    prods.sort((a, c) => (c.discountPct || 0) - (a.discountPct || 0));
+  } catch(_) {}
+  const L = b.live;
+  const cfg = { titolo: L.titolo, titolo2: L.titolo2, testo: L.testo, colore: L.colore, sezione: L.sezione,
+    fascia: prods.length ? L.fasciaOfferte : L.fasciaSenza, barra: L.barra.slice(), inizio: b.inizio, fine: b.fine };
+  _vApply({ handle: b.handle, title: b.title, image: null, productCount: prods.length, cfg }, prods, false);
+}
+
 async function loadVetrina(){
   const params = new URLSearchParams(location.search);
   if (document.body.classList.contains('pannello-mode')) return;
@@ -3166,10 +3217,12 @@ async function loadVetrina(){
   }
   const previewHandle = IS_PANNELLO ? params.get('anteprima') : null;
   const list = await _vLoadList();
-  if (!list.length) return;
   const now = new Date();
 
   let chosen = previewHandle ? list.find(v => v.handle === previewHandle) : _vPickActive(list);
+  // Nessuna festività attiva su Shopify: promozione integrata nel sito (es. Black Friday)
+  if (!previewHandle && !chosen) { const b = _vBuiltin(now); if (b) { _vApplyBuiltin(b); return; } }
+  if (!list.length) return;
 
   // Prossimo cambio programmato (inizio o fine): il sito si aggiorna da solo
   if (!previewHandle) {
@@ -3293,11 +3346,11 @@ function _vApply(v, prods, preview){
   if (cfg.fine) {
     const tick = () => {
       if (new Date() >= cfg.fine) { _vDeactivate(); loadVetrina(); return; }
-      const t = _vCountdown(cfg.fine);
-      const pc = document.getElementById('promoCd'); if (pc && cfg.fascia) pc.textContent = 'Termina tra ' + t;
-      const vc = document.getElementById('vetrinaCd'); if (vc) vc.textContent = 'Termina tra ' + t;
-      const cc = document.getElementById('vColCd'); if (cc) cc.textContent = 'Termina tra ' + t;
-      const dc = document.getElementById('vPdCd'); if (dc) dc.textContent = 'Termina tra ' + t;
+      const t = (cfg.cdLabel || 'Termina tra') + ' ' + _vCountdown(cfg.fine);
+      const pc = document.getElementById('promoCd'); if (pc && cfg.fascia) pc.textContent = t;
+      const vc = document.getElementById('vetrinaCd'); if (vc) vc.textContent = t;
+      const cc = document.getElementById('vColCd'); if (cc) cc.textContent = t;
+      const dc = document.getElementById('vPdCd'); if (dc) dc.textContent = t;
     };
     tick(); window._vTimer = setInterval(tick, 1000);
   }
@@ -3682,7 +3735,8 @@ async function renderVetrineDashboard(){
   // Riepilogo
   const upcoming = list.filter(v => v.status === 'programmata');
   html += '<div class="vd-summary">' +
-    '<div class="vd-stat"><span>Online adesso</span><strong>' + (live ? esc(live.title) : 'Sito normale') + '</strong>' + (live && live.cfg.fine ? '<em>fino al ' + _vFmt(live.cfg.fine, true) + '</em>' : '') + '</div>' +
+    (live || !_vBuiltin(now) ? '<div class="vd-stat"><span>Online adesso</span><strong>' + (live ? esc(live.title) : 'Sito normale') + '</strong>' + (live && live.cfg.fine ? '<em>fino al ' + _vFmt(live.cfg.fine, true) + '</em>' : '') + '</div>'
+      : (x => '<div class="vd-stat"><span>Online adesso</span><strong>' + (x.fase === 'annuncio' ? 'Annuncio Black Friday' : 'Black Friday') + '</strong><em>già inserito nel sito, ' + (x.fase === 'annuncio' ? 'parte il ' + _vFmt(x.b.inizio, true) : 'fino al ' + _vFmt(x.b.fine, true)) + '</em></div>')(_vBuiltin(now))) +
     '<div class="vd-stat"><span>Prossima</span><strong>' + (upcoming[0] ? esc(upcoming[0].title) : 'Nessuna programmata') + '</strong>' + (upcoming[0] ? '<em>parte il ' + _vFmt(upcoming[0].cfg.inizio, true) + '</em>' : '') + '</div>' +
     '<div class="vd-stat"><span>Festività su Shopify</span><strong>' + list.length + '</strong><em>' + list.filter(v=>v.status==='bozza').length + ' in bozza</em></div>' +
     '</div>';
