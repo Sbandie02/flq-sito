@@ -101,6 +101,7 @@ body.v-lv3 .col-page-bg{background:linear-gradient(135deg,#1C1218 10%,var(--prom
 .v-col-banner{display:none;align-items:center;justify-content:center;flex-wrap:wrap;gap:6px 18px;padding:14px 20px;background:var(--promo-bg,var(--rose-d));color:#fff;font:400 11px/1.4 var(--sans);letter-spacing:.14em;text-transform:uppercase;cursor:pointer;text-align:center;}
 .v-col-banner.on{display:flex;}
 .v-col-cd{color:var(--promo-accent,#fff);font-weight:500;}
+body.on-offerte .v-col-go{display:none;}
 .v-col-go{text-decoration:underline;text-underline-offset:3px;}
 .v-pd-banner{display:none;margin:10px 0 4px;padding:10px 14px;background:var(--promo-bg,var(--rose-d));color:#fff;font:400 11px/1.4 var(--sans);letter-spacing:.12em;text-transform:uppercase;gap:4px 14px;flex-wrap:wrap;}
 .v-pd-banner.on{display:flex;}
@@ -3075,10 +3076,16 @@ function _vSetTopOffset(){
   _syncNavTop();
 }
 
+function _vWaitProds(){
+  return new Promise(res => { let n = 0; const t = setInterval(() => {
+    if (window.VETRINA && window.VETRINA.active && window._vProds) { clearInterval(t); res(window._vProds); }
+    else if (++n > 40) { clearInterval(t); res(null); } }, 200); });
+}
 // Quanto si vede la promozione sul sito: 'minimo' | 'leggero' | 'medio' | 'completo'
 const V_LIVELLI = ['minimo','leggero','medio','completo'];
 const V_LIVELLO_DEFAULT = 'completo'; // scelto: D · Completo
 function goVetrina(){
+  if (window.VETRINA && window.VETRINA.active && window._vProds && window._vProds.length) { nav('offerte'); return; }
   if (window.VETRINA && window.VETRINA.lv === 0) { _vOpenCatOffers('borse', 1); return; }
   const go = () => { const sec = document.getElementById('vetrinaSec');
     if (sec && sec.classList.contains('on')) window.scrollTo({ top: sec.getBoundingClientRect().top + window.scrollY - 140, behavior: 'smooth' }); };
@@ -3102,7 +3109,7 @@ function _vPdBanner(){
 }
 function _vDeactivate(){
   window.VETRINA = { active: false };
-  window._vSet = null;
+  window._vSet = null; window._vProds = null;
   _vHubOff();
   document.querySelectorAll('.p-vtag').forEach(el => el.remove());
   document.getElementById('vColBanner')?.classList.remove('on');
@@ -3293,7 +3300,7 @@ function _vNav(){
   const nome = String(window.VETRINA.nome || 'Promozione').replace(/[&<>"']/g, '');
   document.querySelectorAll('.nav-promo-li,.mob-promo').forEach(e => e.remove());
   const ul = document.querySelector('#nav .nav-links');
-  if (ul) ul.insertAdjacentHTML('afterbegin', '<li class="nav-promo-li"><a class="nav-link nav-promo" href="#" onclick="goVetrina();return false">' + nome + '</a></li>');
+  if (ul) ul.insertAdjacentHTML('afterbegin', '<li class="nav-promo-li"><a class="nav-link nav-promo" data-page="offerte" href="#/offerte" onclick="goVetrina();return false">' + nome + '</a></li>');
   const mh = document.querySelector('#mob .mob-link');
   if (mh) mh.insertAdjacentHTML('afterend', '<a class="mob-link mob-promo" href="#" onclick="goVetrina();closeMob();return false">' + nome + '</a>');
 }
@@ -3319,7 +3326,7 @@ async function loadVetrina(){
 
   let chosen = previewHandle ? list.find(v => v.handle === previewHandle) : _vPickActive(list);
   // Nessuna festività attiva su Shopify: promozione integrata nel sito (es. Black Friday)
-  if (!previewHandle && !chosen) { const b = _vBuiltin(now); if (b) { _vApplyBuiltin(b); return; } }
+  if (!previewHandle && !chosen) { const b = _vBuiltin(now); if (b) { await _vApplyBuiltin(b); return; } }
   if (!list.length) return;
 
   // Prossimo cambio programmato (inizio o fine): il sito si aggiorna da solo
@@ -3360,6 +3367,9 @@ function _vApply(v, prods, preview){
   }
   window.VETRINA = Object.assign({ active: true, handle: v.handle }, cfg);
   CACHE['vetrina'] = prods;
+  window._vProds = prods;
+  COL_INFO.offerte = { title: (v.title||'').replace(/^vetrina\s*[-–:]?\s*/i, '').trim() || 'Offerte',
+    meta: prods.length + (prods.length === 1 ? ' pezzo' : ' pezzi') + (cfg.selezione ? ' selezionati' : ' in offerta') + (cfg.fine && cfg.cdLabel !== 'Inizia tra' ? ' · fino al ' + cfg.fine.getDate() + ' ' + ['gennaio','febbraio','marzo','aprile','maggio','giugno','luglio','agosto','settembre','ottobre','novembre','dicembre'][cfg.fine.getMonth()] : '') };
   document.body.classList.add('vetrina-on');
   const _lv = V_LIVELLI.indexOf(cfg.livello || window.V_LIVELLO || V_LIVELLO_DEFAULT);
   const lv = _lv < 0 ? 3 : _lv; window.VETRINA.lv = lv;
@@ -3448,7 +3458,7 @@ function _vApply(v, prods, preview){
   clearInterval(window._vTimer);
   if (cfg.fine) {
     const tick = () => {
-      if (new Date() >= cfg.fine) { _vDeactivate(); loadVetrina(); return; }
+      if (new Date() >= cfg.fine) { _vDeactivate(); Promise.resolve(loadVetrina()).then(() => { if (currentPage === 'offerte') { if (window.VETRINA && window.VETRINA.active) showPage('offerte'); else nav('home'); } }); return; }
       const t = (cfg.cdLabel || 'Termina tra') + ' ' + _vCountdown(cfg.fine);
       const pc = document.getElementById('promoCd'); if (pc && cfg.fascia) pc.textContent = t;
       const vc = document.getElementById('vetrinaCd'); if (vc) vc.textContent = t;
@@ -4295,12 +4305,13 @@ function showPage(page) {
   document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));
   // Nav: solido su tutte le pagine TRANNE home (che ha hero scuro)
   document.body.classList.toggle('solid-nav', page !== 'home');
+  document.body.classList.toggle('on-offerte', page === 'offerte');
 
 
-  const collectionPages = ['borse','portafogli','cinture','accessori','scarpe'];
+  const collectionPages = ['borse','portafogli','cinture','accessori','scarpe','offerte'];
   if (collectionPages.includes(page)) {
     document.getElementById('pg-collection').classList.add('active');
-    const info = COL_INFO[page];
+    const info = COL_INFO[page] || { title: 'Offerte', meta: '' };
     document.getElementById('col-title').textContent = info.title;
     document.getElementById('col-meta').textContent = info.meta;
     // Header: immagine custom (se presente) subito, altrimenti foto prodotto dopo il fetch
@@ -4319,7 +4330,9 @@ function showPage(page) {
         <div style="height:12px;background:var(--rose-pp);border-radius:2px;width:40%"></div>
       </div>`).join('');
     // Fetch async
-    fetchProducts(page, 250).then(apiProds => {
+    (page === 'offerte' ? _vWaitProds() : fetchProducts(page, 250)).then(apiProds => {
+      if (page === 'offerte' && !apiProds) { nav('home'); return; }
+      if (page === 'offerte') { document.getElementById('col-title').textContent = COL_INFO.offerte.title; document.getElementById('col-meta').textContent = COL_INFO.offerte.meta; }
       const prods = (apiProds && apiProds.length > 0) ? apiProds : (PRODUCTS[page] || []);
       grid.innerHTML = prods.map((p,i)=>makeCard(p,`d${i%5}`)).join('');
       // Header categoria: immagine custom > foto prodotto reale > line-art
@@ -4721,7 +4734,7 @@ function _handleOf(p){
 }
 
 
-const ROUTE_PAGES = ['vetrine','pacchetti','home','borse','portafogli','cinture','accessori','scarpe','contatti','vendi','cart','privacy','termini','spedizioni','resi','note-legali','account'];
+const ROUTE_PAGES = ['vetrine','pacchetti','offerte','home','borse','portafogli','cinture','accessori','scarpe','contatti','vendi','cart','privacy','termini','spedizioni','resi','note-legali','account'];
 
 function _hashFor(page){
   if (page === 'product') { const h = _handleOf(currentProductData); return h ? '#/prodotto/' + h : null; }
