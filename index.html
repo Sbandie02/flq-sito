@@ -3220,13 +3220,6 @@ function _vBuiltin(now){
 }
 async function _vApplyBuiltin(x){
   const b = x.b;
-  if (x.fase === 'annuncio') {
-    const cfg = { fascia: b.teaser.fascia, barra: b.teaser.barra.slice(), colore: 'black friday', fine: b.inizio, cdLabel: 'Inizia tra', noHub: true };
-    _vApply({ handle: b.handle, title: b.title, image: null, productCount: 0, cfg }, [], false);
-    document.getElementById('vColBanner')?.classList.remove('on');
-    document.querySelector('.hero-vetrina-img')?.remove();
-    return;
-  }
   // Prodotti davvero scontati, da tutte le categorie
   let prods = [];
   try {
@@ -3239,9 +3232,21 @@ async function _vApplyBuiltin(x){
     }));
     prods.sort((a, c) => (c.discountPct || 0) - (a.discountPct || 0));
   } catch(_) {}
-  const L = b.live;
-  const cfg = { colore: L.colore, sezione: L.sezione,
-    fascia: prods.length ? L.fasciaOfferte : L.fasciaSenza, barra: L.barra.slice(), inizio: b.inizio, fine: b.fine };
+  // Nessun prodotto scontato: si mostra una selezione di pezzi, senza parlare di sconti
+  let selezione = false;
+  if (!prods.length) {
+    const seen = new Set();
+    Object.keys(COLLECTION_HANDLES).forEach(c => (CACHE[c] || []).slice(0, 3).forEach(p => {
+      const h = _handleOf(p); if (!h || seen.has(h) || p.available === false) return;
+      seen.add(h); prods.push({ ...p, cat: p.cat || c });
+    }));
+    prods = prods.slice(0, 8); selezione = prods.length > 0;
+  }
+  const L = b.live, ann = x.fase === 'annuncio';
+  const cfg = { colore: L.colore, sezione: selezione ? 'La selezione del Black Friday' : L.sezione, selezione,
+    fascia: ann ? b.teaser.fascia : (selezione ? L.fasciaSenza : L.fasciaOfferte),
+    barra: (ann ? b.teaser.barra : L.barra).slice(), inizio: b.inizio,
+    fine: ann ? b.inizio : b.fine, cdLabel: ann ? 'Inizia tra' : 'Termina tra' };
   _vApply({ handle: b.handle, title: b.title, image: null, productCount: prods.length, cfg }, prods, false);
 }
 
@@ -3266,7 +3271,7 @@ async function _vHub(v, prods, cfg){
   const best = prods.slice().sort((a, b) => (b.discountPct || 0) - (a.discountPct || 0))[0];
   const img = p => p && p.image ? '<img src="' + shopImg(p.image, 500) + '" alt="" loading="lazy">' : '';
   const tiles = [
-    '<button class="v-tile v-tile-main" onclick="goVetrina()"><span class="v-tile-k">' + esc(nome) + '</span><strong>' + esc(cfg.sezione || nome) + '</strong>' + (cfg.fascia ? '<span class="v-tile-txt v-tile-txt-l">' + esc(cfg.fascia) + '</span>' : '') + '<em class="v-tile-cd" id="vHubCd"></em><span class="v-tile-go">' + (prods.length ? 'Vedi le offerte →' : 'Vedi la selezione →') + '</span></button>',
+    '<button class="v-tile v-tile-main" onclick="goVetrina()"><span class="v-tile-k">' + esc(nome) + '</span><strong>' + esc(cfg.sezione || nome) + '</strong>' + (cfg.fascia ? '<span class="v-tile-txt v-tile-txt-l">' + esc(cfg.fascia) + '</span>' : '') + '<em class="v-tile-cd" id="vHubCd"></em><span class="v-tile-go">' + (prods.length && !cfg.selezione ? 'Vedi le offerte →' : 'Vedi la selezione →') + '</span></button>',
     best && best.discountPct ? '<button class="v-tile" onclick="openProductByHandle(\'' + esc(_handleOf(best)) + '\')"><span class="v-tile-k">L\'offerta più forte</span><strong>' + esc(best.brand) + '</strong>' + img(best) + '<span class="v-pill">' + best.discountPct + '% di sconto</span></button>' : '',
     '<button class="v-tile" onclick="nav(\'borse\')"><span class="v-tile-k">Pezzi unici</span><strong>Quando è venduto, è venduto</strong><span class="v-tile-txt">Ogni articolo è certificato Entrupy e disponibile in un solo esemplare.</span><span class="v-tile-go">Scopri le borse →</span></button>',
     '<button class="v-tile" onclick="scrollToLive()"><span class="v-tile-k">In diretta</span><strong>Le offerte anche in live</strong><span class="v-tile-txt">eBay il giovedì e il sabato dalle 19:30, TikTok dalle 22:00.</span><span class="v-tile-go">Le prossime live →</span></button>'
@@ -3419,7 +3424,7 @@ function _vApply(v, prods, preview){
     const isGeneric = /^vetrina$/i.test((v.title||'').trim());
     const niceTitle = (v.title||'').replace(/^vetrina\s*[-–:]?\s*/i, '').trim();
     document.getElementById('vetrinaTitle').textContent = cfg.sezione || (isGeneric || !niceTitle ? 'Selezione del momento' : niceTitle);
-    if (label) label.textContent = cfg.fine ? 'Solo per pochi giorni' : 'In evidenza';
+    if (label) label.textContent = cfg.cdLabel === 'Inizia tra' ? 'In anteprima' : (cfg.fine ? 'Solo per pochi giorni' : 'In evidenza');
     document.getElementById('vetrinaCd').textContent = '';
     document.getElementById('vetrinaProds').innerHTML = prods.slice(0, 8).map((p,i) => makeCard(p, 'd' + (i%4))).join('');
     sec.classList.add('on');
@@ -3431,7 +3436,7 @@ function _vApply(v, prods, preview){
 
   // Tutto il sito: etichetta sui prodotti in promozione, fascia nelle collezioni, avviso in scheda prodotto
   window.VETRINA.nome = (v.title||'').replace(/^vetrina\s*[-–:]?\s*/i, '').trim() || 'In promozione';
-  window._vSet = new Set(prods.map(_handleOf).filter(Boolean));
+  window._vSet = new Set(cfg.selezione ? [] : prods.map(_handleOf).filter(Boolean));
   _vTagCards();
   const cb = document.getElementById('vColBanner');
   if (cb && cfg.fascia && lv >= 2) { document.getElementById('vColText').textContent = cfg.fascia; cb.classList.add('on'); }
