@@ -235,6 +235,19 @@ body.pannello-mode .btn-outline{border-color:#9E4A65;color:var(--rose-d);}
 .vd-f-row .vd-f:last-child{flex:0 0 120px;}
 .vd-steps{margin:0 0 14px;padding-left:20px;font:300 14px/1.8 var(--sans);}
 .vd-linkbtn{background:none;border:0;padding:0;font:inherit;color:var(--rose-d);text-decoration:underline;cursor:pointer;}
+.pn-act{white-space:nowrap;text-align:right;}
+.pn-price-btn{min-height:36px;padding:0 12px;margin-right:12px;border:1px solid #9E4A65;background:#fff;color:var(--rose-d);font:400 11px/1 var(--sans);letter-spacing:.08em;text-transform:uppercase;cursor:pointer;}
+.pn-price-btn:hover{background:#9E4A65;color:#fff;}
+.pn-pr{max-width:520px;}
+.pn-pr-quick{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:4px 0 16px;font:300 13px/1.3 var(--sans);color:#6E5560;}
+.pn-pr-quick span{flex:1 1 100%;}
+.pn-pr-quick button{min-height:38px;padding:0 12px;border:1px solid var(--rose-l);background:#fff;cursor:pointer;font:500 13px/1 var(--sans);color:var(--text);}
+.pn-pr-quick button:hover{border-color:#9E4A65;}
+.pn-pr-pct{font:400 14px/1.4 var(--sans)!important;color:#1E6B3E!important;margin:0 0 12px!important;}
+.pn-pr-pct.warn{color:#8A5A00!important;}
+.pn-pr-30{display:flex;gap:10px;align-items:flex-start;background:#FFF6E5;padding:12px;font:300 13px/1.5 var(--sans);color:var(--text);margin-bottom:6px;cursor:pointer;}
+.pn-pr-30 input{margin-top:3px;width:18px;height:18px;flex:none;}
+.pn-pr-30[hidden]{display:none;}
 .pn-layout{display:flex;flex-wrap:wrap;max-width:1320px;margin:0 auto;}
 .pn-side{flex:0 0 240px;padding:32px 0 40px 24px;display:flex;flex-direction:column;gap:2px;}
 .pn-sg{font:400 10px/1 var(--sans);letter-spacing:.18em;text-transform:uppercase;color:#6E5560;margin:18px 0 8px 12px;}
@@ -4004,7 +4017,7 @@ async function renderCatalogo(){
       '<td><strong>' + esc(x.p.name) + '</strong><small>' + esc(x.p.brand) + '</small></td><td>' + (labels[x.cat] || x.cat) + '</td>' +
       '<td>' + esc(x.p.price) + (x.p.comparePrice ? ' <s>' + esc(x.p.comparePrice) + '</s>' : '') + '</td>' +
       '<td>' + (x.esaurito ? '<span class="pn-tag-e">Esaurito</span>' : (x.p.isSale ? '<span class="pn-tag-o">−' + x.p.discountPct + '%</span>' : '<span class="pn-tag-ok">In vendita</span>')) + x.avvisi.map(a => '<span class="pn-tag-w">' + a + '</span>').join('') + '</td>' +
-      '<td><a href="' + _pnAdminUrl(x.p) + '" target="_blank" rel="noopener">Modifica</a></td></tr>').join('') +
+      '<td class="pn-act"><button class="pn-price-btn" onclick="_pnPrezzo(\'' + esc(_handleOf(x.p)) + '\')">Prezzo e sconto</button><a href="' + _pnAdminUrl(x.p) + '" target="_blank" rel="noopener">Modifica</a></td></tr>').join('') +
     '</tbody></table></div>';
   _pnFiltra(f);
 }
@@ -4012,6 +4025,70 @@ function _pnFiltra(k){
   document.querySelectorAll('.pn-chip').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.f === k)));
   document.querySelectorAll('.pn-table tbody tr').forEach(r => {
     r.hidden = !(k === 'tutti' || (k === 'offerta' && r.dataset.o === '1') || (k === 'esauriti' && r.dataset.e === '1') || (k === 'sistemare' && r.dataset.s === '1'));
+  });
+}
+
+// ── PREZZO E SCONTO dal Catalogo (scrive su Shopify tramite /pannello/api/vetrina) ──
+const _pnNum = t => { const v = parseFloat(String(t || '').replace(/[^\d,.]/g, '').replace(/\.(?=\d{3}(\D|$))/g, '').replace(',', '.')); return isNaN(v) ? null : v; };
+function _pnFindProd(handle){
+  for (const c of Object.keys(COLLECTION_HANDLES)) { const p = (CACHE[c] || []).find(x => _handleOf(x) === handle); if (p) return p; }
+  return null;
+}
+function _pnPrezzo(handle){
+  const p = _pnFindProd(handle); if (!p) return;
+  const esc = t => String(t == null ? '' : t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const now = _pnNum(p.price), was = p.comparePrice ? _pnNum(p.comparePrice) : null;
+  _vCloseModal();
+  const m = document.createElement('div'); m.id = 'vdModal'; m.className = 'vd-modal';
+  m.innerHTML = '<form class="vd-m-box pn-pr" role="dialog" aria-modal="true" aria-labelledby="vdMTitle" novalidate>' +
+    '<h3 id="vdMTitle">' + esc(p.name) + '</h3><p class="vd-m-small">' + esc(p.brand) + ' · oggi ' + esc(p.price) + (p.comparePrice ? ' (barrato ' + esc(p.comparePrice) + ')' : '') + '</p>' +
+    '<div class="pn-pr-quick"><span>Sconto rapido sul prezzo pieno:</span>' + [10,20,30].map(k => '<button type="button" data-k="' + k + '">−' + k + '%</button>').join('') + (was ? '<button type="button" data-k="0">Togli lo sconto</button>' : '') + '</div>' +
+    '<div class="vd-f-row"><label class="vd-f"><span>Prezzo di vendita (€)</span><input id="prP" type="text" inputmode="decimal" value="' + (now ?? '') + '"></label>' +
+    '<label class="vd-f"><span>Prezzo barrato (€) <i>facoltativo</i></span><input id="prB" type="text" inputmode="decimal" value="' + (was ?? '') + '"></label></div>' +
+    '<p class="pn-pr-pct" id="prPct"></p>' +
+    '<label class="pn-pr-30" id="prC"><input type="checkbox" id="prC30"> <span>Confermo che il prezzo barrato è il prezzo più basso applicato a questo pezzo nei 30 giorni prima dello sconto (Codice del Consumo, art. 17-bis).</span></label>' +
+    '<label class="vd-m-pin">PIN del pannello<input id="vdPin" type="password" inputmode="numeric" autocomplete="current-password" value="' + esc(_vPinGet()) + '"></label>' +
+    '<p class="vd-m-msg" id="vdMsg" role="status"></p>' +
+    '<div class="vd-actions"><button type="button" class="btn btn-outline" onclick="_vCloseModal()">Annulla</button><button type="submit" class="btn btn-fill" id="vdOk">Salva su Shopify</button></div></form>';
+  m.addEventListener('click', e => { if (e.target === m) _vCloseModal(); });
+  document.body.appendChild(m); document.addEventListener('keydown', _vModalKey);
+  const P = document.getElementById('prP'), B = document.getElementById('prB'), C = document.getElementById('prC'), C30 = document.getElementById('prC30'), pct = document.getElementById('prPct'), msg = document.getElementById('vdMsg'), ok = document.getElementById('vdOk');
+  const upd = () => {
+    const a = _pnNum(P.value), b = _pnNum(B.value);
+    C.hidden = !(b > 0);
+    if (a > 0 && b > a) { const d = Math.round((1 - a / b) * 100); pct.textContent = 'Sconto mostrato sul sito: −' + d + '%' + (d < 5 ? ' (molto basso: sotto la scritta della promo può sembrare poco)' : ''); pct.className = 'pn-pr-pct' + (d < 5 ? ' warn' : ''); }
+    else if (b > 0) { pct.textContent = 'Il prezzo barrato deve essere più alto del prezzo di vendita.'; pct.className = 'pn-pr-pct warn'; }
+    else { pct.textContent = 'Nessuno sconto: sul sito compare solo il prezzo.'; pct.className = 'pn-pr-pct'; }
+  };
+  m.querySelectorAll('.pn-pr-quick button').forEach(btn => btn.onclick = () => {
+    const k = +btn.dataset.k;
+    if (k === 0) { P.value = was ?? now; B.value = ''; C30.checked = false; }
+    else { const base = was || now; B.value = base; P.value = Math.round(base * (1 - k / 100)); }
+    upd();
+  });
+  P.oninput = B.oninput = upd; upd();
+  m.querySelector('form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const pin = (document.getElementById('vdPin').value || '').trim();
+    const a = _pnNum(P.value), b = _pnNum(B.value);
+    const say = t => { msg.className = 'vd-m-msg err'; msg.textContent = t; };
+    if (!(a > 0)) return say('Scrivete il prezzo di vendita.');
+    if (b > 0 && b <= a) return say('Il prezzo barrato deve essere più alto del prezzo di vendita.');
+    if (b > 0 && !C30.checked) return say('Spuntate la conferma sul prezzo più basso degli ultimi 30 giorni.');
+    if (!pin) return say('Inserite il PIN.');
+    ok.disabled = true; ok.textContent = 'Un attimo…';
+    let res, data = {};
+    try { res = await fetch('/pannello/api/vetrina', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ action: 'prezzo', pin, id: p.id, prezzo: a, barrato: b > 0 ? b : null, conferma30: b > 0 ? C30.checked : false }) }); data = await res.json().catch(() => ({})); }
+    catch (_) { data = { error: 'Connessione assente: riprovate.' }; }
+    if (res && res.ok && data.ok) {
+      _vPinSet(pin);
+      const fmt = v => '€ ' + Number(v).toLocaleString('it-IT', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+      p.price = fmt(a); p.isSale = b > a; p.comparePrice = p.isSale ? fmt(b) : null; p.discountPct = p.isSale ? Math.round((1 - a / b) * 100) : 0; p.badge = p.isSale ? 'sale' : 'cert';
+      msg.className = 'vd-m-msg okk'; msg.textContent = 'Salvato su Shopify. Sul sito si aggiorna in pochi secondi.'; ok.remove();
+      setTimeout(() => { _vCloseModal(); if (currentPage === 'catalogo') renderCatalogo(); }, 1500); return;
+    }
+    if (res && res.status === 401) { _vPinSet(''); document.getElementById('vdPin').value = ''; }
+    say(data.error || 'Qualcosa non ha funzionato, riprovate.'); ok.disabled = false; ok.textContent = 'Salva su Shopify';
   });
 }
 

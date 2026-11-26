@@ -124,10 +124,45 @@ async function headlessPublicationId(env, fetchFn) {
   return hit && hit.id;
 }
 
+// ── PREZZO e PREZZO BARRATO di un prodotto (prima variante) ──
+// Il prezzo barrato deve essere il più basso degli ultimi 30 giorni (art. 17-bis Codice del Consumo):
+// senza la conferma esplicita di chi lo inserisce non viene salvato.
+export function checkPrezzo(prezzo, barrato, conferma30) {
+  const num = v => (v === null || v === undefined || v === '') ? null : Number(String(v).replace(',', '.'));
+  const p = num(prezzo), b = num(barrato);
+  if (!(p > 0) || p > 1000000) return { error: 'Prezzo non valido' };
+  if (b !== null && !(b > 0)) return { error: 'Prezzo barrato non valido' };
+  if (b !== null && b <= p) return { error: 'Il prezzo barrato deve essere più alto del prezzo di vendita' };
+  if (b !== null && conferma30 !== true) return { error: 'Confermate che il prezzo barrato è il più basso degli ultimi 30 giorni' };
+  return { price: p.toFixed(2), compareAtPrice: b === null ? null : b.toFixed(2) };
+}
+async function cambiaPrezzo(env, fetchFn, { id, prezzo, barrato, conferma30 }) {
+  if (!/^gid:\/\/shopify\/Product\/\d+$/.test(String(id || ''))) return json({ ok: false, error: 'Prodotto non valido' }, 400);
+  const c = checkPrezzo(prezzo, barrato, conferma30);
+  if (c.error) return json({ ok: false, error: c.error }, 400);
+  try {
+    const d = await admin(env, fetchFn, 'query($id:ID!){ product(id:$id){ id title variants(first:1){ nodes{ id } } } }', { id });
+    const v = d && d.product && d.product.variants && d.product.variants.nodes && d.product.variants.nodes[0];
+    if (!v) return json({ ok: false, error: 'Prodotto non trovato' }, 404);
+    const u = await admin(env, fetchFn,
+      'mutation($productId:ID!,$variants:[ProductVariantsBulkInput!]!){ productVariantsBulkUpdate(productId:$productId, variants:$variants){ productVariants{ id price compareAtPrice } userErrors{ field message } } }',
+      { productId: id, variants: [{ id: v.id, price: c.price, compareAtPrice: c.compareAtPrice }] });
+    const r = u && u.productVariantsBulkUpdate;
+    if (!r || (r.userErrors && r.userErrors.length)) return json({ ok: false, error: (r && r.userErrors || []).map(e => e.message).join('; ') || 'Salvataggio non riuscito' }, 422);
+    return json({ ok: true, action: 'prezzo', title: d.product.title, price: c.price, compareAtPrice: c.compareAtPrice });
+  } catch (e) {
+    const m = String(e && e.message || '');
+    if (m === 'config') return json({ ok: false, error: 'Pannello non ancora attivato: manca la chiave Shopify sul server.' }, 503);
+    if (m === 'auth' || m.startsWith('token')) return json({ ok: false, error: 'Shopify ha rifiutato la chiave di accesso: va rigenerata.' }, 502);
+    if (m === 'graphql') return json({ ok: false, error: 'Shopify ha rifiutato l\'operazione: controllate i permessi della chiave.' }, 502);
+    return json({ ok: false, error: 'Shopify non risponde, riprova tra poco.' }, 502);
+  }
+}
+
 export async function onRequestPost({ request, env }, fetchFn = fetch) {
   let body;
   try { body = await request.json(); } catch (_) { return json({ ok: false, error: 'Richiesta non valida' }, 400); }
-  const { action, id, pin, nome, campi, attiva } = body || {};
+  const { action, id, pin, nome, campi, attiva, prezzo, barrato, conferma30 } = body || {};
 
   if (!env.PANNELLO_PIN || String(env.PANNELLO_PIN).length < 6 || !shopHost(env))
     return json({ ok: false, error: 'Pubblicazione non ancora attivata: mancano le impostazioni sul server.' }, 503);
@@ -135,7 +170,8 @@ export async function onRequestPost({ request, env }, fetchFn = fetch) {
     await new Promise(r => setTimeout(r, 800)); // rallenta i tentativi a caso
     return json({ ok: false, error: 'PIN non corretto' }, 401);
   }
-  if (!['pubblica', 'ritira', 'crea', 'salva'].includes(action)) return json({ ok: false, error: 'Azione non valida' }, 400);
+  if (!['pubblica', 'ritira', 'crea', 'salva', 'prezzo'].includes(action)) return json({ ok: false, error: 'Azione non valida' }, 400);
+  if (action === 'prezzo') return cambiaPrezzo(env, fetchFn, { id, prezzo, barrato, conferma30 });
   if (action !== 'crea' && !/^gid:\/\/shopify\/Collection\/\d+$/.test(String(id || ''))) return json({ ok: false, error: 'Collezione non valida' }, 400);
 
   const UPDATE = 'mutation($input:CollectionInput!){ collectionUpdate(input:$input){ collection{ id handle } userErrors{ field message } } }';
