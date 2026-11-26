@@ -1,12 +1,12 @@
 // Cloudflare Pages Function: POST /pannello/api/vetrina
-// Pubblica o ritira una festività ("Vetrina ...") su Shopify, togliendo o
+// Crea, modifica, pubblica o ritira una festività ("Vetrina ...") su Shopify, togliendo o
 // aggiungendo la riga "Stato: bozza" nella descrizione della collezione.
 //
 // Segreti da impostare in Cloudflare → flq-sito → Settings → Variables and Secrets:
 //   PANNELLO_PIN           PIN conosciuto solo da chi gestisce il negozio (almeno 6 caratteri)
 //   SHOPIFY_SHOP           es. 1263f5  (sottodominio .myshopify.com del negozio)
 //   SHOPIFY_CLIENT_ID      } app creata nella Dev Dashboard di Shopify
-//   SHOPIFY_CLIENT_SECRET  } (permesso: write_products)
+//   SHOPIFY_CLIENT_SECRET  } (permessi: write_products, read_publications, write_publications)
 //   SHOPIFY_ADMIN_TOKEN    (alternativa: token shpat_ di una vecchia app personalizzata)
 //
 // La funzione accetta SOLO collezioni il cui handle è "vetrina" o inizia con "vetrina-":
@@ -80,10 +80,54 @@ export function setDraft(html) {
   return '<p>Stato: bozza</p>' + stripState(html);
 }
 
+// ── Impostazioni scritte dal pannello (crea / salva) ──
+const FIELDS = [ // [chiave nel pannello, etichetta nella descrizione, lunghezza massima]
+  ['titolo', 'Titolo', 80], ['titolo2', 'Titolo evidenziato', 80], ['testo', 'Testo', 200],
+  ['fascia', 'Fascia', 120], ['sezione', 'Sezione', 80], ['inizio', 'Inizio', 16], ['fine', 'Fine', 16], ['colore', 'Colore', 20]
+];
+const COLORI = ['natale','rosso','black friday','nero','oro','san valentino','rosa','verde','blu','bordeaux'];
+const DATE_RE = /^\d{1,2}\/\d{1,2}\/\d{4}( \d{1,2}:\d{2})?$/;
+
+function clean(v, max) {
+  return String(v == null ? '' : v).replace(/[\u0000-\u001f<>]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, max);
+}
+const escHtml = t => t.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+
+// Ritorna { html } oppure { error }
+export function buildDescription(f, bozza) {
+  f = f || {};
+  const lines = [];
+  for (const [k, label, max] of FIELDS) {
+    const v = clean(f[k], max);
+    if (!v) continue;
+    if ((k === 'inizio' || k === 'fine') && !DATE_RE.test(v)) return { error: 'La data di ' + label + ' va scritta come 01/12/2026 (ora facoltativa: 01/12/2026 18:00)' };
+    if (k === 'colore' && !/^#[0-9a-f]{6}$/i.test(v) && !COLORI.includes(v.toLowerCase())) return { error: 'Colore non riconosciuto' };
+    lines.push('<p>' + label + ': ' + escHtml(v) + '</p>');
+  }
+  if (!lines.length) return { error: 'Scrivete almeno il titolo o la fascia' };
+  return { html: (bozza ? '<p>Stato: bozza</p>' : '') + lines.join('') };
+}
+
+export function slugify(t) {
+  return String(t || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 50);
+}
+
+const isVetrina = h => h === 'vetrina' || String(h || '').startsWith('vetrina-');
+const isBozza = html => new RegExp('(^|>|\\n)\\s*' + STATE_KEYS + '\\s*:\\s*(bozza|no\\b|spent|disattiv|pausa)', 'i').test(String(html || ''));
+
+async function headlessPublicationId(env, fetchFn) {
+  if (env.SHOPIFY_PUBLICATION_ID) return env.SHOPIFY_PUBLICATION_ID;
+  const d = await admin(env, fetchFn, '{ publications(first: 25) { nodes { id name } } }');
+  const list = (d && d.publications && d.publications.nodes) || [];
+  const hit = list.find(p => /headless/i.test(p.name)) || null;
+  return hit && hit.id;
+}
+
 export async function onRequestPost({ request, env }, fetchFn = fetch) {
   let body;
   try { body = await request.json(); } catch (_) { return json({ ok: false, error: 'Richiesta non valida' }, 400); }
-  const { action, id, pin } = body || {};
+  const { action, id, pin, nome, campi } = body || {};
 
   if (!env.PANNELLO_PIN || String(env.PANNELLO_PIN).length < 6 || !shopHost(env))
     return json({ ok: false, error: 'Pubblicazione non ancora attivata: mancano le impostazioni sul server.' }, 503);
@@ -91,20 +135,51 @@ export async function onRequestPost({ request, env }, fetchFn = fetch) {
     await new Promise(r => setTimeout(r, 800)); // rallenta i tentativi a caso
     return json({ ok: false, error: 'PIN non corretto' }, 401);
   }
-  if (action !== 'pubblica' && action !== 'ritira') return json({ ok: false, error: 'Azione non valida' }, 400);
-  if (!/^gid:\/\/shopify\/Collection\/\d+$/.test(String(id || ''))) return json({ ok: false, error: 'Collezione non valida' }, 400);
+  if (!['pubblica', 'ritira', 'crea', 'salva'].includes(action)) return json({ ok: false, error: 'Azione non valida' }, 400);
+  if (action !== 'crea' && !/^gid:\/\/shopify\/Collection\/\d+$/.test(String(id || ''))) return json({ ok: false, error: 'Collezione non valida' }, 400);
 
+  const UPDATE = 'mutation($input:CollectionInput!){ collectionUpdate(input:$input){ collection{ id handle } userErrors{ field message } } }';
   try {
+    // ── CREA: nuova festività in bozza, pubblicata sul canale Headless ──
+    if (action === 'crea') {
+      const name = clean(nome, 40);
+      const slug = slugify(name);
+      if (!slug) return json({ ok: false, error: 'Scrivete il nome della festività' }, 400);
+      const built = buildDescription(campi, true);
+      if (built.error) return json({ ok: false, error: built.error }, 400);
+      const handle = 'vetrina-' + slug;
+      const ex = await admin(env, fetchFn, 'query($h:String!){ collectionByHandle(handle:$h){ id } }', { h: handle });
+      if (ex && ex.collectionByHandle) return json({ ok: false, error: 'Esiste già una "Vetrina ' + name + '": modificatela dalla sua scheda.' }, 409);
+      const c = await admin(env, fetchFn,
+        'mutation($input:CollectionInput!){ collectionCreate(input:$input){ collection{ id handle title } userErrors{ field message } } }',
+        { input: { title: 'Vetrina ' + name, handle, descriptionHtml: built.html } });
+      const ce = c && c.collectionCreate;
+      if (!ce || (ce.userErrors && ce.userErrors.length) || !ce.collection) return json({ ok: false, error: (ce && ce.userErrors || []).map(e => e.message).join('; ') || 'Creazione non riuscita' }, 422);
+      let published = false;
+      const pubId = await headlessPublicationId(env, fetchFn);
+      if (pubId) {
+        const pu = await admin(env, fetchFn,
+          'mutation($id:ID!,$input:[PublicationInput!]!){ publishablePublish(id:$id, input:$input){ userErrors{ field message } } }',
+          { id: ce.collection.id, input: [{ publicationId: pubId }] });
+        published = !(pu && pu.publishablePublish && pu.publishablePublish.userErrors && pu.publishablePublish.userErrors.length);
+      }
+      return json({ ok: true, action, id: ce.collection.id, handle: ce.collection.handle, title: ce.collection.title, published });
+    }
+
     const d = await admin(env, fetchFn, 'query($id:ID!){ collection(id:$id){ id handle title descriptionHtml } }', { id });
     const col = d && d.collection;
     if (!col) return json({ ok: false, error: 'Collezione non trovata' }, 404);
-    if (!(col.handle === 'vetrina' || col.handle.startsWith('vetrina-')))
-      return json({ ok: false, error: 'Si possono pubblicare solo le collezioni "Vetrina…"' }, 403);
+    if (!isVetrina(col.handle)) return json({ ok: false, error: 'Si possono modificare solo le collezioni "Vetrina…"' }, 403);
 
-    const descriptionHtml = action === 'pubblica' ? stripState(col.descriptionHtml) : setDraft(col.descriptionHtml);
-    const u = await admin(env, fetchFn,
-      'mutation($input:CollectionInput!){ collectionUpdate(input:$input){ collection{ id handle } userErrors{ field message } } }',
-      { input: { id, descriptionHtml } });
+    let descriptionHtml;
+    if (action === 'salva') {
+      const built = buildDescription(campi, isBozza(col.descriptionHtml));
+      if (built.error) return json({ ok: false, error: built.error }, 400);
+      descriptionHtml = built.html;
+    } else {
+      descriptionHtml = action === 'pubblica' ? stripState(col.descriptionHtml) : setDraft(col.descriptionHtml);
+    }
+    const u = await admin(env, fetchFn, UPDATE, { input: { id, descriptionHtml } });
     const errs = u && u.collectionUpdate && u.collectionUpdate.userErrors;
     if (errs && errs.length) return json({ ok: false, error: errs.map(e => e.message).join('; ') }, 422);
     return json({ ok: true, action, handle: col.handle, title: col.title });
@@ -112,6 +187,7 @@ export async function onRequestPost({ request, env }, fetchFn = fetch) {
     const m = String(e && e.message || '');
     if (m === 'config') return json({ ok: false, error: 'Pubblicazione non ancora attivata: manca la chiave Shopify sul server.' }, 503);
     if (m === 'auth' || m.startsWith('token')) return json({ ok: false, error: 'Shopify ha rifiutato la chiave di accesso: va rigenerata.' }, 502);
+    if (m === 'graphql') return json({ ok: false, error: 'Shopify ha rifiutato l\'operazione: controllate i permessi della chiave (prodotti e pubblicazioni).' }, 502);
     return json({ ok: false, error: 'Shopify non risponde, riprova tra poco.' }, 502);
   }
 }

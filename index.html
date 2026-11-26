@@ -175,6 +175,15 @@ body.pannello-mode .btn-outline{border-color:#9E4A65;color:var(--rose-d);}
 .vd-checks{margin:12px 0 0;padding:10px 14px 10px 30px;background:#FFF7E6;border-left:3px solid #E0A526;font:300 13px/1.6 var(--sans);color:#6B4A00;}
 .vd-ok{font:400 13px/1.5 var(--sans);color:#1E6B3E;font-style:normal;margin:12px 0 0;}
 .vd-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px;}
+.vd-form{max-width:520px;max-height:calc(100vh - 32px);overflow-y:auto;}
+.vd-f{display:flex;flex-direction:column;gap:6px;margin:0 0 12px;font:400 10px/1.3 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:#6E5560;flex:1;}
+.vd-f i{font-style:normal;text-transform:none;letter-spacing:0;color:#8A7078;}
+.vd-f input,.vd-f select{padding:11px 12px;border:1px solid var(--rose-l);font:300 15px/1.3 var(--sans);color:var(--text);letter-spacing:0;text-transform:none;background:#fff;box-sizing:border-box;width:100%;}
+.vd-f input:focus,.vd-f select:focus{outline:none;border-color:#9E4A65;}
+.vd-f-row{display:flex;gap:12px;}
+.vd-f-row .vd-f:last-child{flex:0 0 120px;}
+.vd-steps{margin:0 0 14px;padding-left:20px;font:300 14px/1.8 var(--sans);}
+.vd-linkbtn{background:none;border:0;padding:0;font:inherit;color:var(--rose-d);text-decoration:underline;cursor:pointer;}
 .vd-modal{position:fixed;inset:0;background:rgba(20,14,16,.45);display:flex;align-items:center;justify-content:center;z-index:10000;padding:16px;}
 .vd-m-box{background:#fff;max-width:440px;width:100%;padding:28px 26px 22px;box-shadow:0 20px 60px rgba(0,0,0,.25);}
 .vd-m-box h3{font:400 26px/1.2 var(--serif);font-style:italic;margin:0 0 14px;color:var(--text);}
@@ -3366,6 +3375,101 @@ async function _vDoPublish(v, action, okLabel){
   ok.disabled = false; ok.textContent = okLabel;
 }
 
+// ── PREPARA / MODIFICA una festività dal pannello (niente copia-incolla) ──
+const _VD_COLORI = [['Natale','Natale (rosso e oro)'],['Black Friday','Black Friday (nero e oro)'],['oro','Oro'],['San Valentino','San Valentino (rosa)'],['verde','Verde'],['blu','Blu'],['bordeaux','Bordeaux']];
+function _vIsoDate(d){ return d ? d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0') : ''; }
+function _vHm(d){ return d ? String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0') : ''; }
+function _vFromInputs(dv, tv, isEnd){
+  if (!dv) return '';
+  const [y,m,d] = dv.split('-');
+  const t = (tv || '').trim();
+  const def = isEnd ? '23:59' : '00:00';
+  return d + '/' + m + '/' + y + (t && t !== def ? ' ' + t : '');
+}
+function _vOpenForm(mode, ref){
+  const esc = t => String(t == null ? '' : t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  let d, title, v = null;
+  if (mode === 'crea') {
+    const s = ref >= 0 ? (window._vSugg || [])[ref] : null;
+    d = s ? { nome: s.nome, titolo: s.titolo, titolo2: s.titolo2, fascia: s.fascia, sezione: s.sezione, testo: '', inizio: s.inizio, fine: s.fine, colore: s.colore }
+          : { nome: '', titolo: '', titolo2: '', fascia: '', sezione: '', testo: '', inizio: null, fine: null, colore: 'oro' };
+    title = s ? 'Prepara «' + esc(s.nome) + '»' : 'Nuova festività';
+  } else {
+    v = (window.VETRINE || []).find(x => x.handle === ref); if (!v) return;
+    const c = v.cfg;
+    d = { titolo: c.titolo || '', titolo2: c.titolo2 || '', fascia: c.fascia || '', sezione: c.sezione || '', testo: c.testo || '', inizio: c.inizio, fine: c.fine, colore: c.colore || '' };
+    title = 'Modifica «' + esc(v.title) + '»';
+  }
+  const col = (d.colore || '').toLowerCase();
+  const opts = _VD_COLORI.map(([val, lab]) => '<option value="' + val + '"' + (col && col.includes(val.toLowerCase()) ? ' selected' : '') + '>' + lab + '</option>').join('');
+  const fld = (id, lab, val, hint, max) => '<label class="vd-f"><span>' + lab + (hint ? ' <i>' + hint + '</i>' : '') + '</span><input id="vf_' + id + '" type="text" maxlength="' + (max||80) + '" value="' + esc(val) + '"></label>';
+  _vCloseModal();
+  const m = document.createElement('div');
+  m.id = 'vdModal'; m.className = 'vd-modal';
+  m.innerHTML = '<form class="vd-m-box vd-form" role="dialog" aria-modal="true" aria-labelledby="vdMTitle" novalidate>' +
+    '<h3 id="vdMTitle">' + title + '</h3>' +
+    (mode === 'crea' ? '<p class="vd-m-small">Viene creata <b>in bozza</b>: sul sito non si vede finché non premete Pubblica.</p>' + fld('nome', 'Nome della festività', d.nome, 'es. Natale', 40) : '') +
+    fld('titolo', 'Titolo in prima pagina', d.titolo) +
+    fld('titolo2', 'Seconda riga del titolo', d.titolo2, 'in corsivo rosa') +
+    fld('fascia', 'Fascia promo in alto', d.fascia, 'con conto alla rovescia', 120) +
+    fld('sezione', 'Titolo della sezione prodotti', d.sezione) +
+    fld('testo', 'Frase sotto il titolo', d.testo, 'facoltativa', 200) +
+    '<div class="vd-f-row"><label class="vd-f"><span>Inizio</span><input id="vf_ind" type="date" value="' + _vIsoDate(d.inizio) + '"></label><label class="vd-f"><span>ore</span><input id="vf_int" type="time" value="' + (d.inizio ? _vHm(d.inizio) : '00:00') + '"></label></div>' +
+    '<div class="vd-f-row"><label class="vd-f"><span>Fine</span><input id="vf_fid" type="date" value="' + _vIsoDate(d.fine) + '"></label><label class="vd-f"><span>ore</span><input id="vf_fit" type="time" value="' + (d.fine ? _vHm(d.fine) : '23:59') + '"></label></div>' +
+    '<label class="vd-f"><span>Colore</span><select id="vf_colore">' + opts + '</select></label>' +
+    '<label class="vd-m-pin">PIN del pannello<input id="vdPin" type="password" inputmode="numeric" autocomplete="current-password" value="' + esc(_vPinGet()) + '"></label>' +
+    '<p class="vd-m-msg" id="vdMsg" role="status"></p>' +
+    '<div class="vd-actions"><button type="button" class="btn btn-outline" onclick="_vCloseModal()">Annulla</button><button type="submit" class="btn btn-fill" id="vdOk">' + (mode === 'crea' ? 'Crea in bozza' : 'Salva') + '</button></div></form>';
+  m.addEventListener('click', e => { if (e.target === m) _vCloseModal(); });
+  document.body.appendChild(m);
+  document.addEventListener('keydown', _vModalKey);
+  const form = m.querySelector('form');
+  form.addEventListener('submit', e => { e.preventDefault(); _vSaveForm(mode, v); });
+  (document.getElementById(mode === 'crea' ? 'vf_nome' : 'vf_titolo') || {}).focus?.();
+}
+async function _vSaveForm(mode, v){
+  const g = id => (document.getElementById('vf_' + id) || {}).value || '';
+  const ok = document.getElementById('vdOk'), msg = document.getElementById('vdMsg'), inp = document.getElementById('vdPin');
+  const label = ok.textContent;
+  const say = (t, cls) => { msg.className = 'vd-m-msg ' + (cls || 'err'); msg.textContent = t; };
+  const campi = { titolo: g('titolo'), titolo2: g('titolo2'), fascia: g('fascia'), sezione: g('sezione'), testo: g('testo'),
+    inizio: _vFromInputs(g('ind'), g('int'), false), fine: _vFromInputs(g('fid'), g('fit'), true), colore: g('colore') };
+  if (mode === 'crea' && !g('nome').trim()) { say('Scrivete il nome della festività.'); return; }
+  if (!campi.titolo && !campi.fascia) { say('Scrivete almeno il titolo o la fascia.'); return; }
+  if (!campi.fine) { say('Mettete la data di Fine, così si spegne da sola.'); return; }
+  const di = _vParseDate(campi.inizio, false), df = _vParseDate(campi.fine, true);
+  if (di && df && di >= df) { say('La data di Inizio è dopo la data di Fine.'); return; }
+  const pin = (inp && inp.value || '').trim();
+  if (!pin) { say('Inserite il PIN.'); inp && inp.focus(); return; }
+  ok.disabled = true; ok.textContent = 'Un attimo…'; msg.textContent = ''; msg.className = 'vd-m-msg';
+  let res, data = {};
+  try {
+    res = await fetch('/pannello/api/vetrina', { method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(mode === 'crea' ? { action: 'crea', pin, nome: g('nome'), campi } : { action: 'salva', pin, id: v.id, campi }) });
+    data = await res.json().catch(() => ({}));
+  } catch (_) { data = { error: 'Connessione assente: riprovate.' }; }
+  if (res && res.ok && data.ok) {
+    _vPinSet(pin);
+    if (mode === 'crea') {
+      const numId = String(data.id || '').split('/').pop();
+      const box = document.querySelector('#vdModal .vd-m-box');
+      box.innerHTML = '<h3>Fatto!</h3><p>«' + String(data.title || '').replace(/[&<>"]/g,'') + '» è creata <b>in bozza</b>. Adesso:</p>' +
+        '<ol class="vd-steps"><li>aggiungete i <b>prodotti</b> e la <b>foto</b> su Shopify;</li><li>tornate qui e premete <b>Anteprima</b>;</li><li>se va bene, <b>Pubblica</b>.</li></ol>' +
+        (data.published === false ? '<p class="vd-m-warn">Su Shopify attivate il canale "First Luxury Queen Headless" nella Pubblicazione della collezione, altrimenti qui non compare.</p>' : '') +
+        '<div class="vd-actions"><a class="btn btn-fill" href="' + SHOP_ADMIN + '/collections/' + numId + '" target="_blank" rel="noopener">Aggiungi prodotti e foto</a><button class="btn btn-outline" onclick="_vCloseModal()">Chiudi</button></div>';
+      setTimeout(renderVetrineDashboard, 2500);
+    } else {
+      say('Salvato.', 'okk'); ok.remove();
+      setTimeout(() => { _vCloseModal(); renderVetrineDashboard(); try { _vDeactivate(); loadVetrina(); } catch(_){} }, 1400);
+    }
+    return;
+  }
+  if (res && res.status === 401) { _vPinSet(''); if (inp) { inp.value = ''; inp.focus(); } }
+  if (res && res.status === 404 && !data.error) data.error = 'Funzione non trovata sul server.';
+  say(data.error || 'Qualcosa non ha funzionato, riprovate.');
+  ok.disabled = false; ok.textContent = label;
+}
+
 // ── PANNELLO: chi è collegato (Cloudflare Access) ──
 async function _pnIdentity(){
   if (!IS_PANNELLO || window._pnIdDone) return; window._pnIdDone = true;
@@ -3477,7 +3581,7 @@ async function renderVetrineDashboard(){
 
   // Schede festivita'
   html += '<h2>Le promozioni</h2>';
-  if (!list.length) html += '<p class="vd-empty">Non c\'è ancora nessuna festività. Crea su Shopify una collezione con un nome che inizia con <strong>Vetrina</strong> (es. "Vetrina Natale") e pubblicala sul canale Headless: comparirà qui.</p>';
+  if (!list.length) html += '<p class="vd-empty">Non c\'è ancora nessuna festività. Sceglietene una qui sotto in "Prossime ricorrenze" e premete <strong>Prepara</strong>, oppure <button class="vd-linkbtn" onclick="_vOpenForm(\'crea\', -1)">createne una nuova</button>.</p>';
   list.slice().sort((a,b) => ({attiva:0,programmata:1,bozza:2,conclusa:3}[a.status] - {attiva:0,programmata:1,bozza:2,conclusa:3}[b.status]) || ((a.cfg.inizio||0)-(b.cfg.inizio||0))).forEach(v => {
     const checks = _vChecks(v, list);
     const numId = (v.id || '').split('/').pop();
@@ -3494,17 +3598,18 @@ async function renderVetrineDashboard(){
       '<div class="vd-actions"><a class="btn ' + (v.status === 'bozza' ? 'btn-outline' : 'btn-fill') + '" href="' + location.pathname + '?anteprima=' + encodeURIComponent(v.handle) + '#/" target="_blank" rel="noopener">Anteprima</a>' +
       (v.status === 'bozza' ? '<button class="btn btn-fill vd-pub" onclick="_vAskPublish(\'' + v.handle + '\', \'pubblica\')">Pubblica</button>' : '') +
       ((v.status === 'programmata' || v.status === 'attiva') ? '<button class="btn btn-outline vd-rit" onclick="_vAskPublish(\'' + v.handle + '\', \'ritira\')">Ritira</button>' : '') +
-      '<a class="btn btn-outline" href="' + SHOP_ADMIN + '/collections/' + numId + '" target="_blank" rel="noopener">Modifica su Shopify</a></div>' +
+      (v.status !== 'conclusa' ? '<button class="btn btn-outline" onclick="_vOpenForm(\'salva\', \'' + v.handle + '\')">Modifica testi</button>' : '') +
+      '<a class="btn btn-outline" href="' + SHOP_ADMIN + '/collections/' + numId + '" target="_blank" rel="noopener">Prodotti e foto su Shopify</a></div>' +
       '</div>';
   });
 
   // Prossime ricorrenze da preparare
-  html += '<h2>Prossime ricorrenze da preparare</h2><p class="vd-hint">Per prepararne una: Shopify → Prodotti → Collezioni → Crea collezione, titolo "Vetrina" + nome della festività, pubblicala sul canale Headless e incolla nella descrizione il testo pronto: parte in bozza, quindi qui la vedete, la provate con Anteprima e quando siete pronti premete Pubblica. Date e testi si possono cambiare.</p><div class="vd-sugg">';
+  html += '<h2>Prossime ricorrenze da preparare</h2><p class="vd-hint">Premete <strong>Prepara</strong>: controllate titolo, fascia e date (sono già compilati) e la festività viene creata in bozza. Poi aggiungete prodotti e foto, provatela con Anteprima e quando siete pronti premete Pubblica.</p><div class="vd-sugg">';
   window._vSugg = _vSuggestions(now);
   window._vSugg.forEach((s, i) => {
     const already = list.some(v => v.cfg.inizio && v.cfg.fine && v.cfg.inizio <= s.giorno && v.cfg.fine >= new Date(s.giorno.getFullYear(), s.giorno.getMonth(), s.giorno.getDate()));
     html += '<div class="vd-sugg-item"><strong>' + esc(s.nome) + '</strong><span>' + _vFmt(s.giorno) + '</span>' +
-      (already ? '<em class="vd-ok">✓ già programmata</em>' : '<em>Consigliato: dal ' + _vFmt(s.inizio) + '</em><button class="btn btn-outline" onclick="_vCopy(_vTemplate(window._vSugg[' + i + ']), this)">Copia testo pronto</button>') +
+      (already ? '<em class="vd-ok">✓ già programmata</em>' : '<em>Consigliato: dal ' + _vFmt(s.inizio) + '</em><button class="btn btn-outline" onclick="_vOpenForm(\'crea\', ' + i + ')">Prepara</button>') +
       '</div>';
   });
   html += '</div><p class="vd-hint">Saldi: le date ufficiali le fissa la Regione. Prima di promozioni a ridosso dei saldi verificate le regole con il commercialista. Prezzi barrati: sempre il prezzo più basso degli ultimi 30 giorni (Codice del Consumo, art. 17-bis).</p>';
