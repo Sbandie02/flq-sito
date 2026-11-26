@@ -3973,7 +3973,8 @@ async function renderVetrineDashboard(){
 
   // Prossime ricorrenze da preparare
   html += '<h2>Prossime ricorrenze da preparare</h2><p class="vd-hint">Premete <strong>Prepara</strong>: controllate titolo, fascia e date (sono già compilati) e la festività viene creata in bozza. Poi aggiungete prodotti e foto, provatela con Anteprima e quando siete pronti premete Pubblica.</p><div class="vd-sugg">';
-  window._vSugg = _vSuggestions(now).filter(sg => !pronte.some(b => b.nome === sg.nome));
+  const integrate = BUILTIN_PROMOS.filter(b => b.auto !== false && b.fine > now).map(b => b.nome || b.title.replace(/^Vetrina\s*/i, ''));
+  window._vSugg = _vSuggestions(now).filter(sg => !pronte.some(b => b.nome === sg.nome) && !integrate.includes(sg.nome));
   window._vSugg.forEach((s, i) => {
     const already = list.some(v => v.cfg.inizio && v.cfg.fine && v.cfg.inizio <= s.giorno && v.cfg.fine >= new Date(s.giorno.getFullYear(), s.giorno.getMonth(), s.giorno.getDate()));
     html += '<div class="vd-sugg-item"><strong>' + esc(s.nome) + '</strong><span>' + _vFmt(s.giorno) + '</span>' +
