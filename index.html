@@ -74,6 +74,78 @@ body.vetrina-photo .hero-mosaic-overlay{background:linear-gradient(180deg,rgba(2
 .vetrina-grid{grid-template-columns:repeat(4,1fr);}
 .v-preview-badge{position:fixed;left:16px;bottom:16px;z-index:9000;max-width:calc(100% - 110px);background:#1C1218;color:#fff;font:400 12px/1.5 var(--sans);padding:12px 16px;border-left:3px solid var(--promo-accent,var(--rose));box-shadow:0 8px 30px rgba(0,0,0,.25);}
 .v-preview-badge a{color:var(--rose-m);text-decoration:underline;}
+/* ── PANNELLO RISERVATO ── */
+body.pannello-mode .topbar,body.pannello-mode #promoStrip,body.pannello-mode nav#nav,body.pannello-mode #wa-fab,body.pannello-mode #page-overlay{display:none!important;}
+body.pannello-mode{background:#FAF6F3;}
+.pn-hd{background:#fff;border-bottom:1px solid var(--rose-l);}
+.pn-hd-in{max-width:1120px;margin:0 auto;padding:18px 24px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;}
+.pn-brand{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;}
+.pn-logo{font:italic 400 28px/1.1 var(--serif);color:var(--rose-d);text-decoration:none;}
+.pn-tag{font:400 11px/1 var(--sans);letter-spacing:.18em;text-transform:uppercase;color:#6E5560;}
+.pn-user{display:flex;align-items:center;gap:14px;flex-wrap:wrap;font:300 13px/1.4 var(--sans);color:#6E5560;}
+.pn-user a{font:400 11px/1 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--rose-d);}
+body.pannello-mode .vd-wrap{max-width:1120px;padding:40px 24px 80px;}
+.pn-hello h1{margin:0 0 8px;font:400 48px/1.1 var(--serif);color:var(--text);}
+.pn-hello h1 em{color:#9E4A65;}
+.pn-hello p{margin:0 0 32px;font:300 16px/1.6 var(--sans);color:#6E5560;}
+body.pannello-mode .vd-wrap h2{font:italic 400 32px/1.2 var(--serif);color:var(--rose-d);margin:44px 0 16px;}
+body.pannello-mode .vd-stat span,body.pannello-mode .vd-stat em{color:#6E5560;}
+body.pannello-mode .vd-stat strong{font:500 26px/1.2 var(--serif);}
+body.pannello-mode .vd-actions .btn{min-height:44px;display:inline-flex;align-items:center;}
+body.pannello-mode .btn-fill{background:#9E4A65;border-color:#9E4A65;color:#fff;}
+body.pannello-mode .btn-outline{border-color:#9E4A65;color:var(--rose-d);}
+.vd-legend{display:flex;flex-wrap:wrap;gap:18px;font:300 12px/1 var(--sans);color:#6E5560;margin-top:12px;}
+.vd-legend span{display:flex;align-items:center;gap:6px;}
+.vd-legend i{width:14px;height:8px;display:inline-block;}
+.pn-grow-hd{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px;}
+.pn-grow-hd a{font:400 12px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--rose-d);margin-bottom:22px;}
+.pn-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;}
+.pn-tile{background:#fff;border:1px solid var(--rose-l);padding:22px;display:flex;flex-direction:column;gap:10px;}
+.pn-tile-hd{display:flex;justify-content:space-between;align-items:center;color:#9E4A65;}
+.pn-tile-hd span{font:400 11px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:#6E5560;}
+.pn-tile strong{font:500 15px/1.3 var(--sans);}
+.pn-tile p{margin:0;font:300 14px/1.6 var(--sans);color:#6E5560;}
+.pn-cta{display:inline-flex;align-items:center;min-height:48px;padding:0 28px;background:#9E4A65;color:#fff!important;text-decoration:none;font:400 11px/1.3 var(--sans);letter-spacing:.18em;text-transform:uppercase;margin-top:18px;}
+.pn-cta:hover{background:var(--rose-d);}
+/* pagina pacchetti */
+.pk-intro span{font:400 11px/1 var(--sans);letter-spacing:.2em;text-transform:uppercase;color:#6E5560;}
+.pk-intro h1{margin:14px 0;font:400 56px/1.05 var(--serif);}
+.pk-intro p{margin:0;max-width:760px;font:300 17px/1.7 var(--sans);color:#6E5560;}
+.pk-offer{background:#1C1218;color:#fff;padding:26px 28px;display:flex;flex-wrap:wrap;gap:20px;align-items:center;justify-content:space-between;margin:44px 0;}
+.pk-offer small{display:block;font:400 11px/1 var(--sans);letter-spacing:.2em;text-transform:uppercase;color:#F2CF86;margin-bottom:8px;}
+.pk-offer strong{display:block;font:400 28px/1.25 var(--serif);max-width:700px;}
+.pk-offer p{margin:6px 0 0;font:300 14px/1.5 var(--sans);color:#E8D0DA;}
+.pk-offer a{display:inline-flex;align-items:center;min-height:48px;padding:0 26px;background:#F2CF86;color:#1C1218;text-decoration:none;font:500 11px/1 var(--sans);letter-spacing:.18em;text-transform:uppercase;}
+.pk-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:18px;align-items:stretch;}
+.pk-card{background:#fff;border:1px solid var(--rose-l);padding:30px 28px;display:flex;flex-direction:column;gap:16px;position:relative;}
+.pk-card.pk-best{border:2px solid #9E4A65;}
+.pk-flag{position:absolute;top:-14px;left:28px;background:#9E4A65;color:#fff;font:400 11px/1 var(--sans);letter-spacing:.18em;text-transform:uppercase;padding:7px 12px;}
+.pk-card h3{margin:0;font:italic 400 32px/1.1 var(--serif);}
+.pk-card.pk-best h3{color:var(--rose-d);}
+.pk-sub{margin:-8px 0 0;font:300 14px/1.5 var(--sans);color:#6E5560;}
+.pk-price{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
+.pk-price s{font:400 30px/1 var(--serif);color:#6E5560;}
+.pk-price b{font:500 52px/1 var(--serif);}
+.pk-best .pk-price b{color:var(--rose-d);}
+.pk-price span{font:300 14px/1 var(--sans);color:#6E5560;}
+.pk-deal{align-self:flex-start;background:#E3F2E8;color:#1E6B3E;font:400 12px/1.4 var(--sans);letter-spacing:.04em;padding:6px 10px;}
+.pk-card ul{margin:0;padding:0 0 0 18px;display:flex;flex-direction:column;gap:10px;font:300 15px/1.5 var(--sans);}
+.pk-note{margin-top:auto;font:300 12px/1.5 var(--sans);color:#6E5560;}
+.pk-btn{display:flex;justify-content:center;align-items:center;min-height:48px;border:1px solid #9E4A65;color:var(--rose-d);text-decoration:none;font:400 11px/1 var(--sans);letter-spacing:.18em;text-transform:uppercase;}
+.pk-best .pk-btn{background:#9E4A65;color:#fff;}
+.pk-table{background:#fff;border:1px solid var(--rose-l);overflow-x:auto;}
+.pk-table table{width:100%;min-width:600px;border-collapse:collapse;font:300 15px/1.4 var(--sans);}
+.pk-table th{text-align:left;padding:16px 22px;border-bottom:1px solid var(--rose-l);font:400 11px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:#6E5560;}
+.pk-table td{padding:14px 22px;border-bottom:1px solid #F0E4E9;}
+.pk-table tr:last-child td{border-bottom:0;}
+.pk-trust{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;margin-top:44px;}
+.pk-trust strong{display:block;font:500 15px/1.3 var(--sans);margin-bottom:8px;}
+.pk-trust p{margin:0;font:300 14px/1.65 var(--sans);color:#6E5560;}
+.pk-end{border-top:1px solid var(--rose-l);margin-top:44px;padding-top:32px;display:flex;flex-wrap:wrap;gap:20px;align-items:center;justify-content:space-between;}
+.pk-end strong{display:block;font:400 30px/1.2 var(--serif);}
+.pk-end span{font:300 15px/1.5 var(--sans);color:#6E5560;}
+.pk-foot{margin:24px 0 0;font:300 12px/1.5 var(--sans);color:#6E5560;}
+@media(max-width:700px){.pk-table table{min-width:0;font-size:13.5px;}.pk-table th,.pk-table td{padding:12px 10px;}.pn-hello h1{font-size:36px;}.pk-intro h1{font-size:40px;}.pk-offer strong{font-size:23px;}}
 .vd-wrap{max-width:1100px;margin:0 auto;padding:40px 40px 100px;}
 .vd-wrap h2{font:400 30px/1.2 var(--serif);font-style:italic;color:var(--rose-d);margin:56px 0 20px;}
 .vd-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
@@ -1634,12 +1706,19 @@ body.solid-nav .ham span{background:var(--text)!important;}
 
 <!-- ═══ PAGINA: ACCOUNT (custom, potenziata) ═══ -->
 <div class="page" id="pg-vetrine">
-  <section class="legal-hero">
-    <span class="legal-hero-label">Area riservata · non visibile nel menu</span>
-    <h1>Le vostre festività</h1>
-    <p>Qui vedete tutte le promozioni preparate su Shopify, quando vanno online e se c'è qualcosa da sistemare. Si pubblicano da sole alla data di inizio.</p>
-  </section>
+  <header class="pn-hd">
+    <div class="pn-hd-in">
+      <div class="pn-brand"><a href="#/vetrine" class="pn-logo">First Luxury Queen</a><span class="pn-tag">Pannello riservato</span></div>
+      <div class="pn-user">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2E7D4F" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="1.5"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>
+        <span id="pnWho">Accesso sicuro</span>
+        <a href="/" target="_blank" rel="noopener">Vedi il sito</a>
+        <a href="/cdn-cgi/access/logout" id="pnOut" hidden>Esci</a>
+      </div>
+    </div>
+  </header>
   <div class="vd-wrap" id="vdBody"></div>
+</div>
 </div>
 
 <div class="page" id="pg-account">
@@ -2983,7 +3062,7 @@ function _vPickActive(list){
 
 // Area riservata: dashboard e anteprime funzionano solo su /pannello (protetto da Cloudflare Access)
 const IS_PANNELLO = /^\/pannello\/?$/.test(location.pathname);
-if (IS_PANNELLO) { const mr = document.createElement('meta'); mr.name = 'robots'; mr.content = 'noindex,nofollow'; document.head.appendChild(mr); }
+if (IS_PANNELLO) { document.body.classList.add('pannello-mode'); const mr = document.createElement('meta'); mr.name = 'robots'; mr.content = 'noindex,nofollow'; document.head.appendChild(mr); }
 
 async function loadVetrina(){
   const params = new URLSearchParams(location.search);
@@ -3287,6 +3366,78 @@ async function _vDoPublish(v, action, okLabel){
   ok.disabled = false; ok.textContent = okLabel;
 }
 
+// ── PANNELLO: chi è collegato (Cloudflare Access) ──
+async function _pnIdentity(){
+  if (!IS_PANNELLO || window._pnIdDone) return; window._pnIdDone = true;
+  try {
+    const r = await fetch('/cdn-cgi/access/get-identity', { credentials: 'same-origin' });
+    if (!r.ok) return;
+    const d = await r.json(); if (!d || !d.email) return;
+    const nm = (d.name || d.email.split('@')[0].split(/[._-]/)[0] || '').trim();
+    window._pnName = nm ? nm.charAt(0).toUpperCase() + nm.slice(1).toLowerCase() : '';
+    const w = document.getElementById('pnWho'); if (w) w.textContent = 'Accesso sicuro · ' + d.email;
+    const o = document.getElementById('pnOut'); if (o) o.hidden = false;
+    const h = document.querySelector('.pn-hello h1');
+    if (h && window._pnName && !h.querySelector('em')) h.insertAdjacentHTML('beforeend', ', <em>' + window._pnName.replace(/[&<>"]/g,'') + '</em>');
+  } catch(_) {}
+}
+if (IS_PANNELLO) _pnIdentity();
+
+// ── PACCHETTI E PREZZI (modificare qui) ──
+const PN_OFFER = { scadenza: '31 gennaio 2027', testo: 'prezzi di lancio bloccati per 12 mesi, primo mese a metà prezzo e Google Shopping attivato gratis.' };
+const PN_PACKS = [
+  { nome:'Essenziale', sub:'Sapere cosa vende e presentarlo bene.', prezzo:79,
+    voci:['Report vendite ogni mese','Descrizioni prodotto curate, fino a 20 al mese','Recensioni dei clienti sul sito (attivazione inclusa)','Assistenza sul pannello festività'],
+    nota:'Presi singolarmente: 88 €/mese + 120 € di attivazione' },
+  { nome:'Crescita', sub:'Farsi trovare e farsi ricordare, ogni settimana.', prezzo:149, listino:250, best:true,
+    voci:['Tutto Essenziale, descrizioni fino a 40 al mese','Agente marketing: 12 post al mese con didascalie per Instagram e TikTok','Newsletter e avvisi delle live, solo a chi ha dato il consenso','Prodotti su Google Shopping, attivati e tenuti aggiornati'],
+    nota:'Listino 250 €/mese · presi singolarmente 256 €/mese + 310 € di attivazioni' },
+  { nome:'Premium', sub:'Anche la pubblicità, gestita per voi.', prezzo:329,
+    voci:['Tutto Crescita','Campagne Instagram, Facebook e Google create e ottimizzate','Report delle campagne: quanto spendete e quanto rientra','Una call di 30 minuti al mese per decidere le mosse'],
+    nota:'Budget pubblicitario escluso: lo pagate voi direttamente a Meta e Google' }
+];
+const PN_SINGOLI = [
+  ['Report vendite mensile','39 €/mese','1 settimana'], ['Assistente descrizioni','49 €/mese','Subito'],
+  ['Agente marketing','99 €/mese','1 settimana'], ['Newsletter e avvisi live','69 €/mese','2 settimane'],
+  ['Campagne Meta e Google','149 €/mese + budget','2 settimane'], ['Prodotti su Google Shopping','190 € una tantum','2–3 settimane'],
+  ['Recensioni sul sito','120 € una tantum','1 settimana'], ['Gestione conto vendita: venditori, valutazioni, commissioni e pagamenti','da 390 € + 29 €/mese','4–6 settimane']
+];
+const _pnEur = n => (Math.round(n*100)/100).toFixed(n % 1 ? 2 : 0).replace('.', ',') + ' €';
+function _pnMail(subj){ return VD_CONTACT + encodeURIComponent(subj + ' (First Luxury Queen)'); }
+function _pnGrowHtml(){
+  const ic = { report:'M4 20V10M10 20V4M16 20v-7M22 20H2', mkt:'M4 4h16v12H5.2L4 17.2V4z', gs:'M11 4a7 7 0 100 14 7 7 0 000-14zM21 21l-5-5' };
+  const tile = (i, price, t, d) => '<div class="pn-tile"><div class="pn-tile-hd"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true"><path d="' + i + '"/></svg><span>' + price + '</span></div><strong>' + t + '</strong><p>' + d + '</p></div>';
+  return '<div class="pn-grow-hd"><h2>Fate crescere il negozio</h2><a href="#/pacchetti" onclick="nav(\'pacchetti\', event)">Vedi pacchetti e prezzi →</a></div><div class="pn-tiles">' +
+    tile(ic.report, 'Da 39 €/mese', 'Report vendite', 'Ogni mese cosa avete venduto, i pezzi più visti e cosa riassortire.') +
+    tile(ic.mkt, 'Da 99 €/mese', 'Agente marketing', 'Post e didascalie pronti per Instagram e TikTok a ogni nuovo arrivo.') +
+    tile(ic.gs, '190 € una tantum', 'Google Shopping', 'I vostri articoli nella scheda Prodotti di Google, senza pagare pubblicità.') +
+    '</div><a class="pn-cta" href="#/pacchetti" onclick="nav(\'pacchetti\', event)">Scopri l\'offerta di lancio: Crescita a 149 € invece di 250 €</a>';
+}
+function renderPacchetti(){
+  const box = document.getElementById('vdBody'); if (!box) return;
+  const cards = PN_PACKS.map(k => '<article class="pk-card' + (k.best ? ' pk-best' : '') + '">' + (k.best ? '<span class="pk-flag">Consigliato</span>' : '') +
+    '<h3>' + k.nome + '</h3><p class="pk-sub">' + k.sub + '</p>' +
+    '<div class="pk-price">' + (k.listino ? '<s aria-label="Prezzo di listino ' + k.listino + ' euro">' + k.listino + ' €</s>' : '') + '<b>' + k.prezzo + ' €</b><span>/mese</span></div>' +
+    '<span class="pk-deal">' + (k.listino ? 'Prezzo di lancio, bloccato 12 mesi · ' : '') + 'primo mese ' + _pnEur(k.prezzo/2) + '</span>' +
+    '<ul>' + k.voci.map(v => '<li>' + v + '</li>').join('') + '</ul>' +
+    '<span class="pk-note">' + k.nota + '</span>' +
+    '<a class="pk-btn" href="' + _pnMail('Scelgo il pacchetto ' + k.nome) + '" target="_blank" rel="noopener">Scelgo ' + k.nome + '</a></article>').join('');
+  box.innerHTML =
+    '<p style="margin:0 0 28px"><a href="#/vetrine" onclick="nav(\'vetrine\', event)" style="font:400 12px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--rose-d)">← Torna al pannello</a></p>' +
+    '<section class="pk-intro"><span>Servizi per il vostro negozio</span><h1>Il sito è pronto.</h1><p>Scegliete quanto lavoro volete togliervi di dosso: noi prepariamo contenuti, numeri e campagne, voi pensate alle borse e alle live.</p></section>' +
+    '<section class="pk-offer"><div><small>Offerta di lancio · per chi ha il Kit Festività</small><strong>Attivando entro il ' + PN_OFFER.scadenza + ': ' + PN_OFFER.testo + '</strong><p>Nessun vincolo: si disdice con 30 giorni di preavviso.</p></div>' +
+    '<a href="' + _pnMail('Blocco l\'offerta di lancio') + '" target="_blank" rel="noopener">Blocca l\'offerta</a></section>' +
+    '<section class="pk-grid">' + cards + '</section>' +
+    '<h2>Oppure un servizio alla volta</h2><div class="pk-table"><table><thead><tr><th>Servizio</th><th>Prezzo</th><th>Pronto in</th></tr></thead><tbody>' +
+    PN_SINGOLI.map(r => '<tr><td>' + r[0] + '</td><td>' + r[1] + '</td><td>' + r[2] + '</td></tr>').join('') + '</tbody></table></div>' +
+    '<section class="pk-trust"><div><strong>Gli account restano vostri</strong><p>Shopify, Google, Instagram e Facebook restano intestati a voi. Se smettete, tutto resta com\'è.</p></div>' +
+    '<div><strong>Nessun vincolo</strong><p>Cambiate pacchetto dal mese dopo, disdite con 30 giorni di preavviso.</p></div>' +
+    '<div><strong>In regola</strong><p>Newsletter solo con consenso (GDPR), prezzi barrati secondo l\'art. 17-bis del Codice del Consumo, cookie secondo le linee guida del Garante.</p></div></section>' +
+    '<section class="pk-end"><div><strong>Non sapete quale scegliere?</strong><span>Una chiamata di 15 minuti, gratuita, e vi dico quale conviene al vostro negozio.</span></div>' +
+    '<a class="pn-cta" style="margin:0" href="' + _pnMail('Prenoto la chiamata di 15 minuti') + '" target="_blank" rel="noopener">Prenota la chiamata</a></section>' +
+    '<p class="pk-foot">Prezzi mensili finali. Servizi attivabili da gennaio 2027.</p>';
+}
+
 async function renderVetrineDashboard(){
   const box = document.getElementById('vdBody');
   if (!box) return;
@@ -3296,7 +3447,9 @@ async function renderVetrineDashboard(){
   const esc = t => String(t||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const live = _vPickActive(list);
   const labels = { attiva:'Online ora', programmata:'Programmata', conclusa:'Conclusa', bozza:'Bozza' };
-  let html = '';
+  const hr = now.getHours(), saluto = hr < 13 ? 'Buongiorno' : (hr < 18 ? 'Buon pomeriggio' : 'Buonasera');
+  let html = '<section class="pn-hello"><h1>' + saluto + (window._pnName ? ', <em>' + esc(window._pnName) + '</em>' : '') + '</h1>' +
+    '<p>Da qui preparate, provate e pubblicate le promozioni del sito. I prodotti si gestiscono sempre da Shopify.</p></section>';
 
   // Riepilogo
   const upcoming = list.filter(v => v.status === 'programmata');
@@ -3319,7 +3472,8 @@ async function renderVetrineDashboard(){
     const l = pos(s), w = Math.max(1.2, pos(e) - l);
     html += '<div class="vd-row"><span class="vd-row-name">' + esc(v.title) + '</span><div class="vd-track"><span class="vd-bar vd-' + v.status + '" style="left:' + l + '%;width:' + w + '%"></span></div></div>';
   });
-  html += '<div class="vd-area"><div class="vd-today" style="left:' + pos(now) + '%" title="Oggi"></div></div></div>';
+  html += '<div class="vd-area"><div class="vd-today" style="left:' + pos(now) + '%" title="Oggi"></div></div></div>' +
+    '<div class="vd-legend"><span><i style="background:#2E7D4F"></i>Online</span><span><i style="background:var(--rose)"></i>Programmata</span><span><i style="background:repeating-linear-gradient(45deg,#bbb 0 4px,#ddd 4px 8px)"></i>Bozza</span><span><i style="background:#C0392B;width:2px;height:12px"></i>Oggi</span></div>';
 
   // Schede festivita'
   html += '<h2>Le promozioni</h2>';
@@ -3355,7 +3509,7 @@ async function renderVetrineDashboard(){
   });
   html += '</div><p class="vd-hint">Saldi: le date ufficiali le fissa la Regione. Prima di promozioni a ridosso dei saldi verificate le regole con il commercialista. Prezzi barrati: sempre il prezzo più basso degli ultimi 30 giorni (Codice del Consumo, art. 17-bis).</p>';
 
-  html += _vToolsHtml();
+  html += _pnGrowHtml();
   box.innerHTML = html;
 }
 
@@ -3734,6 +3888,7 @@ function nav(page, e, fromHistory, restoreScroll) {
       history.pushState({ page: page }, '', target || (location.pathname + location.search));
     }
   }
+  if (IS_PANNELLO) { showPage(page); window.scrollTo(0, restoreScroll || 0); return; }
   const ov = document.getElementById('page-overlay');
   ov.className = 'enter';
   setTimeout(()=>{
@@ -3820,9 +3975,9 @@ function showPage(page) {
   } else if (page === 'spedizioni') {
     document.getElementById('pg-spedizioni').classList.add('active');
     setTimeout(()=>initReveal(), 80);
-  } else if (page === 'vetrine') {
+  } else if (page === 'vetrine' || page === 'pacchetti') {
     document.getElementById('pg-vetrine').classList.add('active');
-    renderVetrineDashboard();
+    if (page === 'pacchetti') renderPacchetti(); else renderVetrineDashboard();
   } else if (page === 'resi') {
     document.getElementById('pg-resi').classList.add('active');
     setTimeout(()=>initReveal(), 80);
@@ -4144,8 +4299,8 @@ document.addEventListener('click',e=>{
   const a=e.target.closest('a[href^="#"]');
   if(!a) return;
   const id=a.getAttribute('href');
-  if(id==='#') return;
-  const t=document.querySelector(id);
+  if(id==='#' || id.charAt(1)==='/') return;
+  let t=null; try { t=document.querySelector(id); } catch(_){}
   if(t){ e.preventDefault(); t.scrollIntoView({behavior:'smooth',block:'start'}); }
 });
 
@@ -4177,7 +4332,7 @@ function _handleOf(p){
 }
 
 
-const ROUTE_PAGES = ['vetrine','home','borse','portafogli','cinture','accessori','scarpe','contatti','vendi','cart','privacy','termini','spedizioni','resi','note-legali','account'];
+const ROUTE_PAGES = ['vetrine','pacchetti','home','borse','portafogli','cinture','accessori','scarpe','contatti','vendi','cart','privacy','termini','spedizioni','resi','note-legali','account'];
 
 function _hashFor(page){
   if (page === 'product') { const h = _handleOf(currentProductData); return h ? '#/prodotto/' + h : null; }
@@ -4220,7 +4375,7 @@ function routeFromHash(fromHistory, restoreScroll){
   if (m) { openProductByHandle(decodeURIComponent(m[1]), true, restoreScroll); return; }
   const pm = h.match(/^#\/([a-z-]+)/);
   let page = (pm && ROUTE_PAGES.includes(pm[1])) ? pm[1] : 'home';
-  if (page === 'vetrine' && !IS_PANNELLO) page = 'home';
+  if ((page === 'vetrine' || page === 'pacchetti') && !IS_PANNELLO) page = 'home';
   if (IS_PANNELLO && !pm && !new URLSearchParams(location.search).get('anteprima')) page = 'vetrine';
   if (page === currentPage && !fromHistory) return;
   nav(page, null, true, restoreScroll);
