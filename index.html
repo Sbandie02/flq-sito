@@ -175,7 +175,13 @@ body.pannello-mode .btn-outline{border-color:#9E4A65;color:var(--rose-d);}
 .vd-checks{margin:12px 0 0;padding:10px 14px 10px 30px;background:#FFF7E6;border-left:3px solid #E0A526;font:300 13px/1.6 var(--sans);color:#6B4A00;}
 .vd-ok{font:400 13px/1.5 var(--sans);color:#1E6B3E;font-style:normal;margin:12px 0 0;}
 .vd-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px;}
-.vd-form{max-width:520px;max-height:calc(100vh - 32px);overflow-y:auto;}
+.vd-form-wrap{max-width:1120px!important;width:100%;max-height:calc(100vh - 32px);overflow-y:auto;display:grid;grid-template-columns:minmax(0,420px) minmax(0,1fr);gap:28px;align-items:start;}
+.vd-live{position:sticky;top:0;display:flex;flex-direction:column;gap:10px;}
+.vd-live-hd{display:flex;justify-content:space-between;align-items:center;gap:10px;font:400 10px/1.3 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:#6E5560;}
+.vd-live-hd .vd-linkbtn{font:400 12px/1.3 var(--sans);letter-spacing:0;text-transform:none;}
+.vd-live-frame{--vk:.5;position:relative;width:100%;aspect-ratio:1280/820;overflow:hidden;border:1px solid var(--rose-l);background:#fff;}
+.vd-live-frame iframe{position:absolute;top:0;left:0;width:1280px;height:820px;border:0;transform:scale(var(--vk));transform-origin:0 0;pointer-events:none;}
+@media(max-width:900px){.vd-form-wrap{grid-template-columns:1fr;}.vd-live{position:static;order:-1;}}
 .vd-f{display:flex;flex-direction:column;gap:6px;margin:0 0 12px;font:400 10px/1.3 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:#6E5560;flex:1;}
 .vd-f i{font-style:normal;text-transform:none;letter-spacing:0;color:#8A7078;}
 .vd-f input,.vd-f select{padding:11px 12px;border:1px solid var(--rose-l);font:300 15px/1.3 var(--sans);color:var(--text);letter-spacing:0;text-transform:none;background:#fff;box-sizing:border-box;width:100%;}
@@ -3071,10 +3077,43 @@ function _vPickActive(list){
 
 // Area riservata: dashboard e anteprime funzionano solo su /pannello (protetto da Cloudflare Access)
 const IS_PANNELLO = /^\/pannello\/?$/.test(location.pathname);
-if (IS_PANNELLO) { document.body.classList.add('pannello-mode'); const mr = document.createElement('meta'); mr.name = 'robots'; mr.content = 'noindex,nofollow'; document.head.appendChild(mr); }
+const _VQ = new URLSearchParams(location.search), IS_PROVA = IS_PANNELLO && _VQ.has('prova');
+if (IS_PANNELLO && !_VQ.get('anteprima') && !IS_PROVA) document.body.classList.add('pannello-mode');
+if (IS_PANNELLO) { const mr = document.createElement('meta'); mr.name = 'robots'; mr.content = 'noindex,nofollow'; document.head.appendChild(mr); }
+
+// Anteprima dal vivo del modulo Prepara/Modifica: riceve i campi non ancora salvati
+function _vCampiHtml(c){
+  const L = [['titolo','Titolo'],['titolo2','Titolo evidenziato'],['testo','Testo'],['fascia','Fascia'],['sezione','Sezione'],['inizio','Inizio'],['fine','Fine'],['colore','Colore']];
+  const e = t => String(t).replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+  return L.filter(([k]) => c && c[k]).map(([k,l]) => '<p>' + l + ': ' + e(c[k]) + '</p>').join('');
+}
+async function _vProvaApply(d){
+  if (!d) return;
+  let prods = window._vProvaProds || [];
+  if (d.handle && window._vProvaHandle !== d.handle) {
+    window._vProvaHandle = d.handle;
+    const data = await shopifyFetch(VETRINA_PRODUCTS_QUERY, { handle: d.handle });
+    prods = window._vProvaProds = ((data && data.collection && data.collection.products && data.collection.products.edges) || [])
+      .map(({node}) => { const p = mapShopifyNode(node); p.cat = _vGuessCat(p.name); return p; });
+  }
+  const v = { handle: 'prova', title: d.title || 'Anteprima', image: d.image || null, productCount: prods.length, cfg: _vParseSettings(_vCampiHtml(d.campi)) };
+  _vDeactivate();
+  if (currentPage !== 'home') showPage('home');
+  _vApply(v, prods, true);
+  if (!document.body.classList.contains('vetrina-on')) initHeroAnim();
+}
+if (IS_PROVA) {
+  window.addEventListener('message', ev => { if (ev.origin === location.origin && ev.data && ev.data.type === 'vprova') _vProvaApply(ev.data); });
+}
 
 async function loadVetrina(){
   const params = new URLSearchParams(location.search);
+  if (IS_PROVA) {
+    let d = null; try { d = JSON.parse(params.get('prova')); } catch(_) {}
+    if (d && d.campi) _vProvaApply(d);
+    try { if (window.parent !== window) window.parent.postMessage({ type: 'vprova-ready' }, location.origin); } catch(_) {}
+    return;
+  }
   const previewHandle = IS_PANNELLO ? params.get('anteprima') : null;
   const list = await _vLoadList();
   if (!list.length) return;
@@ -3310,7 +3349,7 @@ function _vBlocking(v){
   if (!_vHasContent(v)) out.push('la festività è vuota');
   return out;
 }
-function _vCloseModal(){ document.getElementById('vdModal')?.remove(); document.removeEventListener('keydown', _vModalKey); }
+function _vCloseModal(){ if (window._vLiveCleanup) { window._vLiveCleanup(); window._vLiveCleanup = null; } document.getElementById('vdModal')?.remove(); document.removeEventListener('keydown', _vModalKey); }
 function _vModalKey(e){ if (e.key === 'Escape') _vCloseModal(); }
 function _vAskPublish(handle, action){
   const v = (window.VETRINE || []).find(x => x.handle === handle); if (!v) return;
@@ -3406,7 +3445,7 @@ function _vOpenForm(mode, ref){
   _vCloseModal();
   const m = document.createElement('div');
   m.id = 'vdModal'; m.className = 'vd-modal';
-  m.innerHTML = '<form class="vd-m-box vd-form" role="dialog" aria-modal="true" aria-labelledby="vdMTitle" novalidate>' +
+  m.innerHTML = '<div class="vd-m-box vd-form-wrap" role="dialog" aria-modal="true" aria-labelledby="vdMTitle"><form class="vd-form" novalidate>' +
     '<h3 id="vdMTitle">' + title + '</h3>' +
     (mode === 'crea' ? '<p class="vd-m-small">Viene creata <b>in bozza</b>: sul sito non si vede finché non premete Pubblica.</p>' + fld('nome', 'Nome della festività', d.nome, 'es. Natale', 40) : '') +
     fld('titolo', 'Titolo in prima pagina', d.titolo) +
@@ -3419,21 +3458,45 @@ function _vOpenForm(mode, ref){
     '<label class="vd-f"><span>Colore</span><select id="vf_colore">' + opts + '</select></label>' +
     '<label class="vd-m-pin">PIN del pannello<input id="vdPin" type="password" inputmode="numeric" autocomplete="current-password" value="' + esc(_vPinGet()) + '"></label>' +
     '<p class="vd-m-msg" id="vdMsg" role="status"></p>' +
-    '<div class="vd-actions"><button type="button" class="btn btn-outline" onclick="_vCloseModal()">Annulla</button><button type="submit" class="btn btn-fill" id="vdOk">' + (mode === 'crea' ? 'Crea in bozza' : 'Salva') + '</button></div></form>';
+    '<div class="vd-actions"><button type="button" class="btn btn-outline" onclick="_vCloseModal()">Annulla</button><button type="submit" class="btn btn-fill" id="vdOk">' + (mode === 'crea' ? 'Crea in bozza' : 'Salva') + '</button></div></form>' +
+    '<aside class="vd-live"><div class="vd-live-hd"><span>Anteprima della prima pagina</span><button type="button" class="vd-linkbtn" id="vdLiveBig">Apri a schermo intero</button></div>' +
+    '<div class="vd-live-frame" id="vdLiveBox"><iframe id="vdLive" title="Anteprima del sito con questa festività" src="' + location.pathname + '?prova=1#/" tabindex="-1"></iframe></div>' +
+    '<p class="vd-m-small">Si aggiorna mentre scrivete. ' + (mode === 'crea' ? 'Prodotti e foto li aggiungete dopo la creazione.' : 'Con i prodotti e la foto già scelti.') + '</p></aside></div>';
   m.addEventListener('click', e => { if (e.target === m) _vCloseModal(); });
   document.body.appendChild(m);
   document.addEventListener('keydown', _vModalKey);
   const form = m.querySelector('form');
   form.addEventListener('submit', e => { e.preventDefault(); _vSaveForm(mode, v); });
+  // anteprima dal vivo
+  const nomeVal = () => ((document.getElementById('vf_nome') || {}).value || '').trim();
+  const payload = () => ({ type: 'vprova', campi: _vFormCampi(), handle: v ? v.handle : null, image: v ? v.image : null, title: v ? v.title : 'Vetrina ' + nomeVal() });
+  const frame = document.getElementById('vdLive');
+  let ready = false, tmr;
+  const push = () => { if (ready && frame.contentWindow) frame.contentWindow.postMessage(payload(), location.origin); };
+  const onMsg = ev => { if (ev.origin === location.origin && ev.data && ev.data.type === 'vprova-ready' && ev.source === frame.contentWindow) { ready = true; push(); } };
+  window.addEventListener('message', onMsg);
+  window._vLiveCleanup = () => window.removeEventListener('message', onMsg);
+  form.addEventListener('input', () => { clearTimeout(tmr); tmr = setTimeout(push, 350); });
+  form.addEventListener('change', push);
+  const fit = () => { const box = document.getElementById('vdLiveBox'); if (box) box.style.setProperty('--vk', box.clientWidth / 1280); };
+  fit(); window.addEventListener('resize', fit, { passive: true });
+  document.getElementById('vdLiveBig').onclick = () => {
+    const p = payload(); delete p.type;
+    window.open(location.pathname + '?prova=' + encodeURIComponent(JSON.stringify(p)) + '#/', '_blank', 'noopener');
+  };
   (document.getElementById(mode === 'crea' ? 'vf_nome' : 'vf_titolo') || {}).focus?.();
+}
+function _vFormCampi(){
+  const g = id => (document.getElementById('vf_' + id) || {}).value || '';
+  return { titolo: g('titolo'), titolo2: g('titolo2'), fascia: g('fascia'), sezione: g('sezione'), testo: g('testo'),
+    inizio: _vFromInputs(g('ind'), g('int'), false), fine: _vFromInputs(g('fid'), g('fit'), true), colore: g('colore') };
 }
 async function _vSaveForm(mode, v){
   const g = id => (document.getElementById('vf_' + id) || {}).value || '';
   const ok = document.getElementById('vdOk'), msg = document.getElementById('vdMsg'), inp = document.getElementById('vdPin');
   const label = ok.textContent;
   const say = (t, cls) => { msg.className = 'vd-m-msg ' + (cls || 'err'); msg.textContent = t; };
-  const campi = { titolo: g('titolo'), titolo2: g('titolo2'), fascia: g('fascia'), sezione: g('sezione'), testo: g('testo'),
-    inizio: _vFromInputs(g('ind'), g('int'), false), fine: _vFromInputs(g('fid'), g('fit'), true), colore: g('colore') };
+  const campi = _vFormCampi();
   if (mode === 'crea' && !g('nome').trim()) { say('Scrivete il nome della festività.'); return; }
   if (!campi.titolo && !campi.fascia) { say('Scrivete almeno il titolo o la fascia.'); return; }
   if (!campi.fine) { say('Mettete la data di Fine, così si spegne da sola.'); return; }
@@ -4481,7 +4544,7 @@ function routeFromHash(fromHistory, restoreScroll){
   const pm = h.match(/^#\/([a-z-]+)/);
   let page = (pm && ROUTE_PAGES.includes(pm[1])) ? pm[1] : 'home';
   if ((page === 'vetrine' || page === 'pacchetti') && !IS_PANNELLO) page = 'home';
-  if (IS_PANNELLO && !pm && !new URLSearchParams(location.search).get('anteprima')) page = 'vetrine';
+  if (IS_PANNELLO && !pm && !_VQ.get('anteprima') && !IS_PROVA) page = 'vetrine';
   if (page === currentPage && !fromHistory) return;
   nav(page, null, true, restoreScroll);
 }
@@ -5291,7 +5354,7 @@ window.addEventListener('DOMContentLoaded', () => {
   loadShopBanner().finally(() => loadVetrina());
 
   // Link diretto: se l'indirizzo contiene una pagina (#/borse, #/prodotto/...), aprila
-  if (/^#\/[a-z]/.test(location.hash || '') || (IS_PANNELLO && !new URLSearchParams(location.search).get('anteprima'))) {
+  if (/^#\/[a-z]/.test(location.hash || '') || (IS_PANNELLO && !_VQ.get('anteprima') && !IS_PROVA)) {
     setTimeout(() => routeFromHash(true), 250);
   }
 });
