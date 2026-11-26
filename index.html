@@ -1923,8 +1923,8 @@ body.solid-nav .ham span{background:var(--text)!important;}
     <div style="background:var(--cream2);padding:48px 40px;margin-bottom:48px;text-align:center;border-left:3px solid var(--rose);">
       <span style="font:500 11px/1 var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--rose);">Accedi</span>
       <h2 style="margin:14px 0 12px;border:none;padding:0;">Entra nel tuo account</h2>
-      <p style="font:300 14px/1.7 var(--sans);color:var(--muted);max-width:520px;margin:0 auto 28px;">Usa email e password per accedere al tuo profilo. Se hai acquistato in passato il tuo account è già attivo.</p>
-      <a href="https://firstluxuryqueen.myshopify.com/account/login" target="_blank" rel="noopener" class="btn btn-fill" style="display:inline-block;padding:14px 38px;border:none;cursor:none;">Accedi al mio account →</a>
+      <p style="font:300 14px/1.7 var(--sans);color:var(--muted);max-width:520px;margin:0 auto 28px;">Inserisci la tua email: ti mandiamo un codice per entrare, senza password da ricordare. Se hai acquistato in passato il tuo account è già attivo.</p>
+      <a href="https://shopify.com/76320866651/account" target="_blank" rel="noopener" class="btn btn-fill" style="display:inline-block;padding:14px 38px;border:none;cursor:none;">Accedi al mio account →</a>
       <div style="margin-top:16px;font:300 12px/1.6 var(--sans);color:var(--muted);font-style:italic;">L'autenticazione avviene su area sicura · Protocollo SSL 256-bit</div>
     </div>
 
@@ -1965,9 +1965,9 @@ body.solid-nav .ham span{background:var(--text)!important;}
     <div style="background:var(--rose-pp);padding:36px 32px;margin-bottom:48px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:24px;">
       <div style="flex:1;min-width:240px;">
         <h3 style="margin:0 0 8px;font:300 22px/1.2 var(--serif);font-style:italic;color:var(--rose-d);">Non hai ancora un account?</h3>
-        <p style="margin:0;font:300 13px/1.6 var(--sans);color:var(--muted);">La creazione richiede meno di 1 minuto. Registrandoti riceverai uno sconto di benvenuto del 10% sul tuo primo ordine.</p>
+        <p style="margin:0;font:300 13px/1.6 var(--sans);color:var(--muted);">La creazione richiede meno di 1 minuto: ti basta la tua email.</p>
       </div>
-      <a href="https://firstluxuryqueen.myshopify.com/account/register" target="_blank" rel="noopener" class="btn btn-outline-rose" style="border:1px solid var(--rose);background:transparent;cursor:none;display:inline-block;padding:12px 28px;">Crea account →</a>
+      <a href="https://shopify.com/76320866651/account" target="_blank" rel="noopener" class="btn btn-outline-rose" style="border:1px solid var(--rose);background:transparent;cursor:none;display:inline-block;padding:12px 28px;">Crea account →</a>
     </div>
 
     <!-- AIUTO -->
@@ -2968,7 +2968,7 @@ body.solid-nav .ham span{background:var(--text)!important;}
 // ════════════════════════════════════════════════════
 const SHOPIFY_CONFIG = {
   domain: 'firstluxuryqueen.com',
-  shopDomain: 'firstluxuryqueen.myshopify.com',
+  shopDomain: '1263f5.myshopify.com',
   storefrontToken: 'c5fb9d80758f279b095cc6f071a4dd00',
   apiVersion: '2024-10'
 };
@@ -5564,8 +5564,8 @@ function goCheckout() {
 // Crea un carrello Shopify dal CART locale e reindirizza
 // al checkout ufficiale di Shopify (checkoutUrl).
 const CART_CREATE_MUTATION = `
-  mutation cartCreate($lines: [CartLineInput!]!, $attributes: [AttributeInput!]) {
-    cartCreate(input: { lines: $lines, attributes: $attributes }) {
+  mutation cartCreate($lines: [CartLineInput!]!, $attributes: [AttributeInput!], $discountCodes: [String!]) {
+    cartCreate(input: { lines: $lines, attributes: $attributes, discountCodes: $discountCodes }) {
       cart { id checkoutUrl }
       userErrors { field message }
     }
@@ -5613,7 +5613,7 @@ async function proceedToShopifyCheckout() {
   if (btn) { btn.textContent = 'Creazione checkout…'; btn.style.opacity = '.7'; }
 
   try {
-    const data = await shopifyFetch(CART_CREATE_MUTATION, { lines, attributes });
+    const data = await shopifyFetch(CART_CREATE_MUTATION, { lines, attributes, discountCodes: PROMO_CODE ? [PROMO_CODE] : [] });
     const url = data?.cartCreate?.cart?.checkoutUrl;
     const errs = data?.cartCreate?.userErrors;
 
@@ -5757,14 +5757,18 @@ function removeItem(idx) {
   setTimeout(()=>{ CART.splice(idx,1); renderCart(); setTimeout(initReveal,50); }, 300);
 }
 
+let PROMO_CODE = '';
 function applyPromo() {
   const val = document.getElementById('promoInput').value.trim().toUpperCase();
   const btn = document.querySelector('.cart-promo-btn');
-  if(val === 'FLQ10') {
-    btn.textContent = '−10% applicato ✓';
+  // Il codice viene passato al checkout Shopify, che lo verifica e applica lo sconto vero.
+  if(val) {
+    PROMO_CODE = val;
+    btn.textContent = 'Lo vedrai al pagamento ✓';
     btn.style.cssText = 'background:#e8f5ec;color:#3a7a4a;';
   } else {
-    btn.textContent = 'Codice non valido';
+    PROMO_CODE = '';
+    btn.textContent = 'Inserisci un codice';
     btn.style.cssText = 'background:#fcebeb;color:#a32d2d;';
     setTimeout(()=>{ btn.textContent='Applica'; btn.style.cssText=''; },2000);
   }
