@@ -127,7 +127,7 @@ async function headlessPublicationId(env, fetchFn) {
 export async function onRequestPost({ request, env }, fetchFn = fetch) {
   let body;
   try { body = await request.json(); } catch (_) { return json({ ok: false, error: 'Richiesta non valida' }, 400); }
-  const { action, id, pin, nome, campi } = body || {};
+  const { action, id, pin, nome, campi, attiva } = body || {};
 
   if (!env.PANNELLO_PIN || String(env.PANNELLO_PIN).length < 6 || !shopHost(env))
     return json({ ok: false, error: 'Pubblicazione non ancora attivata: mancano le impostazioni sul server.' }, 503);
@@ -145,7 +145,7 @@ export async function onRequestPost({ request, env }, fetchFn = fetch) {
       const name = clean(nome, 40);
       const slug = slugify(name);
       if (!slug) return json({ ok: false, error: 'Scrivete il nome della festività' }, 400);
-      const built = buildDescription(campi, true);
+      const built = buildDescription(campi, attiva !== true);
       if (built.error) return json({ ok: false, error: built.error }, 400);
       const handle = 'vetrina-' + slug;
       const ex = await admin(env, fetchFn, 'query($h:String!){ collectionByHandle(handle:$h){ id } }', { h: handle });

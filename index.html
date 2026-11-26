@@ -3216,20 +3216,32 @@ const BUILTIN_PROMOS = [{
     colore: 'black friday',
     fasciaOfferte: 'Black Friday: pezzi unici in offerta fino a lunedì 30',
     fasciaSenza: 'Black Friday da First Luxury Queen, fino a lunedì 30',
-    sezione: 'Le offerte del Black Friday',
+    sezione: 'Le offerte del Black Friday', sezioneSel: 'La selezione del Black Friday',
     barra: ['Black Friday fino a lunedì 30 novembre', 'Pezzi unici: quando è venduto, è venduto']
+  }
+}, {
+  // Natale: già pronto, ma NON parte da solo. Si prova con Anteprima e si accende con Pubblica dal pannello.
+  handle: 'builtin-natale', title: 'Vetrina Natale', nome: 'Natale', auto: false, image: null,
+  annuncio: new Date(2026, 11, 1, 0, 0), inizio: new Date(2026, 11, 1, 0, 0), fine: new Date(2026, 11, 24, 23, 59, 59),
+  teaser: { fascia: 'Natale da First Luxury Queen', barra: [] },
+  live: {
+    colore: 'natale',
+    fasciaOfferte: 'Natale: pezzi unici in offerta fino al 24 dicembre',
+    fasciaSenza: 'Natale da First Luxury Queen: regala un pezzo unico',
+    sezione: 'Le offerte di Natale', sezioneSel: 'Idee regalo di Natale',
+    barra: ['Natale: regala un pezzo unico, certificato Entrupy', 'Pezzi unici: quando è venduto, è venduto']
   }
 }];
 function _vBuiltin(now){
   for (const b of BUILTIN_PROMOS) {
+    if (b.auto === false) continue;
     if (now >= b.annuncio && now < b.inizio) return { b, fase: 'annuncio' };
     if (now >= b.inizio && now <= b.fine) return { b, fase: 'live' };
   }
   return null;
 }
-async function _vApplyBuiltin(x){
-  const b = x.b;
-  // Prodotti davvero scontati, da tutte le categorie
+// Prodotti della promo presi da tutto il catalogo: quelli davvero scontati; se non ce ne sono, una selezione di pezzi
+async function _vAutoProds(){
   let prods = [];
   try {
     await Promise.all(Object.keys(COLLECTION_HANDLES).map(c => fetchProducts(c, 250).catch(() => [])));
@@ -3241,22 +3253,29 @@ async function _vApplyBuiltin(x){
     }));
     prods.sort((a, c) => (c.discountPct || 0) - (a.discountPct || 0));
   } catch(_) {}
-  // Nessun prodotto scontato: si mostra una selezione di pezzi, senza parlare di sconti
-  let selezione = false;
-  if (!prods.length) {
-    const seen = new Set();
-    Object.keys(COLLECTION_HANDLES).forEach(c => (CACHE[c] || []).slice(0, 3).forEach(p => {
-      const h = _handleOf(p); if (!h || seen.has(h) || p.available === false) return;
-      seen.add(h); prods.push({ ...p, cat: p.cat || c });
-    }));
-    prods = prods.slice(0, 8); selezione = prods.length > 0;
-  }
+  if (prods.length) return { prods, selezione: false };
+  const seen = new Set();
+  Object.keys(COLLECTION_HANDLES).forEach(c => (CACHE[c] || []).slice(0, 3).forEach(p => {
+    const h = _handleOf(p); if (!h || seen.has(h) || p.available === false) return;
+    seen.add(h); prods.push({ ...p, cat: p.cat || c });
+  }));
+  prods = prods.slice(0, 8);
+  return { prods, selezione: prods.length > 0 };
+}
+async function _vApplyBuiltin(x, preview){
+  const b = x.b;
+  const auto = await _vAutoProds(), prods = auto.prods, selezione = auto.selezione;
   const L = b.live, ann = x.fase === 'annuncio';
-  const cfg = { colore: L.colore, sezione: selezione ? 'La selezione del Black Friday' : L.sezione, selezione,
+  const cfg = { colore: L.colore, sezione: selezione ? (L.sezioneSel || L.sezione) : L.sezione, selezione,
     fascia: ann ? b.teaser.fascia : (selezione ? L.fasciaSenza : L.fasciaOfferte),
     barra: (ann ? b.teaser.barra : L.barra).slice(), inizio: b.inizio,
     fine: ann ? b.inizio : b.fine, cdLabel: ann ? 'Inizia tra' : 'Termina tra' };
-  _vApply({ handle: b.handle, title: b.title, image: null, heroPagina: b.image, productCount: prods.length, cfg }, prods, false);
+  _vApply({ handle: b.handle, title: b.title, image: null, heroPagina: b.image, productCount: prods.length, cfg }, prods, !!preview);
+}
+// Testi della promo pronta, nel formato del pannello (per crearla su Shopify con Pubblica)
+function _vBuiltinCampi(b){
+  const d = x => String(x.getDate()).padStart(2,'0') + '/' + String(x.getMonth()+1).padStart(2,'0') + '/' + x.getFullYear();
+  return { fascia: b.live.fasciaSenza, sezione: b.live.sezioneSel || b.live.sezione, inizio: d(b.inizio), fine: d(b.fine), colore: b.live.colore === 'natale' ? 'Natale' : b.live.colore };
 }
 
 // ── HUB DELLA FESTIVITA' in prima pagina + voce nel menu ──
@@ -3326,6 +3345,12 @@ async function loadVetrina(){
   const list = await _vLoadList();
   const now = new Date();
 
+  if (previewHandle && previewHandle.startsWith('builtin-')) {
+    const b = BUILTIN_PROMOS.find(x => x.handle === previewHandle);
+    _vShowPreviewBadge(b ? { title: b.title } : null, previewHandle);
+    if (b) await _vApplyBuiltin({ b, fase: 'live' }, true);
+    return;
+  }
   let chosen = previewHandle ? list.find(v => v.handle === previewHandle) : _vPickActive(list);
   // Nessuna festività attiva su Shopify: promozione integrata nel sito (es. Black Friday)
   if (!previewHandle && !chosen) { const b = _vBuiltin(now); if (b) { await _vApplyBuiltin(b); return; } }
@@ -3345,8 +3370,12 @@ async function loadVetrina(){
   if (previewHandle) _vShowPreviewBadge(chosen, previewHandle);
   if (!chosen) return;
   const data = await shopifyFetch(VETRINA_PRODUCTS_QUERY, { handle: chosen.handle });
-  const prods = ((data && data.collection && data.collection.products && data.collection.products.edges) || [])
+  let prods = ((data && data.collection && data.collection.products && data.collection.products.edges) || [])
     .map(({node}) => { const p = mapShopifyNode(node); p.cat = _vGuessCat(p.name); return p; });
+  if (!prods.length) {   // nessun prodotto scelto: pezzi in offerta (o una selezione) presi da tutto il catalogo
+    const a = await _vAutoProds(); prods = a.prods;
+    if (a.selezione) chosen = Object.assign({}, chosen, { cfg: Object.assign({}, chosen.cfg, { selezione: true }) });
+  }
   _vApply(chosen, prods, !!previewHandle);
 }
 
@@ -3617,6 +3646,36 @@ function _vAskPublish(handle, action){
   const ok = document.getElementById('vdOk'), inp = document.getElementById('vdPin');
   if (inp) { (pin ? ok : inp).focus(); inp.addEventListener('keydown', e => { if (e.key === 'Enter') ok.click(); }); }
   if (ok) ok.onclick = () => _vDoPublish(v, action, okLabel);
+}
+function _vAskBuiltin(handle){
+  const b = BUILTIN_PROMOS.find(x => x.handle === handle); if (!b) return;
+  const c = _vBuiltinCampi(b), now = new Date();
+  _vCloseModal();
+  const m = document.createElement('div'); m.id = 'vdModal'; m.className = 'vd-modal';
+  m.innerHTML = '<div class="vd-m-box" role="dialog" aria-modal="true" aria-labelledby="vdMTitle"><h3 id="vdMTitle">Pubblicare «' + b.nome + '»?</h3>' +
+    '<p>Andrà online <b>' + (b.inizio > now ? 'da sola il ' + _vFmt(b.inizio, true) : 'subito') + '</b> e si spegnerà <b>il ' + _vFmt(b.fine, true) + '</b>.</p>' +
+    '<p class="vd-m-small">Dopo potete aggiungere prodotti e foto su Shopify, oppure lasciare che il sito mostri da solo i pezzi con il prezzo barrato (il più basso degli ultimi 30 giorni).</p>' +
+    '<label class="vd-m-pin">PIN del pannello<input id="vdPin" type="password" inputmode="numeric" autocomplete="current-password" value="' + _vPinGet().replace(/"/g,'') + '"></label>' +
+    '<p class="vd-m-msg" id="vdMsg" role="status"></p><div class="vd-actions"><button class="btn btn-outline" onclick="_vCloseModal()">Annulla</button><button class="btn btn-fill" id="vdOk">Sì, pubblica</button></div></div>';
+  m.addEventListener('click', e => { if (e.target === m) _vCloseModal(); });
+  document.body.appendChild(m); document.addEventListener('keydown', _vModalKey);
+  const ok = document.getElementById('vdOk'), inp = document.getElementById('vdPin'), msg = document.getElementById('vdMsg');
+  (_vPinGet() ? ok : inp).focus();
+  ok.onclick = async () => {
+    const pin = (inp.value || '').trim(); if (!pin) { msg.className = 'vd-m-msg err'; msg.textContent = 'Inserite il PIN.'; return; }
+    ok.disabled = true; ok.textContent = 'Un attimo…';
+    let res, data = {};
+    try { res = await fetch('/pannello/api/vetrina', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ action: 'crea', pin, nome: b.nome, campi: c, attiva: true }) }); data = await res.json().catch(() => ({})); }
+    catch (_) { data = { error: 'Connessione assente: riprovate.' }; }
+    if (res && res.ok && data.ok) {
+      _vPinSet(pin); msg.className = 'vd-m-msg okk';
+      msg.textContent = 'Fatto! «' + b.nome + '» ' + (b.inizio > now ? 'andrà online da sola il ' + _vFmt(b.inizio, true) : 'è online') + '.';
+      ok.remove(); setTimeout(() => { _vCloseModal(); renderVetrineDashboard(); }, 2200); return;
+    }
+    if (res && res.status === 401) { _vPinSet(''); inp.value = ''; inp.focus(); }
+    msg.className = 'vd-m-msg err'; msg.textContent = data.error || 'Qualcosa non ha funzionato, riprovate.';
+    ok.disabled = false; ok.textContent = 'Sì, pubblica';
+  };
 }
 async function _vDoPublish(v, action, okLabel){
   const ok = document.getElementById('vdOk'), inp = document.getElementById('vdPin'), msg = document.getElementById('vdMsg');
@@ -3898,9 +3957,23 @@ async function renderVetrineDashboard(){
       '</div>';
   });
 
+  // Promozioni già pronte (es. Natale): Anteprima e Pubblica, senza preparare niente
+  const pronte = BUILTIN_PROMOS.filter(b => b.auto === false && b.fine > now && !list.some(v => v.handle === 'vetrina-' + (b.nome || '').toLowerCase()));
+  if (pronte.length) {
+    html += '<h2>Pronte da pubblicare</h2><p class="vd-hint">Le abbiamo preparate noi: testi, colori e date sono già pronti. Guardate l\'anteprima e, se va bene, premete Pubblica. Se non scegliete prodotti, il sito mostra da solo i pezzi con il prezzo barrato su Shopify.</p>';
+    pronte.forEach(b => {
+      const c = _vBuiltinCampi(b);
+      html += '<article class="vd-card"><div class="vd-card-hd"><h3>' + esc(b.nome) + '</h3><span class="vd-badge vd-programmata">Pronta</span></div>' +
+        '<div class="vd-meta"><span><b>Dal</b> ' + _vFmt(b.inizio, true) + '</span><span><b>Al</b> ' + _vFmt(b.fine, true) + '</span><span><b>Colore</b> ' + esc(c.colore) + '</span></div>' +
+        '<p class="vd-fascia">“' + esc(c.fascia) + '”</p>' +
+        '<div class="vd-actions"><a class="btn btn-outline" href="' + location.pathname + '?anteprima=' + b.handle + '#/" target="_blank" rel="noopener">Anteprima</a>' +
+        '<button class="btn btn-fill" onclick="_vAskBuiltin(\'' + b.handle + '\')">Pubblica</button></div></article>';
+    });
+  }
+
   // Prossime ricorrenze da preparare
   html += '<h2>Prossime ricorrenze da preparare</h2><p class="vd-hint">Premete <strong>Prepara</strong>: controllate titolo, fascia e date (sono già compilati) e la festività viene creata in bozza. Poi aggiungete prodotti e foto, provatela con Anteprima e quando siete pronti premete Pubblica.</p><div class="vd-sugg">';
-  window._vSugg = _vSuggestions(now);
+  window._vSugg = _vSuggestions(now).filter(sg => !pronte.some(b => b.nome === sg.nome));
   window._vSugg.forEach((s, i) => {
     const already = list.some(v => v.cfg.inizio && v.cfg.fine && v.cfg.inizio <= s.giorno && v.cfg.fine >= new Date(s.giorno.getFullYear(), s.giorno.getMonth(), s.giorno.getDate()));
     html += '<div class="vd-sugg-item"><strong>' + esc(s.nome) + '</strong><span>' + _vFmt(s.giorno) + '</span>' +
