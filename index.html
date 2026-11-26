@@ -5564,8 +5564,8 @@ function goCheckout() {
 // Crea un carrello Shopify dal CART locale e reindirizza
 // al checkout ufficiale di Shopify (checkoutUrl).
 const CART_CREATE_MUTATION = `
-  mutation cartCreate($lines: [CartLineInput!]!, $attributes: [AttributeInput!]) {
-    cartCreate(input: { lines: $lines, attributes: $attributes }) {
+  mutation cartCreate($lines: [CartLineInput!]!, $attributes: [AttributeInput!], $discountCodes: [String!]) {
+    cartCreate(input: { lines: $lines, attributes: $attributes, discountCodes: $discountCodes }) {
       cart { id checkoutUrl }
       userErrors { field message }
     }
@@ -5613,7 +5613,7 @@ async function proceedToShopifyCheckout() {
   if (btn) { btn.textContent = 'Creazione checkout…'; btn.style.opacity = '.7'; }
 
   try {
-    const data = await shopifyFetch(CART_CREATE_MUTATION, { lines, attributes });
+    const data = await shopifyFetch(CART_CREATE_MUTATION, { lines, attributes, discountCodes: PROMO_CODE ? [PROMO_CODE] : [] });
     const url = data?.cartCreate?.cart?.checkoutUrl;
     const errs = data?.cartCreate?.userErrors;
 
@@ -5757,14 +5757,18 @@ function removeItem(idx) {
   setTimeout(()=>{ CART.splice(idx,1); renderCart(); setTimeout(initReveal,50); }, 300);
 }
 
+let PROMO_CODE = '';
 function applyPromo() {
   const val = document.getElementById('promoInput').value.trim().toUpperCase();
   const btn = document.querySelector('.cart-promo-btn');
-  if(val === 'FLQ10') {
-    btn.textContent = '−10% applicato ✓';
+  // Il codice viene passato al checkout Shopify, che lo verifica e applica lo sconto vero.
+  if(val) {
+    PROMO_CODE = val;
+    btn.textContent = 'Lo vedrai al pagamento ✓';
     btn.style.cssText = 'background:#e8f5ec;color:#3a7a4a;';
   } else {
-    btn.textContent = 'Codice non valido';
+    PROMO_CODE = '';
+    btn.textContent = 'Inserisci un codice';
     btn.style.cssText = 'background:#fcebeb;color:#a32d2d;';
     setTimeout(()=>{ btn.textContent='Applica'; btn.style.cssText=''; },2000);
   }
