@@ -103,6 +103,21 @@ body.vetrina-photo .hero-mosaic-overlay{background:linear-gradient(180deg,rgba(2
 .vd-checks{margin:12px 0 0;padding:10px 14px 10px 30px;background:#FFF7E6;border-left:3px solid #E0A526;font:300 13px/1.6 var(--sans);color:#6B4A00;}
 .vd-ok{font:400 13px/1.5 var(--sans);color:#1E6B3E;font-style:normal;margin:12px 0 0;}
 .vd-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px;}
+.vd-modal{position:fixed;inset:0;background:rgba(20,14,16,.45);display:flex;align-items:center;justify-content:center;z-index:10000;padding:16px;}
+.vd-m-box{background:#fff;max-width:440px;width:100%;padding:28px 26px 22px;box-shadow:0 20px 60px rgba(0,0,0,.25);}
+.vd-m-box h3{font:400 26px/1.2 var(--serif);font-style:italic;margin:0 0 14px;color:var(--text);}
+.vd-m-box p{font:300 14px/1.65 var(--sans);color:var(--text);margin:0 0 10px;}
+.vd-m-box b{font-weight:500;}
+.vd-m-box .vd-m-small{font-size:12.5px;color:var(--muted);}
+.vd-m-warn{background:#FFF6E5;padding:8px 12px;}
+.vd-m-err,.vd-m-msg.err{color:#A12A2A;}
+.vd-m-msg.okk{color:#1E6B3E;font-weight:400;}
+.vd-m-msg:empty{display:none;}
+.vd-m-pin{display:block;font:400 10px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:16px 0 8px;}
+.vd-m-pin input{display:block;width:100%;margin-top:8px;padding:12px;border:1px solid var(--rose-l);font:400 18px/1 var(--sans);letter-spacing:.3em;box-sizing:border-box;}
+.vd-m-pin input:focus{outline:none;border-color:var(--rose);}
+.vd-actions .btn[disabled]{opacity:.6;cursor:wait;}
+
 .vd-actions .btn,.vd-sugg-item .btn{padding:11px 20px;font-size:9.5px;}
 .vd-wrap .btn-outline{border:1px solid var(--rose-d);color:var(--rose-d);background:transparent;}
 .vd-hint{font:300 13px/1.7 var(--sans);color:var(--muted);margin:0 0 16px;max-width:760px;}
@@ -2947,6 +2962,10 @@ async function _vLoadList(){
       const v = { id: n.id, handle: n.handle, title: n.title, image: n.image && n.image.url,
                   productCount: (n.products && n.products.edges || []).length,
                   cfg: _vParseSettings(n.descriptionHtml) };
+      const ov = (window._vOverride || {})[n.handle];
+      if (ov && Date.now() - ov.t < 120000) {
+        if (ov.bozza === v.cfg.bozza) delete window._vOverride[n.handle]; else v.cfg.bozza = ov.bozza;
+      }
       v.status = _vStatus(v, now);
       return v;
     })
@@ -3135,7 +3154,7 @@ function _vSuggestions(now){
 }
 function _vTemplate(s){
   const hm = d => String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
-  return 'Titolo: ' + s.titolo + '\nTitolo evidenziato: ' + s.titolo2 + '\nFascia: ' + s.fascia + '\nSezione: ' + s.sezione +
+  return 'Stato: bozza\nTitolo: ' + s.titolo + '\nTitolo evidenziato: ' + s.titolo2 + '\nFascia: ' + s.fascia + '\nSezione: ' + s.sezione +
     '\nInizio: ' + _vDMY(s.inizio) + '\nFine: ' + _vDMY(s.fine) + ' ' + hm(s.fine) + '\nColore: ' + s.colore;
 }
 function _vCopy(text, btn){
@@ -3186,6 +3205,84 @@ function _vToolsHtml(){
     '</div>').join('') + '</div>';
 }
 
+// ── PUBBLICA / RITIRA con conferma (scrive su Shopify tramite /api/vetrina) ──
+const VD_PIN_KEY = 'flq_pannello_pin';
+function _vPinGet(){ try { return sessionStorage.getItem(VD_PIN_KEY) || ''; } catch(_) { return ''; } }
+function _vPinSet(p){ try { p ? sessionStorage.setItem(VD_PIN_KEY, p) : sessionStorage.removeItem(VD_PIN_KEY); } catch(_) {} }
+function _vBlocking(v){
+  const c = v.cfg, out = [];
+  if (c.inizioRaw && !c.inizio) out.push('la data di Inizio non è leggibile');
+  if (c.fineRaw && !c.fine) out.push('la data di Fine non è leggibile');
+  if (c.inizio && c.fine && c.inizio >= c.fine) out.push('la data di Inizio è dopo la data di Fine');
+  if (c.fine && c.fine <= new Date()) out.push('la data di Fine è già passata');
+  if (!_vHasContent(v)) out.push('la festività è vuota');
+  return out;
+}
+function _vCloseModal(){ document.getElementById('vdModal')?.remove(); document.removeEventListener('keydown', _vModalKey); }
+function _vModalKey(e){ if (e.key === 'Escape') _vCloseModal(); }
+function _vAskPublish(handle, action){
+  const v = (window.VETRINE || []).find(x => x.handle === handle); if (!v) return;
+  const esc = t => String(t||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const now = new Date(), c = v.cfg;
+  let title, body, okLabel, blocking = [];
+  if (action === 'pubblica') {
+    blocking = _vBlocking(v);
+    title = 'Pubblicare «' + esc(v.title) + '»?';
+    const start = c.inizio && c.inizio > now ? 'Andrà online <b>da sola il ' + _vFmt(c.inizio, true) + '</b>' : 'Andrà online <b>subito</b>';
+    const end = c.fine ? ' e si spegnerà <b>il ' + _vFmt(c.fine, true) + '</b>.' : '. <b>Non ha una data di Fine</b>: resterà online finché non la ritirate.';
+    const live = _vPickActive(window.VETRINE || []);
+    const clash = live && live.handle !== v.handle && (!c.inizio || c.inizio <= now) ? '<p class="vd-m-warn">Adesso è online «' + esc(live.title) + '»: verrà sostituita da questa.</p>' : '';
+    body = '<p>' + start + end + '</p>' + clash + '<p class="vd-m-small">Prima di confermare, controllate l\'anteprima: i prezzi barrati devono essere il prezzo più basso degli ultimi 30 giorni.</p>';
+    okLabel = 'Sì, pubblica';
+  } else {
+    title = 'Ritirare «' + esc(v.title) + '»?';
+    body = '<p>' + (v.status === 'attiva' ? 'Sparirà <b>subito</b> dal sito, che tornerà normale.' : 'Non andrà più online il ' + _vFmt(c.inizio, true) + '.') + ' Tornerà in bozza: potrete ripubblicarla quando volete.</p>';
+    okLabel = 'Sì, ritira';
+  }
+  const pin = _vPinGet();
+  _vCloseModal();
+  const m = document.createElement('div');
+  m.id = 'vdModal'; m.className = 'vd-modal';
+  m.innerHTML = '<div class="vd-m-box" role="dialog" aria-modal="true" aria-labelledby="vdMTitle">' +
+    '<h3 id="vdMTitle">' + title + '</h3>' + body +
+    (blocking.length ? '<p class="vd-m-err">Non si può pubblicare: ' + esc(blocking.join(', ')) + '. Correggetela su Shopify e riprovate.</p>' :
+      '<label class="vd-m-pin">PIN del pannello<input id="vdPin" type="password" inputmode="numeric" autocomplete="current-password" value="' + esc(pin) + '"></label>') +
+    '<p class="vd-m-msg" id="vdMsg" role="status"></p>' +
+    '<div class="vd-actions"><button class="btn btn-outline" onclick="_vCloseModal()">' + (blocking.length ? 'Chiudi' : 'Annulla') + '</button>' +
+    (blocking.length ? '' : '<button class="btn btn-fill" id="vdOk">' + okLabel + '</button>') + '</div></div>';
+  m.addEventListener('click', e => { if (e.target === m) _vCloseModal(); });
+  document.body.appendChild(m);
+  document.addEventListener('keydown', _vModalKey);
+  const ok = document.getElementById('vdOk'), inp = document.getElementById('vdPin');
+  if (inp) { (pin ? ok : inp).focus(); inp.addEventListener('keydown', e => { if (e.key === 'Enter') ok.click(); }); }
+  if (ok) ok.onclick = () => _vDoPublish(v, action, okLabel);
+}
+async function _vDoPublish(v, action, okLabel){
+  const ok = document.getElementById('vdOk'), inp = document.getElementById('vdPin'), msg = document.getElementById('vdMsg');
+  const pin = (inp && inp.value || '').trim();
+  if (!pin) { msg.className = 'vd-m-msg err'; msg.textContent = 'Inserite il PIN.'; inp && inp.focus(); return; }
+  ok.disabled = true; ok.textContent = 'Un attimo…'; msg.className = 'vd-m-msg'; msg.textContent = '';
+  let res, data = {};
+  try {
+    res = await fetch('/api/vetrina', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ action, id: v.id, pin }) });
+    data = await res.json().catch(() => ({}));
+  } catch (_) { data = { error: 'Connessione assente: riprovate.' }; }
+  if (res && res.ok && data.ok) {
+    _vPinSet(pin);
+    window._vOverride = window._vOverride || {};
+    window._vOverride[v.handle] = { bozza: action === 'ritira', t: Date.now() };
+    msg.className = 'vd-m-msg okk';
+    msg.textContent = action === 'pubblica' ? 'Fatto! «' + v.title + '» è pubblicata.' : 'Fatto! «' + v.title + '» è tornata in bozza.';
+    ok.remove();
+    setTimeout(() => { _vCloseModal(); renderVetrineDashboard(); try { _vDeactivate(); loadVetrina(); } catch(_){} }, 1600);
+    return;
+  }
+  if (res && res.status === 401) { _vPinSet(''); if (inp) { inp.value = ''; inp.focus(); } }
+  if (res && res.status === 404 && !data.error) data.error = 'Funzione di pubblicazione non trovata sul server.';
+  msg.className = 'vd-m-msg err'; msg.textContent = data.error || 'Qualcosa non ha funzionato, riprovate.';
+  ok.disabled = false; ok.textContent = okLabel;
+}
+
 async function renderVetrineDashboard(){
   const box = document.getElementById('vdBody');
   if (!box) return;
@@ -3229,19 +3326,22 @@ async function renderVetrineDashboard(){
     let when = '';
     if (v.status === 'programmata') when = 'Parte tra ' + _vCountdown(v.cfg.inizio);
     else if (v.status === 'attiva' && v.cfg.fine) when = 'Termina tra ' + _vCountdown(v.cfg.fine);
+    else if (v.status === 'bozza') when = 'In bozza: sul sito non si vede. Provatela con Anteprima, poi premete Pubblica.';
     html += '<div class="vd-card">' +
       '<div class="vd-card-hd"><h3>' + esc(v.title) + '</h3><span class="vd-badge vd-' + v.status + '">' + (live && live.handle === v.handle ? 'Online ora' : labels[v.status]) + '</span></div>' +
       '<div class="vd-meta"><span><b>Dal</b> ' + _vFmt(v.cfg.inizio, true) + '</span><span><b>Al</b> ' + _vFmt(v.cfg.fine, true) + '</span><span><b>Prodotti</b> ' + v.productCount + '</span><span><b>Foto</b> ' + (v.image ? 'sì' : 'no') + '</span></div>' +
       (v.cfg.fascia ? '<p class="vd-fascia">“' + esc(v.cfg.fascia) + '”</p>' : '') +
       (when ? '<p class="vd-when">' + when + '</p>' : '') +
       (checks.length ? '<ul class="vd-checks">' + checks.map(c => '<li>' + esc(c) + '</li>').join('') + '</ul>' : '<p class="vd-ok">✓ Tutto a posto</p>') +
-      '<div class="vd-actions"><a class="btn btn-fill" href="' + location.pathname + '?anteprima=' + encodeURIComponent(v.handle) + '#/" target="_blank" rel="noopener">Anteprima</a>' +
+      '<div class="vd-actions"><a class="btn ' + (v.status === 'bozza' ? 'btn-outline' : 'btn-fill') + '" href="' + location.pathname + '?anteprima=' + encodeURIComponent(v.handle) + '#/" target="_blank" rel="noopener">Anteprima</a>' +
+      (v.status === 'bozza' ? '<button class="btn btn-fill vd-pub" onclick="_vAskPublish(\'' + v.handle + '\', \'pubblica\')">Pubblica</button>' : '') +
+      ((v.status === 'programmata' || v.status === 'attiva') ? '<button class="btn btn-outline vd-rit" onclick="_vAskPublish(\'' + v.handle + '\', \'ritira\')">Ritira</button>' : '') +
       '<a class="btn btn-outline" href="' + SHOP_ADMIN + '/collections/' + numId + '" target="_blank" rel="noopener">Modifica su Shopify</a></div>' +
       '</div>';
   });
 
   // Prossime ricorrenze da preparare
-  html += '<h2>Prossime ricorrenze da preparare</h2><p class="vd-hint">Per prepararne una: Shopify → Prodotti → Collezioni → Crea collezione, titolo "Vetrina" + nome della festività, pubblicala sul canale Headless e incolla nella descrizione il testo pronto. Date e testi si possono cambiare.</p><div class="vd-sugg">';
+  html += '<h2>Prossime ricorrenze da preparare</h2><p class="vd-hint">Per prepararne una: Shopify → Prodotti → Collezioni → Crea collezione, titolo "Vetrina" + nome della festività, pubblicala sul canale Headless e incolla nella descrizione il testo pronto: parte in bozza, quindi qui la vedete, la provate con Anteprima e quando siete pronti premete Pubblica. Date e testi si possono cambiare.</p><div class="vd-sugg">';
   window._vSugg = _vSuggestions(now);
   window._vSugg.forEach((s, i) => {
     const already = list.some(v => v.cfg.inizio && v.cfg.fine && v.cfg.inizio <= s.giorno && v.cfg.fine >= new Date(s.giorno.getFullYear(), s.giorno.getMonth(), s.giorno.getDate()));
