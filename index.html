@@ -4127,25 +4127,25 @@ async function _vSaveForm(mode, v){
 
 // ── PANNELLO DI CONTROLLO: menu, panoramica, catalogo, moduli da sbloccare ──
 const PN_MODULI = [
-  { id:'schedaia', nome:'Scheda dalla foto (IA)', prezzo:'149 €/mese', pack:'Magazzino', ic:'M4 7h3l2-3h6l2 3h3v12H4zM12 16a3 3 0 100-6 3 3 0 000 6z',
+  { id:'schedaia', nome:'Scheda dalla foto (IA)', prezzo:'149 €/mese', pack:'Crescita', ic:'M4 7h3l2-3h6l2 3h3v12H4zM12 16a3 3 0 100-6 3 3 0 000 6z',
     desc:'Fotografate il pezzo: l\'IA prepara titolo, descrizione, brand, condizioni e testi per Google. Voi controllate e pubblicate.',
     voci:['Fino a 40 pezzi al mese','Stesso tono del vostro sito, testi pensati per Google','Bozza su Shopify pronta da approvare'] },
-  { id:'ebay', nome:'Sito + eBay sincronizzati', prezzo:'89 €/mese', pack:'Magazzino', ic:'M7 7h10v10H7zM3 12h4M17 12h4M12 3v4M12 17v4',
+  { id:'ebay', nome:'Sito + eBay sincronizzati', prezzo:'89 €/mese', pack:'Crescita', ic:'M7 7h10v10H7zM3 12h4M17 12h4M12 3v4M12 17v4',
     desc:'Pubblicate una volta sola. Quando un pezzo unico si vende su eBay o sul sito, sparisce da tutti i canali: niente doppie vendite.',
     voci:['Pezzi del sito pubblicati su eBay','Venduto da una parte = tolto ovunque','Ordini eBay visibili su Shopify'] },
-  { id:'live', nome:'Kit live', prezzo:'79 €/mese', pack:'Vendite', ic:'M4 8h12v8H4zM16 11l4-3v8l-4-3',
+  { id:'live', nome:'Kit live', prezzo:'79 €/mese', pack:'Premium', ic:'M4 8h12v8H4zM16 11l4-3v8l-4-3',
     desc:'Per le live su eBay e TikTok: scaletta dal magazzino, schede dei pezzi e, a fine live, venduti chiusi e invenduti di nuovo online.',
     voci:['Scaletta e schede pezzi pronte prima della live','Dopo la live: venduti chiusi su tutti i canali','Riepilogo: venduto, incassato, da rimettere online'] },
-  { id:'report', nome:'Report vendite', prezzo:'39 €/mese', pack:'Vetrina', ic:'M4 20V10M10 20V4M16 20v-7M22 20H2',
+  { id:'report', nome:'Report vendite', prezzo:'39 €/mese', pack:'Essenziale', ic:'M4 20V10M10 20V4M16 20v-7M22 20H2',
     desc:'Ogni mese un riepilogo chiaro: quanto avete venduto, i pezzi più visti, cosa si vende in fretta e cosa resta fermo.',
     voci:['Vendite e incassi del mese, confrontati con il mese prima','Pezzi più visti e pezzi fermi da troppo tempo','Consigli su cosa mettere in offerta'] },
-  { id:'marketing', nome:'Agente marketing', prezzo:'99 €/mese', pack:'Vendite', ic:'M4 4h16v12H5.2L4 17.2V4z',
+  { id:'marketing', nome:'Agente marketing', prezzo:'99 €/mese', pack:'Premium', ic:'M4 4h16v12H5.2L4 17.2V4z',
     desc:'Per ogni nuovo arrivo prepara post e didascalie per Instagram e TikTok, pronti da pubblicare.',
     voci:['12 post al mese con testi e hashtag','Calendario dei contenuti','Avvisi delle live'] },
-  { id:'dm', nome:'Risposte DM e WhatsApp', prezzo:'69 €/mese', pack:'Vendite', ic:'M4 5h16v11H8l-4 4z',
+  { id:'dm', nome:'Risposte DM e WhatsApp', prezzo:'69 €/mese', pack:'Premium', ic:'M4 5h16v11H8l-4 4z',
     desc:'L\'IA prepara le risposte alle domande più frequenti (autenticità, spedizioni, misure, disponibilità): voi le approvate con un tocco.',
     voci:['Bozze di risposta per Instagram e WhatsApp','Sempre approvate da voi prima dell\'invio','Le domande difficili restano a voi'] },
-  { id:'campagne', nome:'Campagne Meta e Google', prezzo:'149 €/mese + budget', pack:'Vendite', ic:'M3 11v2l13 5V6L3 11zM16 9a3 3 0 010 6',
+  { id:'campagne', nome:'Campagne Meta e Google', prezzo:'149 €/mese + budget', pack:'Premium', ic:'M3 11v2l13 5V6L3 11zM16 9a3 3 0 010 6',
     desc:'Pubblicità su Instagram, Facebook e Google creata e ottimizzata per voi, con un report mensile.',
     voci:['Creazione e gestione delle campagne','Report: quanto spendete e quanto rientra','Budget pagato da voi direttamente a Meta e Google'] },
   { id:'contovendita', nome:'Conto vendita', prezzo:'49 €/mese', pack:'', ic:'M4 7h16v13H4zM9 7V4h6v3',
@@ -4489,16 +4489,16 @@ async function _pnIdentity(){
 if (IS_PANNELLO) _pnIdentity();
 
 // ── PACCHETTI E PREZZI (modificare qui) ──
-const PN_OFFER = { scadenza: '31 gennaio 2027', testo: 'Magazzino a 199 € invece di 299 € al mese con l\'annuale, pagabile in 3 rate, e Google Shopping attivato gratis.' };
+const PN_OFFER = { scadenza: '31 gennaio 2027', testo: 'Crescita a 199 € invece di 299 € al mese con l\'annuale, pagabile in 3 rate, e Google Shopping attivato gratis.' };
 const PN_PACKS = [
-  { nome:'Vetrina', sub:'Tutto sotto controllo, senza pensieri.', prezzo:79, mensile:0,
+  { nome:'Essenziale', sub:'Tutto sotto controllo, senza pensieri.', prezzo:79, mensile:0,
     voci:['Pannello, festività e statistiche del catalogo','Report vendite ogni mese','Recensioni dei clienti sul sito (attivazione inclusa)','Assistenza sul pannello'],
     nota:'Presi singolarmente: 39 €/mese + 120 € di attivazione, assistenza esclusa' },
-  { nome:'Magazzino', sub:'Più pezzi in vendita, in meno tempo, senza doppie vendite.', prezzo:199, mensile:299, best:true,
-    voci:['Tutto Vetrina','<b>Scheda dalla foto con l\'IA</b>: titolo, descrizione e testi per Google, fino a 40 pezzi al mese','<b>Sito + eBay sincronizzati</b>: pezzo venduto da una parte, tolto ovunque','<b>Pezzi fermi</b>: ogni settimana la lista con lo sconto proposto','Prezzo consigliato su pezzi simili già venduti, su richiesta','Prodotti su Google Shopping'],
+  { nome:'Crescita', sub:'Più pezzi in vendita, in meno tempo, senza doppie vendite.', prezzo:199, mensile:299, best:true,
+    voci:['Tutto Essenziale','<b>Scheda dalla foto con l\'IA</b>: titolo, descrizione e testi per Google, fino a 40 pezzi al mese','<b>Sito + eBay sincronizzati</b>: pezzo venduto da una parte, tolto ovunque','<b>Pezzi fermi</b>: ogni settimana la lista con lo sconto proposto','Prezzo consigliato su pezzi simili già venduti, su richiesta','Prodotti su Google Shopping'],
     nota:'Presi singolarmente: 277 €/mese + 310 € di attivazioni · app eBay a vostro carico (gratis fino a 50 ordini al mese)' },
-  { nome:'Vendite', sub:'Vendere di più, su tutti i canali.', prezzo:399, mensile:549,
-    voci:['Tutto Magazzino','<b>Kit live</b> per eBay e TikTok: scaletta, schede, venduti chiusi ovunque','<b>Risposte a DM e WhatsApp</b> preparate dall\'IA, approvate da voi','<b>16 post al mese</b> (4 a settimana) e avvisi delle live','Campagne Meta e Google, con report','Una call di 30 minuti al mese'],
+  { nome:'Premium', sub:'Vendere di più, su tutti i canali.', prezzo:399, mensile:549,
+    voci:['Tutto Crescita','<b>Kit live</b> per eBay e TikTok: scaletta, schede, venduti chiusi ovunque','<b>Risposte a DM e WhatsApp</b> preparate dall\'IA, approvate da voi','<b>16 post al mese</b> (4 a settimana) e avvisi delle live','Campagne Meta e Google, con report','Una call di 30 minuti al mese'],
     nota:'Presi singolarmente oltre 700 €/mese · budget pubblicitario escluso, lo pagate voi a Meta e Google' }
 ];
 const PN_EXTRA = [
@@ -4522,7 +4522,7 @@ function _pnGrowHtml(){
     tile('M4 7h3l2-3h6l2 3h3v12H4zM12 16a3 3 0 100-6 3 3 0 000 6z', 'Da 149 €/mese', 'Scheda dalla foto', 'Fotografate il pezzo: titolo e descrizione li scrive l\'IA, voi approvate.') +
     tile('M7 7h10v10H7zM3 12h4M17 12h4M12 3v4M12 17v4', 'Da 89 €/mese', 'Sito + eBay', 'Pezzo unico venduto su eBay o sul sito? Sparisce da tutti i canali.') +
     tile('M4 8h12v8H4zM16 11l4-3v8l-4-3', 'Da 79 €/mese', 'Kit live', 'Scaletta e schede per le live; a fine live venduti chiusi ovunque.') +
-    '</div><a class="pn-cta" href="#/pacchetti" onclick="nav(\'pacchetti\', event)">Scopri i pacchetti: Magazzino a 199 € invece di 299 € con l\'annuale</a>';
+    '</div><a class="pn-cta" href="#/pacchetti" onclick="nav(\'pacchetti\', event)">Scopri i pacchetti: Crescita a 199 € invece di 299 € con l\'annuale</a>';
 }
 async function renderPacchetti(){
   const box = document.getElementById('vdBody'); if (!box) return;
