@@ -375,6 +375,7 @@ a.pn-stat:hover{border-color:#9E4A65;}
 .pk-extra p{font:300 13.5px/1.5 var(--sans);color:#6E5560;margin:0;flex:1;}
 .pk-extra a{font:400 11px/1 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:#7A3048;text-decoration:none;margin-top:6px;}
 .pk-card li b{font-weight:500;color:#1C1218;}
+.pk-alt{display:block;margin:6px 0 0;font:300 12.5px/1.4 var(--sans);color:#6E5560;}
 @media(max-width:760px){.pk-calc,.pk-extra{grid-template-columns:1fr;}}
 
 /* ── PANNELLO: velocità, layout da app, dashboard, filtri, statistiche ── */
@@ -4126,10 +4127,10 @@ async function _vSaveForm(mode, v){
 
 // ── PANNELLO DI CONTROLLO: menu, panoramica, catalogo, moduli da sbloccare ──
 const PN_MODULI = [
-  { id:'schedaia', nome:'Scheda dalla foto (IA)', prezzo:'119 €/mese', pack:'Magazzino', ic:'M4 7h3l2-3h6l2 3h3v12H4zM12 16a3 3 0 100-6 3 3 0 000 6z',
+  { id:'schedaia', nome:'Scheda dalla foto (IA)', prezzo:'149 €/mese', pack:'Magazzino', ic:'M4 7h3l2-3h6l2 3h3v12H4zM12 16a3 3 0 100-6 3 3 0 000 6z',
     desc:'Fotografate il pezzo: l\'IA prepara titolo, descrizione, brand, condizioni e testi per Google. Voi controllate e pubblicate.',
     voci:['Fino a 40 pezzi al mese','Stesso tono del vostro sito, testi pensati per Google','Bozza su Shopify pronta da approvare'] },
-  { id:'ebay', nome:'Sito + eBay sincronizzati', prezzo:'69 €/mese', pack:'Magazzino', ic:'M7 7h10v10H7zM3 12h4M17 12h4M12 3v4M12 17v4',
+  { id:'ebay', nome:'Sito + eBay sincronizzati', prezzo:'89 €/mese', pack:'Magazzino', ic:'M7 7h10v10H7zM3 12h4M17 12h4M12 3v4M12 17v4',
     desc:'Pubblicate una volta sola. Quando un pezzo unico si vende su eBay o sul sito, sparisce da tutti i canali: niente doppie vendite.',
     voci:['Pezzi del sito pubblicati su eBay','Venduto da una parte = tolto ovunque','Ordini eBay visibili su Shopify'] },
   { id:'live', nome:'Kit live', prezzo:'79 €/mese', pack:'Vendite', ic:'M4 8h12v8H4zM16 11l4-3v8l-4-3',
@@ -4488,17 +4489,17 @@ async function _pnIdentity(){
 if (IS_PANNELLO) _pnIdentity();
 
 // ── PACCHETTI E PREZZI (modificare qui) ──
-const PN_OFFER = { scadenza: '31 gennaio 2027', testo: 'prezzi bloccati per 12 mesi, primo mese a metà prezzo e Google Shopping attivato gratis.' };
+const PN_OFFER = { scadenza: '31 gennaio 2027', testo: 'Magazzino a 199 € invece di 299 € al mese con l\'annuale, pagabile in 3 rate, e Google Shopping attivato gratis.' };
 const PN_PACKS = [
-  { nome:'Vetrina', sub:'Tutto sotto controllo, senza pensieri.', prezzo:79,
+  { nome:'Vetrina', sub:'Tutto sotto controllo, senza pensieri.', prezzo:79, mensile:0,
     voci:['Pannello, festività e statistiche del catalogo','Report vendite ogni mese','Recensioni dei clienti sul sito (attivazione inclusa)','Assistenza sul pannello'],
     nota:'Presi singolarmente: 39 €/mese + 120 € di attivazione, assistenza esclusa' },
-  { nome:'Magazzino', sub:'Più pezzi in vendita, in meno tempo, senza doppie vendite.', prezzo:199, best:true,
+  { nome:'Magazzino', sub:'Più pezzi in vendita, in meno tempo, senza doppie vendite.', prezzo:199, mensile:299, best:true,
     voci:['Tutto Vetrina','<b>Scheda dalla foto con l\'IA</b>: titolo, descrizione e testi per Google, fino a 40 pezzi al mese','<b>Sito + eBay sincronizzati</b>: pezzo venduto da una parte, tolto ovunque','<b>Pezzi fermi</b>: ogni settimana la lista con lo sconto proposto','Prezzo consigliato su pezzi simili già venduti, su richiesta','Prodotti su Google Shopping'],
-    nota:'Presi singolarmente: 227 €/mese + 310 € di attivazioni · app eBay a vostro carico (gratis fino a 50 ordini al mese)' },
-  { nome:'Vendite', sub:'Vendere di più, su tutti i canali.', prezzo:399,
-    voci:['Tutto Magazzino','<b>Kit live</b> per eBay e TikTok: scaletta, schede, venduti chiusi ovunque','<b>Risposte a DM e WhatsApp</b> preparate dall\'IA, approvate da voi','12 post al mese e avvisi delle live','Campagne Meta e Google, con report','Una call di 30 minuti al mese'],
-    nota:'Presi singolarmente oltre 600 €/mese · budget pubblicitario escluso, lo pagate voi a Meta e Google' }
+    nota:'Presi singolarmente: 277 €/mese + 310 € di attivazioni · app eBay a vostro carico (gratis fino a 50 ordini al mese)' },
+  { nome:'Vendite', sub:'Vendere di più, su tutti i canali.', prezzo:399, mensile:549,
+    voci:['Tutto Magazzino','<b>Kit live</b> per eBay e TikTok: scaletta, schede, venduti chiusi ovunque','<b>Risposte a DM e WhatsApp</b> preparate dall\'IA, approvate da voi','<b>16 post al mese</b> (4 a settimana) e avvisi delle live','Campagne Meta e Google, con report','Una call di 30 minuti al mese'],
+    nota:'Presi singolarmente oltre 700 €/mese · budget pubblicitario escluso, lo pagate voi a Meta e Google' }
 ];
 const PN_EXTRA = [
   ['Conto vendita', '49 €/mese', 'Chi vi affida i pezzi, contratti, commissioni, estratti conto e liquidazioni.'],
@@ -4506,7 +4507,7 @@ const PN_EXTRA = [
   ['Certificato FLQ in PDF', '19 €/mese', 'Un certificato con il vostro marchio per ogni pezzo venduto, con qualsiasi fornitore di autenticazione.']
 ];
 const PN_SINGOLI = [
-  ['Scheda dalla foto (IA), fino a 40 pezzi','119 €/mese','2 settimane'], ['Sito + eBay sincronizzati','69 €/mese + app eBay','2–3 settimane'],
+  ['Scheda dalla foto (IA), fino a 40 pezzi','149 €/mese','2 settimane'], ['Sito + eBay sincronizzati','89 €/mese + app eBay','2–3 settimane'],
   ['Kit live','79 €/mese','3–4 settimane'], ['Report vendite mensile','39 €/mese','1 settimana'],
   ['Agente marketing','99 €/mese','1 settimana'], ['Risposte DM e WhatsApp','69 €/mese','3–4 settimane'],
   ['Newsletter e avvisi live','69 €/mese','2 settimane'], ['Campagne Meta e Google','149 €/mese + budget','2 settimane'],
@@ -4518,24 +4519,26 @@ function _pnGrowHtml(){
   const ic = { report:'M4 20V10M10 20V4M16 20v-7M22 20H2', mkt:'M4 4h16v12H5.2L4 17.2V4z', gs:'M11 4a7 7 0 100 14 7 7 0 000-14zM21 21l-5-5' };
   const tile = (i, price, t, d) => '<div class="pn-tile"><div class="pn-tile-hd"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true"><path d="' + i + '"/></svg><span>' + price + '</span></div><strong>' + t + '</strong><p>' + d + '</p></div>';
   return '<div class="pn-grow-hd"><h2>Fate crescere il negozio</h2><a href="#/pacchetti" onclick="nav(\'pacchetti\', event)">Vedi pacchetti e prezzi →</a></div><div class="pn-tiles">' +
-    tile('M4 7h3l2-3h6l2 3h3v12H4zM12 16a3 3 0 100-6 3 3 0 000 6z', 'Da 119 €/mese', 'Scheda dalla foto', 'Fotografate il pezzo: titolo e descrizione li scrive l\'IA, voi approvate.') +
-    tile('M7 7h10v10H7zM3 12h4M17 12h4M12 3v4M12 17v4', 'Da 69 €/mese', 'Sito + eBay', 'Pezzo unico venduto su eBay o sul sito? Sparisce da tutti i canali.') +
+    tile('M4 7h3l2-3h6l2 3h3v12H4zM12 16a3 3 0 100-6 3 3 0 000 6z', 'Da 149 €/mese', 'Scheda dalla foto', 'Fotografate il pezzo: titolo e descrizione li scrive l\'IA, voi approvate.') +
+    tile('M7 7h10v10H7zM3 12h4M17 12h4M12 3v4M12 17v4', 'Da 89 €/mese', 'Sito + eBay', 'Pezzo unico venduto su eBay o sul sito? Sparisce da tutti i canali.') +
     tile('M4 8h12v8H4zM16 11l4-3v8l-4-3', 'Da 79 €/mese', 'Kit live', 'Scaletta e schede per le live; a fine live venduti chiusi ovunque.') +
-    '</div><a class="pn-cta" href="#/pacchetti" onclick="nav(\'pacchetti\', event)">Scopri i pacchetti: Magazzino a 199 €, primo mese a metà prezzo</a>';
+    '</div><a class="pn-cta" href="#/pacchetti" onclick="nav(\'pacchetti\', event)">Scopri i pacchetti: Magazzino a 199 € invece di 299 € con l\'annuale</a>';
 }
 async function renderPacchetti(){
   const box = document.getElementById('vdBody'); if (!box) return;
   const cards = PN_PACKS.map(k => '<article class="pk-card' + (k.best ? ' pk-best' : '') + '">' + (k.best ? '<span class="pk-flag">Consigliato</span>' : '') +
     '<h3>' + k.nome + '</h3><p class="pk-sub">' + k.sub + '</p>' +
-    '<div class="pk-price"><b>' + k.prezzo + ' €</b><span>/mese</span></div>' +
-    '<span class="pk-deal">Primo mese ' + _pnEur(k.prezzo/2) + ' · prezzo bloccato 12 mesi</span>' +
+    '<div class="pk-price">' + (k.mensile ? '<s aria-label="Prezzo mensile senza vincolo ' + k.mensile + ' euro">' + k.mensile + ' €</s>' : '') + '<b>' + k.prezzo + ' €</b><span>/mese</span></div>' +
+    (k.mensile
+      ? '<span class="pk-deal">Con l\'annuale riservato a voi: ' + _pnEurN(k.prezzo * 12).replace('€ ', '') + ' € in 3 rate da ' + _pnEurN(k.prezzo * 4).replace('€ ', '') + ' € · risparmiate ' + _pnEurN((k.mensile - k.prezzo) * 12).replace('€ ', '') + ' € l\'anno</span><span class="pk-alt">Oppure mensile senza vincolo: ' + k.mensile + ' €/mese</span>'
+      : '<span class="pk-deal">Mensile, senza vincolo</span>') +
     '<ul>' + k.voci.map(v => '<li>' + v + '</li>').join('') + '</ul>' +
     '<span class="pk-note">' + k.nota + '</span>' +
-    '<a class="pk-btn" href="' + _pnMail('Scelgo il pacchetto ' + k.nome) + '" target="_blank" rel="noopener">Scelgo ' + k.nome + '</a></article>').join('');
+    '<a class="pk-btn" href="' + _pnMail('Scelgo il pacchetto ' + k.nome + (k.mensile ? ' (annuale in 3 rate)' : '')) + '" target="_blank" rel="noopener">Scelgo ' + k.nome + '</a></article>').join('');
   box.innerHTML =
     '<section class="pk-intro"><span>Servizi per il vostro negozio</span><h1>Meno tempo al computer, più pezzi venduti.</h1><p>Voi pensate alle borse, alle live e ai clienti. Schede, canali, numeri e contenuti li prepara l\'IA, e voi approvate.</p></section>' +
     '<section class="pk-calc" id="pkCalc"><div><small>Il vostro mese, in numeri</small><strong>Calcolo in corso…</strong></div></section>' +
-    '<section class="pk-offer"><div><small>Offerta di lancio · per chi ha il Kit Festività</small><strong>Attivando entro il ' + PN_OFFER.scadenza + ': ' + PN_OFFER.testo + '</strong><p>Nessun vincolo: si disdice con 30 giorni di preavviso.</p></div>' +
+    '<section class="pk-offer"><div><small>Offerta di lancio · per chi ha il Kit Festività</small><strong>Attivando entro il ' + PN_OFFER.scadenza + ': ' + PN_OFFER.testo + '</strong><p>Annuale: 12 mesi, in 3 rate ogni 4 mesi. Mensile: nessun vincolo, si disdice con 30 giorni di preavviso.</p></div>' +
     '<a href="' + _pnMail('Blocco l\'offerta di lancio') + '" target="_blank" rel="noopener">Blocca l\'offerta</a></section>' +
     '<section class="pk-grid">' + cards + '</section>' +
     '<h2>Da aggiungere a qualsiasi pacchetto</h2><div class="pk-extra">' + PN_EXTRA.map(e => '<div><strong>' + e[0] + '</strong><b>' + e[1] + '</b><p>' + e[2] + '</p><a href="' + _pnMail('Vorrei aggiungere: ' + e[0]) + '" target="_blank" rel="noopener">Aggiungi →</a></div>').join('') + '</div>' +
@@ -4546,7 +4549,7 @@ async function renderPacchetti(){
     '<div><strong>In regola</strong><p>Newsletter solo con consenso (GDPR), prezzi barrati secondo l\'art. 17-bis del Codice del Consumo, cookie secondo le linee guida del Garante.</p></div></section>' +
     '<section class="pk-end"><div><strong>Non sapete quale scegliere?</strong><span>Una chiamata di 15 minuti, gratuita, e vi dico quale conviene al vostro negozio.</span></div>' +
     '<a class="pn-cta" style="margin:0" href="' + _pnMail('Prenoto la chiamata di 15 minuti') + '" target="_blank" rel="noopener">Prenota la chiamata</a></section>' +
-    '<p class="pk-foot">Prezzi mensili finali. Servizi attivabili da gennaio 2027. Le stime di tempo sono indicative.</p>';
+    '<p class="pk-foot">Prezzi finali. Annuale: 12 mesi pagati in 3 rate ogni 4 mesi, la prima all\'attivazione. Servizi attivabili da gennaio 2027. Le stime di tempo sono indicative.</p>';
   // Calcolo sul loro catalogo reale
   try {
     const cat = await _pnCatalogo(); if (currentPage !== 'pacchetti') return;
