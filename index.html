@@ -3892,7 +3892,13 @@ function _vFromInputs(dv, tv, isEnd){
 function _vOpenForm(mode, ref){
   const esc = t => String(t == null ? '' : t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   let d, title, v = null;
-  if (mode === 'crea') {
+  const bi = (mode === 'crea' && typeof ref === 'string') ? BUILTIN_PROMOS.find(x => x.handle === ref) : null;
+  if (bi) {
+    // Festività già pronta (es. Natale): si parte dai suoi testi e diventa una festività vostra, modificabile quando volete
+    const c = _vBuiltinCampi(bi);
+    d = { nome: bi.nome, titolo: '', titolo2: '', fascia: c.fascia, sezione: c.sezione, testo: '', inizio: bi.inizio, fine: bi.fine, colore: c.colore };
+    title = 'Modifica «' + esc(bi.nome) + '»';
+  } else if (mode === 'crea') {
     const s = ref >= 0 ? (window._vSugg || [])[ref] : null;
     d = s ? { nome: s.nome, titolo: s.titolo, titolo2: s.titolo2, fascia: s.fascia, sezione: s.sezione, testo: '', inizio: s.inizio, fine: s.fine, colore: s.colore }
           : { nome: '', titolo: '', titolo2: '', fascia: '', sezione: '', testo: '', inizio: null, fine: null, colore: 'oro' };
@@ -3911,7 +3917,7 @@ function _vOpenForm(mode, ref){
   m.id = 'vdModal'; m.className = 'vd-modal';
   m.innerHTML = '<div class="vd-m-box vd-form-wrap" role="dialog" aria-modal="true" aria-labelledby="vdMTitle"><form class="vd-form" novalidate>' +
     '<h3 id="vdMTitle">' + title + '</h3>' +
-    (mode === 'crea' ? '<p class="vd-m-small">Viene creata <b>in bozza</b>: sul sito non si vede finché non premete Pubblica.</p>' + fld('nome', 'Nome della festività', d.nome, 'es. Natale', 40) : '') +
+    (mode === 'crea' ? '<p class="vd-m-small">' + (bi ? 'Cambiate quello che volete e guardate l\'anteprima a fianco. Si salva <b>in bozza</b>: poi premete Pubblica.' : 'Viene creata <b>in bozza</b>: sul sito non si vede finché non premete Pubblica.') + '</p>' + fld('nome', 'Nome della festività', d.nome, 'es. Natale', 40) : '') +
     fld('titolo', 'Titolo in prima pagina', d.titolo) +
     fld('titolo2', 'Seconda riga del titolo', d.titolo2, 'in corsivo rosa') +
     fld('fascia', 'Fascia promo in alto', d.fascia, 'con conto alla rovescia', 120) +
@@ -3922,7 +3928,7 @@ function _vOpenForm(mode, ref){
     '<label class="vd-f"><span>Colore</span><select id="vf_colore">' + opts + '</select></label>' +
     '<label class="vd-m-pin">PIN del pannello<input id="vdPin" type="password" inputmode="numeric" autocomplete="current-password" value="' + esc(_vPinGet()) + '"></label>' +
     '<p class="vd-m-msg" id="vdMsg" role="status"></p>' +
-    '<div class="vd-actions"><button type="button" class="btn btn-outline" onclick="_vCloseModal()">Annulla</button><button type="submit" class="btn btn-fill" id="vdOk">' + (mode === 'crea' ? 'Crea in bozza' : 'Salva') + '</button></div></form>' +
+    '<div class="vd-actions"><button type="button" class="btn btn-outline" onclick="_vCloseModal()">Annulla</button><button type="submit" class="btn btn-fill" id="vdOk">' + (bi ? 'Salva le modifiche' : mode === 'crea' ? 'Crea in bozza' : 'Salva') + '</button></div></form>' +
     '<aside class="vd-live"><div class="vd-live-hd"><label class="vd-live-pg">Anteprima di <select id="vdLivePage"><option value="home">prima pagina</option><option value="borse">pagina Borse</option><option value="prodotto">scheda di un prodotto</option></select></label><button type="button" class="vd-linkbtn" id="vdLiveBig">Apri a schermo intero</button></div>' +
     '<div class="vd-live-frame" id="vdLiveBox"><iframe id="vdLive" title="Anteprima del sito con questa festività" src="' + location.pathname + '?prova=1#/" tabindex="-1"></iframe></div>' +
     '<p class="vd-m-small">Si aggiorna mentre scrivete. ' + (mode === 'crea' ? 'Prodotti e foto li aggiungete dopo la creazione.' : 'Con i prodotti e la foto già scelti.') + '</p></aside></div>';
@@ -4382,6 +4388,7 @@ async function renderVetrineDashboard(){
         '<p class="vd-fascia">“' + esc(c.fascia) + '”</p>' +
         '<div class="vd-actions"><a class="btn btn-outline" href="' + location.pathname + '?anteprima=' + b.handle + '#/" target="_blank" rel="noopener">Anteprima</a>' +
         '<button class="btn btn-fill" onclick="_vAskBuiltin(\'' + b.handle + '\')">Pubblica</button>' +
+        '<button class="btn btn-outline" onclick="_vOpenForm(\'crea\', \'' + b.handle + '\')">Modifica</button>' +
         '<button class="btn btn-outline pn-req-btn" onclick="_pnRichiesta(\'' + esc(b.nome) + '\', \'Dal ' + _vFmt(b.inizio, true) + ' al ' + _vFmt(b.fine, true) + ' · fascia: ' + esc(c.fascia).replace(/'/g, '’') + '\')">Chiedi una modifica</button></div></article>';
     });
   }
