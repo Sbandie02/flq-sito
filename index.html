@@ -4160,13 +4160,13 @@ const PN_MODULI = [
   { id:'ebay', nome:'Sito + eBay sincronizzati', prezzo:'89 €/mese', pack:'Crescita', ic:'M7 7h10v10H7zM3 12h4M17 12h4M12 3v4M12 17v4',
     desc:'Pubblicate una volta sola. Quando un pezzo unico si vende su eBay o sul sito, sparisce da tutti i canali: niente doppie vendite.',
     voci:['Pezzi del sito pubblicati su eBay','Venduto da una parte = tolto ovunque','Ordini eBay visibili su Shopify'] },
-  { id:'live', nome:'Kit live', prezzo:'79 €/mese', pack:'Premium', ic:'M4 8h12v8H4zM16 11l4-3v8l-4-3',
-    desc:'Per le live su eBay e TikTok: scaletta dal magazzino, schede dei pezzi e, a fine live, venduti chiusi e invenduti di nuovo online.',
-    voci:['Scaletta e schede pezzi pronte prima della live','Dopo la live: venduti chiusi su tutti i canali','Riepilogo: venduto, incassato, da rimettere online'] },
+  { id:'lista', nome:'Lista desideri', prezzo:'29 €/mese', pack:'Crescita', ic:'M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 00-7.8 7.8l1 1.1L12 21l7.8-7.8 1-1.1a5.5 5.5 0 000-7.5z',
+    desc:'Ogni cliente ha il suo account sul sito: salva i pezzi che gli piacciono e i modelli che cerca. Quando caricate un pezzo che corrisponde, viene avvisato in automatico.',
+    voci:['Account cliente con pezzi salvati e modelli cercati','Avviso automatico quando arriva il pezzo giusto','Solo con il consenso del cliente (GDPR)'] },
   { id:'report', nome:'Report vendite', prezzo:'39 €/mese', pack:'Essenziale', ic:'M4 20V10M10 20V4M16 20v-7M22 20H2',
     desc:'Ogni mese un riepilogo chiaro: quanto avete venduto, i pezzi più visti, cosa si vende in fretta e cosa resta fermo.',
     voci:['Vendite e incassi del mese, confrontati con il mese prima','Pezzi più visti e pezzi fermi da troppo tempo','Consigli su cosa mettere in offerta'] },
-  { id:'marketing', nome:'Agente marketing', prezzo:'99 €/mese', pack:'Premium', ic:'M4 4h16v12H5.2L4 17.2V4z',
+  { id:'marketing', nome:'Agente marketing', prezzo:'99 €/mese', pack:'Essenziale', ic:'M4 4h16v12H5.2L4 17.2V4z',
     desc:'Per ogni nuovo arrivo prepara post e didascalie per Instagram e TikTok, pronti da pubblicare.',
     voci:['12 post al mese con testi e hashtag','Calendario dei contenuti','Avvisi delle live'] },
   { id:'dm', nome:'Assistente clienti', prezzo:'89 €/mese', pack:'Premium', ic:'M4 5h16v11H8l-4 4z',
@@ -4522,14 +4522,14 @@ if (IS_PANNELLO) _pnIdentity();
 const PN_OFFER = { scadenza: '31 gennaio 2027', testo: 'Crescita a 199 € invece di 299 € al mese con l\'annuale, pagabile in 3 rate, e Google Shopping attivato gratis.' };
 const PN_PACKS = [
   { nome:'Essenziale', sub:'Tutto sotto controllo, senza pensieri.', prezzo:79, mensile:0, tempo:'',
-    voci:['Pannello, festività e statistiche: già vostri, inclusi','<b>Agente marketing</b>: 8 post al mese (2 a settimana) per Instagram e Facebook, preparati dai vostri pezzi, voi approvate','<b>Agente report</b>: il resoconto delle vendite ogni mese','Recensioni dei clienti sul sito (attivazione inclusa)','Assistenza sul pannello'],
+    voci:['Pannello, festività e statistiche: già vostri, inclusi','<b>Agente marketing</b>: 8 post al mese (2 a settimana) per Instagram e Facebook, preparati dai vostri pezzi, voi approvate','Report vendite ogni mese','Recensioni dei clienti sul sito (attivazione inclusa)','Assistenza sul pannello'],
     nota:'Presi singolarmente: oltre 130 €/mese + 120 € di attivazione, assistenza esclusa' },
   { nome:'Crescita', sub:'Più pezzi in vendita, in meno tempo, senza doppie vendite.', prezzo:199, mensile:299, best:true, tempo:'<b>Ore risparmiate ogni settimana</b>: schede, foto e pubblicazione su eBay le prepara l\'IA, voi approvate.',
-    voci:['Tutto Essenziale','<b>Scheda dalla foto con l\'IA</b>: titolo, descrizione e testi per Google, anche in inglese per eBay, fino a 40 pezzi al mese','<b>Foto pulite</b>: sfondo uniforme e luce corretta, i difetti restano visibili','<b>Sito + eBay sincronizzati</b>: pezzo venduto da una parte, tolto ovunque','<b>Pezzi fermi</b>: ogni settimana la lista con lo sconto proposto','Prezzo consigliato su pezzi simili già venduti, su richiesta','Prodotti su Google Shopping'],
-    nota:'Presi singolarmente: 316 €/mese + 310 € di attivazioni · app eBay a vostro carico (gratis fino a 50 ordini al mese)' },
-  { nome:'Premium', sub:'Vendere di più, su tutti i canali.', prezzo:399, mensile:549, tempo:'<b>Il risparmio di tempo più grande</b>: oltre a schede ed eBay, anche live, messaggi dei clienti e post.',
-    voci:['Tutto Crescita','<b>Kit live</b> per eBay e TikTok: scaletta, schede, venduti chiusi ovunque','<b>Assistente clienti</b>: chat sul sito che conosce ogni pezzo, risposte a DM e WhatsApp approvate da voi','<b>Lista desideri</b>: chi cerca una borsa viene avvisato quando arriva','<b>Valutatore «Vendi con noi»</b>: stima indicativa dalle foto per chi vuole vendervi un pezzo','<b>Agente marketing potenziato</b>: 16 post al mese (4 a settimana) e avvisi delle live','Una call di 30 minuti al mese'],
-    nota:'Presi singolarmente oltre 650 €/mese · campagne pubblicitarie a parte, se le volete' }
+    voci:['Tutto Essenziale','<b>Scheda dalla foto con l\'IA</b>: titolo, descrizione e testi per Google, anche in inglese per eBay, fino a 40 pezzi al mese','<b>Foto pulite</b>: sfondo uniforme e luce corretta, i difetti restano visibili','<b>Sito + eBay sincronizzati</b>: pezzo venduto da una parte, tolto ovunque','<b>Pezzi fermi</b>: ogni settimana la lista con lo sconto proposto','Prezzo consigliato su pezzi simili già venduti, su richiesta','Prodotti su Google Shopping','<b>Lista desideri con account cliente</b>: ogni cliente ha il suo account, salva i pezzi e i modelli che cerca e viene avvisato quando arrivano'],
+    nota:'Presi singolarmente: 345 €/mese + 310 € di attivazioni · app eBay a vostro carico (gratis fino a 50 ordini al mese)' },
+  { nome:'Premium', sub:'Vendere di più, su tutti i canali.', prezzo:399, mensile:549, tempo:'<b>Il risparmio di tempo più grande</b>: oltre a schede ed eBay, anche messaggi dei clienti, post e newsletter.',
+    voci:['Tutto Crescita','<b>Assistente clienti</b>: chat sul sito che conosce ogni pezzo, risposte a DM e WhatsApp approvate da voi','<b>Valutatore «Vendi con noi»</b>: stima indicativa dalle foto per chi vuole vendervi un pezzo','<b>Agente marketing al doppio</b>: 16 post al mese (4 a settimana) invece di 8','<b>Newsletter e avvisi</b>: nuovi arrivi e promozioni ai clienti iscritti, solo con consenso','Una call di 30 minuti al mese'],
+    nota:'Presi singolarmente oltre 600 €/mese · campagne pubblicitarie a parte, se le volete' }
 ];
 const PN_EXTRA = [
   ['Campagne Meta e Google', '149 €/mese + budget', 'Pubblicità su Instagram, Facebook e Google creata e ottimizzata, con report mensile. Il budget lo pagate voi direttamente a Meta e Google.'],
@@ -4539,9 +4539,9 @@ const PN_EXTRA = [
 ];
 const PN_SINGOLI = [
   ['Scheda dalla foto (IA), fino a 40 pezzi','149 €/mese','2 settimane'], ['Sito + eBay sincronizzati','89 €/mese + app eBay','2–3 settimane'],
-  ['Foto pulite (sfondo e luce)','39 €/mese','1 settimana'], ['Kit live','79 €/mese','3–4 settimane'], ['Report vendite mensile','39 €/mese','1 settimana'],
+  ['Foto pulite (sfondo e luce)','39 €/mese','1 settimana'], ['Report vendite mensile','39 €/mese','1 settimana'],
   ['Agente marketing, 12 post','99 €/mese','1 settimana'], ['Assistente clienti (chat sul sito, DM, WhatsApp)','89 €/mese','3–4 settimane'],
-  ['Lista desideri','29 €/mese','2 settimane'], ['Valutatore «Vendi con noi»','49 €/mese','3–4 settimane'],
+  ['Lista desideri con account cliente','29 €/mese','2 settimane'], ['Valutatore «Vendi con noi»','49 €/mese','3–4 settimane'],
   ['Newsletter e avvisi live','69 €/mese','2 settimane'], ['Campagne Meta e Google','149 €/mese + budget','2 settimane'],
   ['Prodotti su Google Shopping','190 € una tantum','2–3 settimane'], ['Recensioni sul sito','120 € una tantum','1 settimana']
 ];
@@ -4553,7 +4553,7 @@ function _pnGrowHtml(){
   return '<div class="pn-grow-hd"><h2>Fate crescere il negozio</h2><a href="#/pacchetti" onclick="nav(\'pacchetti\', event)">Vedi pacchetti e prezzi →</a></div><div class="pn-tiles">' +
     tile('M4 7h3l2-3h6l2 3h3v12H4zM12 16a3 3 0 100-6 3 3 0 000 6z', 'Da 149 €/mese', 'Scheda dalla foto', 'Fotografate il pezzo: titolo e descrizione li scrive l\'IA, voi approvate.') +
     tile('M7 7h10v10H7zM3 12h4M17 12h4M12 3v4M12 17v4', 'Da 89 €/mese', 'Sito + eBay', 'Pezzo unico venduto su eBay o sul sito? Sparisce da tutti i canali.') +
-    tile('M4 8h12v8H4zM16 11l4-3v8l-4-3', 'Da 79 €/mese', 'Kit live', 'Scaletta e schede per le live; a fine live venduti chiusi ovunque.') +
+    tile('M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 00-7.8 7.8l1 1.1L12 21l7.8-7.8 1-1.1a5.5 5.5 0 000-7.5z', 'Da 29 €/mese', 'Lista desideri', 'Il cliente salva il modello che cerca: quando arriva, viene avvisato.') +
     '</div><a class="pn-cta" href="#/pacchetti" onclick="nav(\'pacchetti\', event)">Scopri i pacchetti: Crescita a 199 € invece di 299 € con l\'annuale</a>';
 }
 
@@ -4570,7 +4570,7 @@ async function renderPacchetti(){
     '<span class="pk-note">' + k.nota + '</span>' +
     '<a class="pk-btn" href="' + _pnMail('Scelgo il pacchetto ' + k.nome + (k.mensile ? ' (annuale in 3 rate)' : '')) + '" target="_blank" rel="noopener">Scelgo ' + k.nome + '</a></article>').join('');
   box.innerHTML =
-    '<section class="pk-intro"><span>Servizi per il vostro negozio</span><h1>Meno tempo al computer, più pezzi venduti.</h1><p>Ogni servizio è un <b>agente IA costruito su misura per il vostro negozio</b>: prepara schede, canali, numeri e contenuti, e voi approvate. Voi pensate alle borse, alle live e ai clienti.</p></section>' +
+    '<section class="pk-intro"><span>Servizi per il vostro negozio</span><h1>Meno tempo al computer, più pezzi venduti.</h1><p>Voi pensate alle borse, alle live e ai clienti. Schede, canali, numeri e contenuti li prepara l\'IA, e voi approvate.</p></section>' +
     '<section class="pk-offer"><div><small>Offerta di lancio · per chi ha il Kit Festività</small><strong>Attivando entro il ' + PN_OFFER.scadenza + ': ' + PN_OFFER.testo + '</strong><p>Annuale: 12 mesi, in 3 rate ogni 4 mesi. Mensile: nessun vincolo, si disdice con 30 giorni di preavviso.</p></div>' +
     '<a href="' + _pnMail('Blocco l\'offerta di lancio') + '" target="_blank" rel="noopener">Blocca l\'offerta</a></section>' +
     '<section class="pk-grid">' + cards + '</section>' +
@@ -4580,7 +4580,7 @@ async function renderPacchetti(){
     '<section class="pk-trust"><div><strong>Gli account restano vostri</strong><p>Shopify, eBay, Google, Instagram e Facebook restano intestati a voi. Se smettete, tutto resta com\'è.</p></div>' +
     '<div><strong>L\'ultima parola è vostra</strong><p>L\'IA prepara schede, risposte e post: niente viene pubblicato o inviato senza la vostra approvazione.</p></div>' +
     '<div><strong>In regola</strong><p>Newsletter solo con consenso (GDPR), prezzi barrati secondo l\'art. 17-bis del Codice del Consumo, cookie secondo le linee guida del Garante.</p></div></section>' +
-    '<section class="pk-more"><strong>Questi sono gli agenti che vi consiglio io, ma non sono gli unici.</strong><p>Ogni negozio ha i suoi tempi morti: spedizioni e tracking, resi, altri marketplace come Vestiaire o Vinted, fatture e documenti, ricerca dei pezzi da comprare. Se c\'è un lavoro che vi porta via tempo ogni settimana, ne parliamo e costruiamo l\'agente che lo fa per voi.</p><a href="' + _pnMail('Idea per un agente su misura') + '" target="_blank" rel="noopener">Proponete un\'idea →</a></section>' +
+    '<section class="pk-more"><strong>Questi sono i servizi che vi consiglio io, ma non sono gli unici.</strong><p>Li ho scelti guardando come lavorate oggi. Se c\'è un lavoro che vi porta via tempo ogni settimana e non lo vedete qui, ditemelo: lo valutiamo insieme e, se ha senso, lo costruiamo su misura.</p><a href="' + _pnMail('Idea per un servizio su misura') + '" target="_blank" rel="noopener">Proponete un\'idea →</a></section>' +
     '<section class="pk-end"><div><strong>Non sapete quale scegliere?</strong><span>Una chiamata di 15 minuti, gratuita, e vi dico quale conviene al vostro negozio.</span></div>' +
     '<a class="pn-cta" style="margin:0" href="' + _pnMail('Prenoto la chiamata di 15 minuti') + '" target="_blank" rel="noopener">Prenota la chiamata</a></section>' +
     '<p class="pk-foot">Prezzi finali. Annuale: 12 mesi pagati in 3 rate ogni 4 mesi, la prima all\'attivazione. Servizi attivabili da gennaio 2027. Le stime di tempo sono indicative.</p>';
