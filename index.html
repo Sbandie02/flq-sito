@@ -368,7 +368,7 @@ a.pn-stat:hover{border-color:#9E4A65;}
 .pk-calc-i strong{font:400 34px/1.1 var(--serif);color:#1C1218;}
 .pk-calc-i span{font:300 13.5px/1.4 var(--sans);color:#6E5560;}
 .pk-calc-n{grid-column:1/-1;margin:-4px 0 0;font:300 12px/1.5 var(--sans);color:#8E7883;}
-.pk-extra{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;}
+.pk-extra{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;}
 .pk-extra>div{background:#fff;border:1px solid rgba(28,18,24,.06);border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;gap:6px;}
 .pk-extra strong{font:400 22px/1.2 var(--serif);color:#1C1218;}
 .pk-extra b{font:500 13px/1 var(--sans);color:#7A3048;}
@@ -4174,7 +4174,7 @@ const PN_MODULI = [
   { id:'valutatore', nome:'Valutatore «Vendi con noi»', prezzo:'49 €/mese', pack:'Premium', ic:'M12 3l8 4v6c0 4-3.5 7-8 8-4.5-1-8-4-8-8V7z',
     desc:'Chi vuole vendervi una borsa carica le foto: l\'IA riconosce il modello e propone una stima indicativa. A voi arriva una richiesta già ordinata.',
     voci:['Stima indicativa, mai vincolante: il prezzo lo decidete voi dopo averla vista','Controllo che ci siano le foto giuste (etichette, codici, difetti)','Richieste ordinate per valore nel pannello'] },
-  { id:'campagne', nome:'Campagne Meta e Google', prezzo:'149 €/mese + budget', pack:'Premium', ic:'M3 11v2l13 5V6L3 11zM16 9a3 3 0 010 6',
+  { id:'campagne', nome:'Campagne Meta e Google', prezzo:'149 €/mese + budget', pack:'', ic:'M3 11v2l13 5V6L3 11zM16 9a3 3 0 010 6',
     desc:'Pubblicità su Instagram, Facebook e Google creata e ottimizzata per voi, con un report mensile.',
     voci:['Creazione e gestione delle campagne','Report: quanto spendete e quanto rientra','Budget pagato da voi direttamente a Meta e Google'] },
   { id:'contovendita', nome:'Conto vendita', prezzo:'49 €/mese', pack:'', ic:'M4 7h16v13H4zM9 7V4h6v3',
@@ -4526,11 +4526,12 @@ const PN_PACKS = [
   { nome:'Crescita', sub:'Più pezzi in vendita, in meno tempo, senza doppie vendite.', prezzo:199, mensile:299, best:true, tempo:'<b>Ore risparmiate ogni settimana</b>: schede, foto e pubblicazione su eBay le prepara l\'IA, voi approvate.',
     voci:['Tutto Essenziale','<b>Scheda dalla foto con l\'IA</b>: titolo, descrizione e testi per Google, anche in inglese per eBay, fino a 40 pezzi al mese','<b>Foto pulite</b>: sfondo uniforme e luce corretta, i difetti restano visibili','<b>Sito + eBay sincronizzati</b>: pezzo venduto da una parte, tolto ovunque','<b>Pezzi fermi</b>: ogni settimana la lista con lo sconto proposto','Prezzo consigliato su pezzi simili già venduti, su richiesta','Prodotti su Google Shopping'],
     nota:'Presi singolarmente: 316 €/mese + 310 € di attivazioni · app eBay a vostro carico (gratis fino a 50 ordini al mese)' },
-  { nome:'Premium', sub:'Vendere di più, su tutti i canali.', prezzo:499, mensile:699, tempo:'<b>Il risparmio di tempo più grande</b>: oltre a schede ed eBay, anche live, messaggi dei clienti e post.',
-    voci:['Tutto Crescita','<b>Kit live</b> per eBay e TikTok: scaletta, schede, venduti chiusi ovunque','<b>Assistente clienti</b>: chat sul sito che conosce ogni pezzo, risposte a DM e WhatsApp approvate da voi','<b>Lista desideri</b>: chi cerca una borsa viene avvisato quando arriva','<b>Valutatore «Vendi con noi»</b>: stima indicativa dalle foto per chi vuole vendervi un pezzo','<b>16 post al mese</b> (4 a settimana) e avvisi delle live','Campagne Meta e Google, con report','Una call di 30 minuti al mese'],
-    nota:'Presi singolarmente oltre 800 €/mese · budget pubblicitario escluso, lo pagate voi a Meta e Google' }
+  { nome:'Premium', sub:'Vendere di più, su tutti i canali.', prezzo:399, mensile:549, tempo:'<b>Il risparmio di tempo più grande</b>: oltre a schede ed eBay, anche live, messaggi dei clienti e post.',
+    voci:['Tutto Crescita','<b>Kit live</b> per eBay e TikTok: scaletta, schede, venduti chiusi ovunque','<b>Assistente clienti</b>: chat sul sito che conosce ogni pezzo, risposte a DM e WhatsApp approvate da voi','<b>Lista desideri</b>: chi cerca una borsa viene avvisato quando arriva','<b>Valutatore «Vendi con noi»</b>: stima indicativa dalle foto per chi vuole vendervi un pezzo','<b>16 post al mese</b> (4 a settimana) e avvisi delle live','Una call di 30 minuti al mese'],
+    nota:'Presi singolarmente oltre 650 €/mese · campagne pubblicitarie a parte, se le volete' }
 ];
 const PN_EXTRA = [
+  ['Campagne Meta e Google', '149 €/mese + budget', 'Pubblicità su Instagram, Facebook e Google creata e ottimizzata, con report mensile. Il budget lo pagate voi direttamente a Meta e Google.'],
   ['Conto vendita', '49 €/mese', 'Chi vi affida i pezzi, contratti, commissioni, estratti conto e liquidazioni.'],
   ['Report margini', '29 €/mese', 'Costo d\'acquisto contro prezzo di vendita, pezzo per pezzo. Utile al commercialista per il regime del margine sui beni usati.'],
   ['Certificato FLQ in PDF', '19 €/mese', 'Un certificato con il vostro marchio per ogni pezzo venduto, con qualsiasi fornitore di autenticazione.']
