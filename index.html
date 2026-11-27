@@ -362,6 +362,10 @@ a.pn-stat:hover{border-color:#9E4A65;}
 @media(max-width:900px){.pn-side{flex:1 1 100%;flex-direction:row;overflow-x:auto;padding:12px 16px;gap:6px;border-bottom:1px solid var(--rose-l);background:#fff;}.pn-sg{display:none;}.pn-si{flex:none;white-space:nowrap;border:1px solid var(--rose-l);}.pn-si.on{box-shadow:none;border-color:#9E4A65;}}
 .vd-modal{position:fixed;inset:0;background:rgba(20,14,16,.45);display:flex;align-items:center;justify-content:center;z-index:10000;padding:16px;}
 .vd-m-box{background:#fff;max-width:440px;width:100%;padding:28px 26px 22px;box-shadow:0 20px 60px rgba(0,0,0,.25);}
+body.pannello-mode .pn-brand{align-items:center;}body.pannello-mode .pn-logo img{height:44px;width:auto;display:block;filter:brightness(0) invert(1);opacity:.95;}
+@media(max-width:760px){body.pannello-mode .pn-logo img{height:34px;}}
+.pn-req textarea:focus{outline:none;border-color:#9E4A65;}
+
 .ft-staff{color:inherit;opacity:.55;text-decoration:none;transition:opacity .2s;}.ft-staff:hover{opacity:1;text-decoration:underline;text-underline-offset:3px;}
 /* ── PANNELLO SU TELEFONO: barra in basso stile app, catalogo a schede, finestre dal basso ── */
 @media(max-width:760px){
@@ -3888,7 +3892,13 @@ function _vFromInputs(dv, tv, isEnd){
 function _vOpenForm(mode, ref){
   const esc = t => String(t == null ? '' : t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   let d, title, v = null;
-  if (mode === 'crea') {
+  const bi = (mode === 'crea' && typeof ref === 'string') ? BUILTIN_PROMOS.find(x => x.handle === ref) : null;
+  if (bi) {
+    // Festività già pronta (es. Natale): si parte dai suoi testi e diventa una festività vostra, modificabile quando volete
+    const c = _vBuiltinCampi(bi);
+    d = { nome: bi.nome, titolo: '', titolo2: '', fascia: c.fascia, sezione: c.sezione, testo: '', inizio: bi.inizio, fine: bi.fine, colore: c.colore };
+    title = 'Modifica «' + esc(bi.nome) + '»';
+  } else if (mode === 'crea') {
     const s = ref >= 0 ? (window._vSugg || [])[ref] : null;
     d = s ? { nome: s.nome, titolo: s.titolo, titolo2: s.titolo2, fascia: s.fascia, sezione: s.sezione, testo: '', inizio: s.inizio, fine: s.fine, colore: s.colore }
           : { nome: '', titolo: '', titolo2: '', fascia: '', sezione: '', testo: '', inizio: null, fine: null, colore: 'oro' };
@@ -3907,7 +3917,7 @@ function _vOpenForm(mode, ref){
   m.id = 'vdModal'; m.className = 'vd-modal';
   m.innerHTML = '<div class="vd-m-box vd-form-wrap" role="dialog" aria-modal="true" aria-labelledby="vdMTitle"><form class="vd-form" novalidate>' +
     '<h3 id="vdMTitle">' + title + '</h3>' +
-    (mode === 'crea' ? '<p class="vd-m-small">Viene creata <b>in bozza</b>: sul sito non si vede finché non premete Pubblica.</p>' + fld('nome', 'Nome della festività', d.nome, 'es. Natale', 40) : '') +
+    (mode === 'crea' ? '<p class="vd-m-small">' + (bi ? 'Cambiate quello che volete e guardate l\'anteprima a fianco. Si salva <b>in bozza</b>: poi premete Pubblica.' : 'Viene creata <b>in bozza</b>: sul sito non si vede finché non premete Pubblica.') + '</p>' + fld('nome', 'Nome della festività', d.nome, 'es. Natale', 40) : '') +
     fld('titolo', 'Titolo in prima pagina', d.titolo) +
     fld('titolo2', 'Seconda riga del titolo', d.titolo2, 'in corsivo rosa') +
     fld('fascia', 'Fascia promo in alto', d.fascia, 'con conto alla rovescia', 120) +
@@ -3918,7 +3928,7 @@ function _vOpenForm(mode, ref){
     '<label class="vd-f"><span>Colore</span><select id="vf_colore">' + opts + '</select></label>' +
     '<label class="vd-m-pin">PIN del pannello<input id="vdPin" type="password" inputmode="numeric" autocomplete="current-password" value="' + esc(_vPinGet()) + '"></label>' +
     '<p class="vd-m-msg" id="vdMsg" role="status"></p>' +
-    '<div class="vd-actions"><button type="button" class="btn btn-outline" onclick="_vCloseModal()">Annulla</button><button type="submit" class="btn btn-fill" id="vdOk">' + (mode === 'crea' ? 'Crea in bozza' : 'Salva') + '</button></div></form>' +
+    '<div class="vd-actions"><button type="button" class="btn btn-outline" onclick="_vCloseModal()">Annulla</button><button type="submit" class="btn btn-fill" id="vdOk">' + (bi ? 'Salva le modifiche' : mode === 'crea' ? 'Crea in bozza' : 'Salva') + '</button></div></form>' +
     '<aside class="vd-live"><div class="vd-live-hd"><label class="vd-live-pg">Anteprima di <select id="vdLivePage"><option value="home">prima pagina</option><option value="borse">pagina Borse</option><option value="prodotto">scheda di un prodotto</option></select></label><button type="button" class="vd-linkbtn" id="vdLiveBig">Apri a schermo intero</button></div>' +
     '<div class="vd-live-frame" id="vdLiveBox"><iframe id="vdLive" title="Anteprima del sito con questa festività" src="' + location.pathname + '?prova=1#/" tabindex="-1"></iframe></div>' +
     '<p class="vd-m-small">Si aggiorna mentre scrivete. ' + (mode === 'crea' ? 'Prodotti e foto li aggiungete dopo la creazione.' : 'Con i prodotti e la foto già scelti.') + '</p></aside></div>';
@@ -4191,6 +4201,45 @@ function _pnPrezzo(handle){
   });
 }
 
+
+// ── RICHIESTA DI MODIFICA a Federico (si apre l'email già compilata) ──
+function _pnRichiesta(nome, dettagli){
+  _vCloseModal();
+  const d = document.createElement('div'); d.id = 'vdModal'; d.className = 'vd-modal';
+  d.innerHTML = '<div class="vd-m-box pn-req" role="dialog" aria-modal="true" aria-labelledby="vdMTitle">' +
+    '<h3 id="vdMTitle">Chiedi una modifica · ' + nome + '</h3>' +
+    '<p class="vd-hint" style="margin:6px 0 14px;">Scrivete cosa volete cambiare: ci pensiamo noi e vi avvisiamo quando è fatto.</p>' +
+    '<label class="vd-lbl" for="pnReqTxt">Cosa volete cambiare?</label>' +
+    '<textarea id="pnReqTxt" rows="5" placeholder="Es. cambiare la frase della fascia, spostare le date, usare un’altra foto, mettere in evidenza certe borse…" style="width:100%;padding:12px;border:1px solid #E6D9DE;border-radius:10px;font:300 15px/1.5 var(--sans);resize:vertical;"></textarea>' +
+    '<label style="display:flex;gap:8px;align-items:center;margin:12px 0 4px;font:300 14px var(--sans);"><input type="checkbox" id="pnReqUrg"> È urgente (serve entro 24 ore)</label>' +
+    '<p class="vd-err" id="pnReqErr" role="alert" style="min-height:18px;color:#A32D2D;font-size:13px;margin:6px 0 0;"></p>' +
+    '<div class="vd-actions"><button class="btn btn-outline" onclick="_vCloseModal()">Annulla</button><button class="btn btn-fill" id="pnReqGo">Invia la richiesta</button></div>' +
+    '<p class="vd-hint" style="margin:12px 0 0;font-size:12px;">Si apre la vostra email già compilata: premete Invia.</p></div>';
+  d.addEventListener('click', e => { if (e.target === d) _vCloseModal(); });
+  document.body.appendChild(d); document.addEventListener('keydown', _vModalKey);
+  setTimeout(() => document.getElementById('pnReqTxt')?.focus(), 50);
+  document.getElementById('pnReqGo').onclick = () => {
+    const txt = document.getElementById('pnReqTxt').value.trim();
+    if (txt.length < 5) { document.getElementById('pnReqErr').textContent = 'Scrivete due parole su cosa cambiare.'; return; }
+    const urg = document.getElementById('pnReqUrg').checked;
+    const subj = (urg ? 'URGENTE · ' : '') + 'Richiesta modifica: ' + nome + ' (First Luxury Queen)';
+    const body = 'Richiesta dal pannello di First Luxury Queen\n\n' +
+      'Festività: ' + nome + '\n' + (dettagli ? dettagli + '\n' : '') +
+      'Da: ' + (window._pnName || 'staff') + ' · ' + new Date().toLocaleString('it-IT') + '\n' + (urg ? 'Urgente: entro 24 ore\n' : '') +
+      '\nCosa cambiare:\n' + txt + '\n';
+    _pnGo(VD_CONTACT.replace(/\?subject=$/, '') + '?subject=' + encodeURIComponent(subj) + '&body=' + encodeURIComponent(body));
+    const box = d.querySelector('.vd-m-box');
+    box.innerHTML = '<h3>Richiesta pronta ✓</h3><p class="vd-hint" style="margin:8px 0 16px;">Si è aperta la vostra email già compilata: premete <b>Invia</b>. Se non si è aperta, scrivete a <b>' + VD_CONTACT.replace(/^mailto:|\?.*$/g, '') + '</b>.</p><div class="vd-actions"><button class="btn btn-fill" onclick="_vCloseModal()">Chiudi</button></div>';
+  };
+}
+function _pnGo(u){ location.href = u; }
+// Logo nel pannello: lo stesso del sito
+function _pnLogo(){
+  const a = document.querySelector('.pn-logo'), src = document.querySelector('.nav-logo img')?.getAttribute('src');
+  if (a && src && !a.querySelector('img')) a.innerHTML = '<img src="' + src + '" alt="First Luxury Queen">';
+}
+if (IS_PANNELLO) _pnLogo();
+
 // ── PANNELLO: chi è collegato (utente e password, vedi functions/_middleware.js) ──
 async function _pnIdentity(){
   if (!IS_PANNELLO || window._pnIdDone) return; window._pnIdDone = true;
@@ -4323,7 +4372,8 @@ async function renderVetrineDashboard(){
       (v.status === 'bozza' ? '<button class="btn btn-fill vd-pub" onclick="_vAskPublish(\'' + v.handle + '\', \'pubblica\')">Pubblica</button>' : '') +
       ((v.status === 'programmata' || v.status === 'attiva') ? '<button class="btn btn-outline vd-rit" onclick="_vAskPublish(\'' + v.handle + '\', \'ritira\')">Ritira</button>' : '') +
       (v.status !== 'conclusa' ? '<button class="btn btn-outline" onclick="_vOpenForm(\'salva\', \'' + v.handle + '\')">Modifica testi</button>' : '') +
-      '<a class="btn btn-outline" href="' + SHOP_ADMIN + '/collections/' + numId + '" target="_blank" rel="noopener">Prodotti e foto su Shopify</a></div>' +
+      '<a class="btn btn-outline" href="' + SHOP_ADMIN + '/collections/' + numId + '" target="_blank" rel="noopener">Prodotti e foto su Shopify</a>' +
+      '<button class="btn btn-outline pn-req-btn" onclick="_pnRichiesta(\'' + esc(v.title).replace(/'/g, '’') + '\', \'Dal ' + _vFmt(v.cfg.inizio, true) + ' al ' + _vFmt(v.cfg.fine, true) + '\')">Chiedi una modifica</button></div>' +
       '</div>';
   });
 
@@ -4337,7 +4387,9 @@ async function renderVetrineDashboard(){
         '<div class="vd-meta"><span><b>Dal</b> ' + _vFmt(b.inizio, true) + '</span><span><b>Al</b> ' + _vFmt(b.fine, true) + '</span><span><b>Colore</b> ' + esc(c.colore) + '</span></div>' +
         '<p class="vd-fascia">“' + esc(c.fascia) + '”</p>' +
         '<div class="vd-actions"><a class="btn btn-outline" href="' + location.pathname + '?anteprima=' + b.handle + '#/" target="_blank" rel="noopener">Anteprima</a>' +
-        '<button class="btn btn-fill" onclick="_vAskBuiltin(\'' + b.handle + '\')">Pubblica</button></div></article>';
+        '<button class="btn btn-fill" onclick="_vAskBuiltin(\'' + b.handle + '\')">Pubblica</button>' +
+        '<button class="btn btn-outline" onclick="_vOpenForm(\'crea\', \'' + b.handle + '\')">Modifica</button>' +
+        '<button class="btn btn-outline pn-req-btn" onclick="_pnRichiesta(\'' + esc(b.nome) + '\', \'Dal ' + _vFmt(b.inizio, true) + ' al ' + _vFmt(b.fine, true) + ' · fascia: ' + esc(c.fascia).replace(/'/g, '’') + '\')">Chiedi una modifica</button></div></article>';
     });
   }
 
