@@ -378,6 +378,7 @@ a.pn-stat:hover{border-color:#9E4A65;}
 
 .pk-ore{display:block;margin:10px 0 2px;padding:9px 12px;border-radius:10px;background:rgba(217,180,74,.14);border:1px solid rgba(217,180,74,.45);font:300 13.5px/1.35 var(--sans);color:#4A3A12;}
 .pk-ore b{font-weight:600;color:#1C1218;}
+.pk-ore[hidden]{display:none!important;}
 .pk-time{background:#fff;border:1px solid rgba(28,18,24,.06);border-radius:16px;padding:22px 24px;margin:0 0 24px;box-shadow:0 4px 14px rgba(28,18,24,.04);}
 .pk-time-hd{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;margin-bottom:16px;}
 .pk-time-hd small{font:500 10.5px/1.2 var(--sans);letter-spacing:.16em;text-transform:uppercase;color:#7A3048;}
@@ -391,11 +392,12 @@ a.pn-stat:hover{border-color:#9E4A65;}
 .pk-inputs input{height:40px;border:1px solid rgba(28,18,24,.12);border-radius:9px;padding:0 10px;font:400 15px var(--sans);color:#1C1218;background:#FBF8F5;}
 .pk-inputs input:focus{outline:none;border-color:#9E4A65;background:#fff;}
 .pk-chart{display:flex;flex-direction:column;gap:14px;padding-top:4px;}
-.pk-bar-row{display:grid;grid-template-columns:86px 1fr 54px;gap:12px;align-items:center;}
+.pk-bar-row{display:grid;grid-template-columns:86px 1fr 70px;gap:12px;align-items:center;}
 .pk-bar-n{font:400 15px/1 var(--serif);color:#1C1218;}
 .pk-bar-t{display:flex;height:26px;border-radius:7px;overflow:hidden;background:#F3ECEF;}
 .pk-bar-t i{display:block;height:100%;border-right:1px solid rgba(255,255,255,.7);}
-.pk-bar-row strong{font:500 15px/1 var(--sans);text-align:right;color:#1C1218;}
+.pk-bar-row strong{font:500 15px/1.1 var(--sans);text-align:right;color:#1C1218;}
+.pk-bar-row strong small{display:block;font:300 11.5px/1.2 var(--sans);color:#6E5560;margin-top:3px;}
 .pk-legend{display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:4px;font:300 12px/1.3 var(--sans);color:#6E5560;}
 .pk-legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px;}
 @media(max-width:900px){.pk-time-b{grid-template-columns:1fr;}.pk-time-hd{flex-direction:column;align-items:flex-start;}}
@@ -4524,7 +4526,7 @@ const PN_PACKS = [
   { nome:'Crescita', sub:'Più pezzi in vendita, in meno tempo, senza doppie vendite.', prezzo:199, mensile:299, best:true,
     voci:['Tutto Essenziale','<b>Scheda dalla foto con l\'IA</b>: titolo, descrizione e testi per Google, anche in inglese per eBay, fino a 40 pezzi al mese','<b>Foto pulite</b>: sfondo uniforme e luce corretta, i difetti restano visibili','<b>Sito + eBay sincronizzati</b>: pezzo venduto da una parte, tolto ovunque','<b>Pezzi fermi</b>: ogni settimana la lista con lo sconto proposto','Prezzo consigliato su pezzi simili già venduti, su richiesta','Prodotti su Google Shopping'],
     nota:'Presi singolarmente: 316 €/mese + 310 € di attivazioni · app eBay a vostro carico (gratis fino a 50 ordini al mese)' },
-  { nome:'Premium', sub:'Vendere di più, su tutti i canali.', prezzo:399, mensile:549,
+  { nome:'Premium', sub:'Vendere di più, su tutti i canali.', prezzo:499, mensile:699,
     voci:['Tutto Crescita','<b>Kit live</b> per eBay e TikTok: scaletta, schede, venduti chiusi ovunque','<b>Assistente clienti</b>: chat sul sito che conosce ogni pezzo, risposte a DM e WhatsApp approvate da voi','<b>Lista desideri</b>: chi cerca una borsa viene avvisato quando arriva','<b>Valutatore «Vendi con noi»</b>: stima indicativa dalle foto per chi vuole vendervi un pezzo','<b>16 post al mese</b> (4 a settimana) e avvisi delle live','Campagne Meta e Google, con report','Una call di 30 minuti al mese'],
     nota:'Presi singolarmente oltre 800 €/mese · budget pubblicitario escluso, lo pagate voi a Meta e Google' }
 ];
@@ -4562,7 +4564,8 @@ const PK_IN = [
   ['live', 'Live al mese', 8, 0, 40],
   ['oreLive', 'Ore di preparazione e chiusura per live', 1.5, 0, 8],
   ['dm', 'Messaggi di clienti al giorno', 10, 0, 200],
-  ['post', 'Post a settimana', 4, 0, 21]
+  ['post', 'Post a settimana', 4, 0, 21],
+  ['euroOra', 'Quanto vale un\'ora del vostro tempo (€, esempio)', 15, 0, 200]
 ];
 function _pkOre(v){
   const h = m => m / 60;
@@ -4583,12 +4586,17 @@ const _PK_COL = { numeri:'#C9A9B6', schede:'#7A3048', canali:'#9E4A65', foto:'#B
 function _pkDraw(){
   const v = {}; PK_IN.forEach(([k,, d]) => { const e = document.getElementById('pk_' + k); v[k] = e ? Math.max(0, Number(String(e.value).replace(',', '.')) || 0) : d; });
   const r = _pkOre(v), max = r.pack.Premium.ore || 1, fmt = n => n < 10 ? n.toFixed(1).replace('.', ',') : String(Math.round(n));
-  Object.entries(r.pack).forEach(([nome, p]) => { document.querySelectorAll('[data-pk-ore="' + nome + '"]').forEach(e => { e.innerHTML = '≈ <b>' + fmt(p.ore) + ' ore</b> risparmiate al mese' + (p.ore >= 8 ? ' · ' + fmt(p.ore / 8) + ' giornate' : ''); }); });
+  const eur = n => Math.round(n).toLocaleString('it-IT') + ' €';
+  Object.entries(r.pack).forEach(([nome, p]) => { document.querySelectorAll('[data-pk-ore="' + nome + '"]').forEach(e => {
+    const pk = PN_PACKS.find(x => x.nome === nome), conta = nome !== 'Essenziale' && p.ore >= 10;
+    e.hidden = !conta; if (!conta) return;
+    e.innerHTML = 'Vi restituisce <b>≈ ' + fmt(p.ore) + ' ore al mese</b> (' + fmt(p.ore / 8) + ' giornate)' + (v.euroOra ? ', che valgono <b>≈ ' + eur(p.ore * v.euroOra) + '</b> contro ' + pk.prezzo + ' € di pacchetto' : '');
+  }); });
   const ch = document.getElementById('pkChart'); if (!ch) return;
-  ch.innerHTML = Object.entries(r.pack).map(([nome, p]) =>
+  ch.innerHTML = Object.entries(r.pack).filter(([nome]) => nome !== 'Essenziale').map(([nome, p]) =>
     '<div class="pk-bar-row"><span class="pk-bar-n">' + nome + '</span><div class="pk-bar-t">' +
       p.ks.map(k => '<i style="width:' + (r.parti[k].ore / max * 100).toFixed(2) + '%;background:' + _PK_COL[k] + '" title="' + r.parti[k].nome + ': ' + fmt(r.parti[k].ore) + ' ore"></i>').join('') +
-    '</div><strong>' + fmt(p.ore) + ' h</strong></div>').join('') +
+    '</div><strong>' + fmt(p.ore) + ' h' + (v.euroOra ? '<small>≈ ' + eur(p.ore * v.euroOra) + '</small>' : '') + '</strong></div>').join('') +
     '<div class="pk-legend">' + Object.keys(r.parti).map(k => '<span><i style="background:' + _PK_COL[k] + '"></i>' + r.parti[k].nome + ' · ' + fmt(r.parti[k].ore) + ' h</span>').join('') + '</div>';
 }
 
@@ -4606,7 +4614,7 @@ async function renderPacchetti(){
     '<a class="pk-btn" href="' + _pnMail('Scelgo il pacchetto ' + k.nome + (k.mensile ? ' (annuale in 3 rate)' : '')) + '" target="_blank" rel="noopener">Scelgo ' + k.nome + '</a></article>').join('');
   box.innerHTML =
     '<section class="pk-intro"><span>Servizi per il vostro negozio</span><h1>Meno tempo al computer, più pezzi venduti.</h1><p>Voi pensate alle borse, alle live e ai clienti. Schede, canali, numeri e contenuti li prepara l\'IA, e voi approvate.</p></section>' +
-    '<section class="pk-time"><div class="pk-time-hd"><div><small>Quanto tempo vi restituisce</small><h2>Ore risparmiate ogni mese, pacchetto per pacchetto</h2></div><p>Cambiate i numeri con quelli veri del vostro negozio: il calcolo si aggiorna.</p></div>' +
+    '<section class="pk-time"><div class="pk-time-hd"><div><small>Quanto tempo vi restituisce</small><h2>Ore restituite ogni mese da Crescita e Premium</h2></div><p>Cambiate i numeri con quelli veri del vostro negozio: il calcolo si aggiorna.</p></div>' +
       '<div class="pk-time-b"><div class="pk-inputs">' + PK_IN.map(([k, l, d, mn, mx]) => '<label><span>' + l + '</span><input id="pk_' + k + '" type="number" inputmode="decimal" min="' + mn + '" max="' + mx + '" step="' + (d % 1 ? 0.5 : 1) + '" value="' + d + '" oninput="_pkDraw()"></label>').join('') + '</div>' +
       '<div class="pk-chart" id="pkChart"></div></div>' +
       '<p class="pk-calc-n">Con l\'IA restano a voi circa 4 minuti a scheda, 1 minuto a foto, mezz\'ora a live, 30 secondi a messaggio e 5 minuti a post: il tempo per controllare e approvare. «Numeri e pezzi fermi» = circa 3 ore al mese di conti fatti a mano. Pezzi nuovi presi dal vostro catalogo degli ultimi 30 giorni.</p></section>' +
