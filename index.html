@@ -4520,13 +4520,13 @@ if (IS_PANNELLO) _pnIdentity();
 // ── PACCHETTI E PREZZI (modificare qui) ──
 const PN_OFFER = { scadenza: '31 gennaio 2027', testo: 'Crescita a 199 € invece di 299 € al mese con l\'annuale, pagabile in 3 rate, e Google Shopping attivato gratis.' };
 const PN_PACKS = [
-  { nome:'Essenziale', sub:'Tutto sotto controllo, senza pensieri.', prezzo:79, mensile:0,
+  { nome:'Essenziale', sub:'Tutto sotto controllo, senza pensieri.', prezzo:79, mensile:0, tempo:'',
     voci:['Pannello, festività e statistiche del catalogo','Report vendite ogni mese','Recensioni dei clienti sul sito (attivazione inclusa)','Assistenza sul pannello'],
     nota:'Presi singolarmente: 39 €/mese + 120 € di attivazione, assistenza esclusa' },
-  { nome:'Crescita', sub:'Più pezzi in vendita, in meno tempo, senza doppie vendite.', prezzo:199, mensile:299, best:true,
+  { nome:'Crescita', sub:'Più pezzi in vendita, in meno tempo, senza doppie vendite.', prezzo:199, mensile:299, best:true, tempo:'<b>Ore risparmiate ogni settimana</b>: schede, foto e pubblicazione su eBay le prepara l\'IA, voi approvate.',
     voci:['Tutto Essenziale','<b>Scheda dalla foto con l\'IA</b>: titolo, descrizione e testi per Google, anche in inglese per eBay, fino a 40 pezzi al mese','<b>Foto pulite</b>: sfondo uniforme e luce corretta, i difetti restano visibili','<b>Sito + eBay sincronizzati</b>: pezzo venduto da una parte, tolto ovunque','<b>Pezzi fermi</b>: ogni settimana la lista con lo sconto proposto','Prezzo consigliato su pezzi simili già venduti, su richiesta','Prodotti su Google Shopping'],
     nota:'Presi singolarmente: 316 €/mese + 310 € di attivazioni · app eBay a vostro carico (gratis fino a 50 ordini al mese)' },
-  { nome:'Premium', sub:'Vendere di più, su tutti i canali.', prezzo:499, mensile:699,
+  { nome:'Premium', sub:'Vendere di più, su tutti i canali.', prezzo:499, mensile:699, tempo:'<b>Il risparmio di tempo più grande</b>: oltre a schede ed eBay, anche live, messaggi dei clienti e post.',
     voci:['Tutto Crescita','<b>Kit live</b> per eBay e TikTok: scaletta, schede, venduti chiusi ovunque','<b>Assistente clienti</b>: chat sul sito che conosce ogni pezzo, risposte a DM e WhatsApp approvate da voi','<b>Lista desideri</b>: chi cerca una borsa viene avvisato quando arriva','<b>Valutatore «Vendi con noi»</b>: stima indicativa dalle foto per chi vuole vendervi un pezzo','<b>16 post al mese</b> (4 a settimana) e avvisi delle live','Campagne Meta e Google, con report','Una call di 30 minuti al mese'],
     nota:'Presi singolarmente oltre 800 €/mese · budget pubblicitario escluso, lo pagate voi a Meta e Google' }
 ];
@@ -4555,51 +4555,6 @@ function _pnGrowHtml(){
     '</div><a class="pn-cta" href="#/pacchetti" onclick="nav(\'pacchetti\', event)">Scopri i pacchetti: Crescita a 199 € invece di 299 € con l\'annuale</a>';
 }
 
-// ── ORE RISPARMIATE: modello trasparente, valori modificabili nella pagina Pacchetti ──
-const PK_IN = [
-  ['pezzi',  'Pezzi nuovi al mese', 40, 1, 200],
-  ['minScheda', 'Minuti per una scheda fatta a mano', 20, 1, 90],
-  ['minEbay', 'Minuti per ripubblicarla su eBay', 10, 0, 60],
-  ['minFoto', 'Minuti di ritocco foto a pezzo', 5, 0, 60],
-  ['live', 'Live al mese', 8, 0, 40],
-  ['oreLive', 'Ore di preparazione e chiusura per live', 1.5, 0, 8],
-  ['dm', 'Messaggi di clienti al giorno', 10, 0, 200],
-  ['post', 'Post a settimana', 4, 0, 21],
-  ['euroOra', 'Quanto vale un\'ora del vostro tempo (€, esempio)', 15, 0, 200]
-];
-function _pkOre(v){
-  const h = m => m / 60;
-  const parti = {
-    numeri:   { nome:'Numeri e pezzi fermi', ore: 3 },
-    schede:   { nome:'Schede dalla foto', ore: v.pezzi * h(Math.max(0, v.minScheda - 4)) },
-    canali:   { nome:'eBay sincronizzato', ore: v.pezzi * h(v.minEbay) },
-    foto:     { nome:'Foto pulite', ore: v.pezzi * h(Math.max(0, v.minFoto - 1)) },
-    live:     { nome:'Kit live', ore: v.live * Math.max(0, v.oreLive - 0.5) },
-    clienti:  { nome:'Assistente clienti', ore: v.dm * 30 * h(1.5) },
-    social:   { nome:'Post', ore: v.post * 4.33 * h(25) }
-  };
-  const somma = ks => ks.reduce((t, k) => t + parti[k].ore, 0);
-  const ess = ['numeri'], cre = ess.concat(['schede','canali','foto']), pre = cre.concat(['live','clienti','social']);
-  return { parti, pack: { Essenziale: { ks: ess, ore: somma(ess) }, Crescita: { ks: cre, ore: somma(cre) }, Premium: { ks: pre, ore: somma(pre) } } };
-}
-const _PK_COL = { numeri:'#C9A9B6', schede:'#7A3048', canali:'#9E4A65', foto:'#B97A90', live:'#D9B44A', clienti:'#C79A2E', social:'#E6CF8A' };
-function _pkDraw(){
-  const v = {}; PK_IN.forEach(([k,, d]) => { const e = document.getElementById('pk_' + k); v[k] = e ? Math.max(0, Number(String(e.value).replace(',', '.')) || 0) : d; });
-  const r = _pkOre(v), max = r.pack.Premium.ore || 1, fmt = n => n < 10 ? n.toFixed(1).replace('.', ',') : String(Math.round(n));
-  const eur = n => Math.round(n).toLocaleString('it-IT') + ' €';
-  Object.entries(r.pack).forEach(([nome, p]) => { document.querySelectorAll('[data-pk-ore="' + nome + '"]').forEach(e => {
-    const pk = PN_PACKS.find(x => x.nome === nome), conta = nome !== 'Essenziale' && p.ore >= 10;
-    e.hidden = !conta; if (!conta) return;
-    e.innerHTML = 'Vi restituisce <b>≈ ' + fmt(p.ore) + ' ore al mese</b> (' + fmt(p.ore / 8) + ' giornate)' + (v.euroOra ? ', che valgono <b>≈ ' + eur(p.ore * v.euroOra) + '</b> contro ' + pk.prezzo + ' € di pacchetto' : '');
-  }); });
-  const ch = document.getElementById('pkChart'); if (!ch) return;
-  ch.innerHTML = Object.entries(r.pack).filter(([nome]) => nome !== 'Essenziale').map(([nome, p]) =>
-    '<div class="pk-bar-row"><span class="pk-bar-n">' + nome + '</span><div class="pk-bar-t">' +
-      p.ks.map(k => '<i style="width:' + (r.parti[k].ore / max * 100).toFixed(2) + '%;background:' + _PK_COL[k] + '" title="' + r.parti[k].nome + ': ' + fmt(r.parti[k].ore) + ' ore"></i>').join('') +
-    '</div><strong>' + fmt(p.ore) + ' h' + (v.euroOra ? '<small>≈ ' + eur(p.ore * v.euroOra) + '</small>' : '') + '</strong></div>').join('') +
-    '<div class="pk-legend">' + Object.keys(r.parti).map(k => '<span><i style="background:' + _PK_COL[k] + '"></i>' + r.parti[k].nome + ' · ' + fmt(r.parti[k].ore) + ' h</span>').join('') + '</div>';
-}
-
 async function renderPacchetti(){
   const box = document.getElementById('vdBody'); if (!box) return;
   const cards = PN_PACKS.map(k => '<article class="pk-card' + (k.best ? ' pk-best' : '') + '">' + (k.best ? '<span class="pk-flag">Consigliato</span>' : '') +
@@ -4608,16 +4563,12 @@ async function renderPacchetti(){
     (k.mensile
       ? '<span class="pk-deal">Con l\'annuale riservato a voi: ' + _pnEurN(k.prezzo * 12).replace('€ ', '') + ' € in 3 rate da ' + _pnEurN(k.prezzo * 4).replace('€ ', '') + ' € · risparmiate ' + _pnEurN((k.mensile - k.prezzo) * 12).replace('€ ', '') + ' € l\'anno</span><span class="pk-alt">Oppure mensile senza vincolo: ' + k.mensile + ' €/mese</span>'
       : '<span class="pk-deal">Mensile, senza vincolo</span>') +
-    '<span class="pk-ore" data-pk-ore="' + k.nome + '">≈ … ore risparmiate al mese</span>' +
+    (k.tempo ? '<span class="pk-ore">' + k.tempo + '</span>' : '') +
     '<ul>' + k.voci.map(v => '<li>' + v + '</li>').join('') + '</ul>' +
     '<span class="pk-note">' + k.nota + '</span>' +
     '<a class="pk-btn" href="' + _pnMail('Scelgo il pacchetto ' + k.nome + (k.mensile ? ' (annuale in 3 rate)' : '')) + '" target="_blank" rel="noopener">Scelgo ' + k.nome + '</a></article>').join('');
   box.innerHTML =
     '<section class="pk-intro"><span>Servizi per il vostro negozio</span><h1>Meno tempo al computer, più pezzi venduti.</h1><p>Voi pensate alle borse, alle live e ai clienti. Schede, canali, numeri e contenuti li prepara l\'IA, e voi approvate.</p></section>' +
-    '<section class="pk-time"><div class="pk-time-hd"><div><small>Quanto tempo vi restituisce</small><h2>Ore restituite ogni mese da Crescita e Premium</h2></div><p>Cambiate i numeri con quelli veri del vostro negozio: il calcolo si aggiorna.</p></div>' +
-      '<div class="pk-time-b"><div class="pk-inputs">' + PK_IN.map(([k, l, d, mn, mx]) => '<label><span>' + l + '</span><input id="pk_' + k + '" type="number" inputmode="decimal" min="' + mn + '" max="' + mx + '" step="' + (d % 1 ? 0.5 : 1) + '" value="' + d + '" oninput="_pkDraw()"></label>').join('') + '</div>' +
-      '<div class="pk-chart" id="pkChart"></div></div>' +
-      '<p class="pk-calc-n">Con l\'IA restano a voi circa 4 minuti a scheda, 1 minuto a foto, mezz\'ora a live, 30 secondi a messaggio e 5 minuti a post: il tempo per controllare e approvare. «Numeri e pezzi fermi» = circa 3 ore al mese di conti fatti a mano. Pezzi nuovi presi dal vostro catalogo degli ultimi 30 giorni.</p></section>' +
     '<section class="pk-offer"><div><small>Offerta di lancio · per chi ha il Kit Festività</small><strong>Attivando entro il ' + PN_OFFER.scadenza + ': ' + PN_OFFER.testo + '</strong><p>Annuale: 12 mesi, in 3 rate ogni 4 mesi. Mensile: nessun vincolo, si disdice con 30 giorni di preavviso.</p></div>' +
     '<a href="' + _pnMail('Blocco l\'offerta di lancio') + '" target="_blank" rel="noopener">Blocca l\'offerta</a></section>' +
     '<section class="pk-grid">' + cards + '</section>' +
@@ -4630,13 +4581,6 @@ async function renderPacchetti(){
     '<section class="pk-end"><div><strong>Non sapete quale scegliere?</strong><span>Una chiamata di 15 minuti, gratuita, e vi dico quale conviene al vostro negozio.</span></div>' +
     '<a class="pn-cta" style="margin:0" href="' + _pnMail('Prenoto la chiamata di 15 minuti') + '" target="_blank" rel="noopener">Prenota la chiamata</a></section>' +
     '<p class="pk-foot">Prezzi finali. Annuale: 12 mesi pagati in 3 rate ogni 4 mesi, la prima all\'attivazione. Servizi attivabili da gennaio 2027. Le stime di tempo sono indicative.</p>';
-  _pkDraw();
-  // Pezzi nuovi: dal loro catalogo reale
-  try {
-    const cat = await _pnCatalogo(); if (currentPage !== 'pacchetti') return;
-    const nuovi = cat.filter(x => !x.esaurito).filter(x => { const g = _pnGiorni(x.p); return g !== null && g <= 30; }).length;
-    const e = document.getElementById('pk_pezzi'); if (e && nuovi > 0) { e.value = nuovi; _pkDraw(); }
-  } catch (_) {}
 }
 
 async function renderVetrineDashboard(){
