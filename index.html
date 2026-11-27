@@ -4162,25 +4162,25 @@ async function _vSaveForm(mode, v){
 
 // ── PANNELLO DI CONTROLLO: menu, panoramica, catalogo, moduli da sbloccare ──
 const PN_MODULI = [
-  { id:'schedaia', nome:'Copywriter delle schede', prezzo:'149 €/mese', pack:'Crescita', ic:'M4 7h3l2-3h6l2 3h3v12H4zM12 16a3 3 0 100-6 3 3 0 000 6z',
+  { id:'schedaia', nome:'Copywriter IA', prezzo:'149 €/mese', pack:'Crescita', ic:'M4 7h3l2-3h6l2 3h3v12H4zM12 16a3 3 0 100-6 3 3 0 000 6z',
     desc:'Fotografate il pezzo: l\'IA prepara titolo, descrizione, brand, condizioni e testi per Google. Voi controllate e pubblicate.',
     voci:['Fino a 40 pezzi al mese','Stesso tono del vostro sito, testi pensati per Google','Bozza su Shopify pronta da approvare'] },
-  { id:'ebay', nome:'Responsabile canali', prezzo:'89 €/mese', pack:'Crescita', ic:'M7 7h10v10H7zM3 12h4M17 12h4M12 3v4M12 17v4',
+  { id:'ebay', nome:'E-commerce Manager IA', prezzo:'89 €/mese', pack:'Crescita', ic:'M7 7h10v10H7zM3 12h4M17 12h4M12 3v4M12 17v4',
     desc:'Pubblicate una volta sola. Quando un pezzo unico si vende su eBay o sul sito, sparisce da tutti i canali: niente doppie vendite.',
     voci:['Pezzi del sito pubblicati su eBay','Venduto da una parte = tolto ovunque','Ordini eBay visibili su Shopify'] },
-  { id:'lista', nome:'Personal shopper', prezzo:'29 €/mese', pack:'Crescita', ic:'M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 00-7.8 7.8l1 1.1L12 21l7.8-7.8 1-1.1a5.5 5.5 0 000-7.5z',
+  { id:'lista', nome:'Personal Shopper IA', prezzo:'29 €/mese', pack:'Crescita', ic:'M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 00-7.8 7.8l1 1.1L12 21l7.8-7.8 1-1.1a5.5 5.5 0 000-7.5z',
     desc:'Ogni cliente ha il suo account sul sito: salva i pezzi che gli piacciono e i modelli che cerca. Quando caricate un pezzo che corrisponde, viene avvisato in automatico.',
     voci:['Account cliente con pezzi salvati e modelli cercati','Avviso automatico quando arriva il pezzo giusto','Solo con il consenso del cliente (GDPR)'] },
-  { id:'report', nome:'Analista vendite', prezzo:'39 €/mese', pack:'Essenziale', ic:'M4 20V10M10 20V4M16 20v-7M22 20H2',
+  { id:'report', nome:'Data Analyst IA', prezzo:'39 €/mese', pack:'Essenziale', ic:'M4 20V10M10 20V4M16 20v-7M22 20H2',
     desc:'Ogni mese un riepilogo chiaro: quanto avete venduto, i pezzi più visti, cosa si vende in fretta e cosa resta fermo.',
     voci:['Vendite e incassi del mese, confrontati con il mese prima','Pezzi più visti e pezzi fermi da troppo tempo','Consigli su cosa mettere in offerta'] },
-  { id:'marketing', nome:'Social media manager', prezzo:'99 €/mese', pack:'Essenziale', ic:'M4 4h16v12H5.2L4 17.2V4z',
+  { id:'marketing', nome:'Social Media Manager IA', prezzo:'99 €/mese', pack:'Essenziale', ic:'M4 4h16v12H5.2L4 17.2V4z',
     desc:'Per ogni nuovo arrivo prepara post e didascalie per Instagram e TikTok, pronti da pubblicare.',
     voci:['12 post al mese con testi e hashtag','Calendario dei contenuti','Avvisi delle live'] },
-  { id:'dm', nome:'Addetto clienti', prezzo:'89 €/mese', pack:'Premium', ic:'M4 5h16v11H8l-4 4z',
+  { id:'dm', nome:'Customer Care IA', prezzo:'89 €/mese', pack:'Premium', ic:'M4 5h16v11H8l-4 4z',
     desc:'Una chat sul sito che risponde subito su misure, condizioni e disponibilità di ogni pezzo; per DM e WhatsApp prepara le risposte, voi le approvate.',
     voci:['Chat sul sito che conosce tutto il catalogo, dichiarata come assistente IA','Bozze di risposta per Instagram e WhatsApp, inviate solo dopo il vostro ok','Autenticità, trattative e reclami passano sempre a voi'] },
-  { id:'valutatore', nome:'Valutatore acquisti', prezzo:'49 €/mese', pack:'Premium', ic:'M12 3l8 4v6c0 4-3.5 7-8 8-4.5-1-8-4-8-8V7z',
+  { id:'valutatore', nome:'Buyer IA', prezzo:'49 €/mese', pack:'Premium', ic:'M12 3l8 4v6c0 4-3.5 7-8 8-4.5-1-8-4-8-8V7z',
     desc:'Chi vuole vendervi una borsa carica le foto: l\'IA riconosce il modello e propone una stima indicativa. A voi arriva una richiesta già ordinata.',
     voci:['Stima indicativa, mai vincolante: il prezzo lo decidete voi dopo averla vista','Controllo che ci siano le foto giuste (etichette, codici, difetti)','Richieste ordinate per valore nel pannello'] },
   { id:'campagne', nome:'Campagne Meta e Google', prezzo:'149 €/mese + budget', pack:'', ic:'M3 11v2l13 5V6L3 11zM16 9a3 3 0 010 6',
@@ -4530,24 +4530,24 @@ if (IS_PANNELLO) _pnIdentity();
 const PN_OFFER = { scadenza: '31 gennaio 2027', testo: 'Crescita a 199 € invece di 299 € al mese con l\'annuale, pagabile in 3 rate, e Google Shopping attivato gratis.' };
 const PN_PACKS = [
   { nome:'Essenziale', sub:'I primi due esperti: social sempre attivi e numeri chiari.', prezzo:79, mensile:0, tempo:'',
-    team:[['SM','Social media manager','8 post al mese per Instagram e Facebook, preparati dai vostri pezzi e nel vostro stile'],
-          ['AV','Analista vendite','ogni mese il resoconto: incassi, pezzi più venduti, cosa resta fermo']],
+    team:[['SM','Social Media Manager','8 post al mese per Instagram e Facebook, preparati dai vostri pezzi e nel vostro stile'],
+          ['DA','Data Analyst','ogni mese il resoconto: incassi, pezzi più venduti, cosa resta fermo']],
     base:['Pannello, festività e statistiche: già vostri, inclusi','Recensioni dei clienti sul sito (attivazione inclusa)','Assistenza sul pannello'],
     nota:'Presi singolarmente: oltre 130 €/mese + 120 € di attivazione, assistenza esclusa' },
-  { nome:'Crescita', sub:'Il team che lavora il catalogo: più pezzi online, in meno tempo, senza doppie vendite.', prezzo:199, mensile:299, best:true, tempo:'<b>Ore risparmiate ogni settimana</b>: schede, foto e pubblicazione su eBay le preparano loro, voi approvate.',
-    team:[['CS','Copywriter delle schede','dalla foto scrive titolo e descrizione in italiano e inglese, con i testi per Google. Fino a 40 pezzi al mese'],
-          ['FT','Fotoritoccatore','sfondo pulito e luce corretta su ogni foto, difetti sempre visibili'],
-          ['RC','Responsabile canali','sito, eBay e Google Shopping allineati: venduto da una parte, tolto ovunque'],
-          ['RM','Responsabile magazzino','ogni settimana i pezzi fermi con lo sconto proposto e quelli ancora da caricare, in ordine di valore; prezzo consigliato su richiesta'],
-          ['PS','Personal shopper','un account per ogni cliente con la sua lista desideri: lo avvisa quando arriva il pezzo che cerca']],
+  { nome:'Crescita', sub:'Il team che lavora il catalogo: più pezzi online, in meno tempo, senza doppie vendite.', prezzo:199, mensile:299, best:true, tempo:'<b>Ore risparmiate ogni settimana</b>: schede, foto e pubblicazione su eBay le prepara il team, voi approvate.',
+    team:[['CW','Copywriter','dalla foto scrive titolo e descrizione in italiano e inglese, con i testi per Google. Fino a 40 pezzi al mese'],
+          ['PE','Photo Editor','sfondo pulito e luce corretta su ogni foto, difetti sempre visibili'],
+          ['EM','E-commerce Manager','sito, eBay e Google Shopping allineati: venduto da una parte, tolto ovunque'],
+          ['IM','Inventory Manager','ogni settimana i pezzi fermi con lo sconto proposto e quelli ancora da caricare, in ordine di valore; prezzo consigliato su richiesta'],
+          ['PS','Personal Shopper','un account per ogni cliente con la sua lista desideri: lo avvisa quando arriva il pezzo che cerca']],
     base:['Tutto il team di Essenziale'],
     nota:'Presi singolarmente: 345 €/mese + 310 € di attivazioni · app eBay a vostro carico (gratis fino a 50 ordini al mese)' },
   { nome:'Premium', sub:'Il team completo: anche clienti, post-vendita e acquisti.', prezzo:399, mensile:549, tempo:'<b>Il risparmio di tempo più grande</b>: oltre al catalogo, anche messaggi dei clienti, spedizioni, resi e newsletter.',
-    team:[['AC','Addetto clienti','chat sul sito 7 giorni su 7 che conosce ogni pezzo; bozze di risposta a DM e WhatsApp'],
-          ['PV','Responsabile post-vendita','tracking ai clienti, resi in ordine e un fascicolo foto e seriale per ogni pezzo spedito, contro le sostituzioni'],
-          ['CF','Responsabile clienti fedeli','newsletter, anteprime e messaggi a chi ha già comprato, solo con il suo consenso'],
-          ['VA','Valutatore acquisti','stima indicativa dalle foto per chi vuole vendervi un pezzo, richieste già ordinate']],
-    base:['Tutto il team di Crescita','Il social media manager raddoppia: 16 post al mese','Una call di 30 minuti al mese'],
+    team:[['CC','Customer Care','chat sul sito 7 giorni su 7 che conosce ogni pezzo; bozze di risposta a DM e WhatsApp'],
+          ['AS','After-Sales Specialist','tracking ai clienti, resi in ordine e un fascicolo foto e seriale per ogni pezzo spedito, contro le sostituzioni'],
+          ['CR','CRM Manager','newsletter, anteprime e messaggi a chi ha già comprato, solo con il suo consenso'],
+          ['BY','Buyer','stima indicativa dalle foto per chi vuole vendervi un pezzo, richieste già ordinate']],
+    base:['Tutto il team di Crescita','Il Social Media Manager raddoppia: 16 post al mese','Una call di 30 minuti al mese'],
     nota:'Presi singolarmente oltre 650 €/mese · campagne pubblicitarie a parte, se le volete' }
 ];
 const PN_EXTRA = [
@@ -4557,11 +4557,11 @@ const PN_EXTRA = [
   ['Certificato FLQ in PDF', '19 €/mese', 'Un certificato con il vostro marchio per ogni pezzo venduto, con qualsiasi fornitore di autenticazione.']
 ];
 const PN_SINGOLI = [
-  ['Copywriter delle schede IA, fino a 40 pezzi','149 €/mese','2 settimane'], ['Sito + eBay sincronizzati','89 €/mese + app eBay','2–3 settimane'],
-  ['Foto pulite (sfondo e luce)','39 €/mese','1 settimana'], ['Report vendite mensile','39 €/mese','1 settimana'],
-  ['Social media manager IA, 12 post','99 €/mese','1 settimana'], ['Addetto clienti IA (chat sul sito, DM, WhatsApp)','89 €/mese','3–4 settimane'],
-  ['Personal shopper IA (lista desideri e account cliente)','29 €/mese','2 settimane'], ['Valutatore «Vendi con noi»','49 €/mese','3–4 settimane'],
-  ['Responsabile clienti fedeli IA (newsletter e anteprime)','69 €/mese','2 settimane'], ['Responsabile post-vendita IA (tracking, resi)','59 €/mese','3 settimane'], ['Campagne Meta e Google','149 €/mese + budget','2 settimane'],
+  ['Copywriter IA, schede fino a 40 pezzi','149 €/mese','2 settimane'], ['E-commerce Manager IA (sito + eBay)','89 €/mese + app eBay','2–3 settimane'],
+  ['Photo Editor IA (sfondo e luce)','39 €/mese','1 settimana'], ['Data Analyst IA (report mensile)','39 €/mese','1 settimana'],
+  ['Social Media Manager IA, 12 post','99 €/mese','1 settimana'], ['Customer Care IA (chat sul sito, DM, WhatsApp)','89 €/mese','3–4 settimane'],
+  ['Personal Shopper IA (lista desideri e account cliente)','29 €/mese','2 settimane'], ['Buyer IA (valutatore «Vendi con noi»)','49 €/mese','3–4 settimane'],
+  ['CRM Manager IA (newsletter e anteprime)','69 €/mese','2 settimane'], ['After-Sales Specialist IA (tracking, resi)','59 €/mese','3 settimane'], ['Campagne Meta e Google','149 €/mese + budget','2 settimane'],
   ['Prodotti su Google Shopping','190 € una tantum','2–3 settimane'], ['Recensioni sul sito','120 € una tantum','1 settimana']
 ];
 const _pnEur = n => (Math.round(n*100)/100).toFixed(n % 1 ? 2 : 0).replace('.', ',') + ' €';
