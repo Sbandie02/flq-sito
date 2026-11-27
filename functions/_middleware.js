@@ -102,8 +102,8 @@ body{min-height:100vh;display:flex;align-items:center;justify-content:center;pad
 background:radial-gradient(1200px 600px at 15% 0%,#3A1828 0%,transparent 60%),radial-gradient(900px 500px at 100% 100%,#2A1420 0%,transparent 55%),#120B0F}
 .card{width:100%;max-width:420px;background:linear-gradient(180deg,rgba(36,21,28,.92),rgba(24,14,19,.96));border:1px solid rgba(217,180,74,.22);border-radius:18px;padding:44px 36px 34px;box-shadow:0 30px 80px rgba(0,0,0,.45)}
 .k{font:500 10px/1 'Jost';letter-spacing:.32em;text-transform:uppercase;color:#D9B44A;text-align:center}
-h1{font:italic 300 42px/1.05 'Cormorant Garamond',serif;text-align:center;margin:14px 0 6px;color:#fff}
-h1 em{color:#D7A3B6;font-style:italic}
+h1.logo{margin:0 0 18px;text-align:center;line-height:0}
+h1.logo img{height:auto;width:min(240px,70%);filter:brightness(0) invert(1);opacity:.96}
 .rule{width:64px;height:1px;background:linear-gradient(90deg,transparent,#D9B44A,transparent);margin:18px auto 28px}
 label{display:block;font:400 11px/1 'Jost';letter-spacing:.18em;text-transform:uppercase;color:#BFA9B3;margin:0 0 8px}
 .f{margin-bottom:18px;position:relative}
@@ -117,8 +117,8 @@ button.go:hover{transform:translateY(-1px)} button.go:disabled{opacity:.6;cursor
 .foot a{color:#BFA9B3}
 </style></head><body>
 <main class="card">
+  <h1 class="logo"><img src="/logo-flq.png" alt="First Luxury Queen" width="542" height="178"></h1>
   <div class="k">Pannello di controllo</div>
-  <h1>First Luxury <em>Queen</em></h1>
   <div class="rule"></div>
   ${attivo ? `<form id="f" autocomplete="on">
     <div class="f"><label for="u">Utente</label><input id="u" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" required></div>
